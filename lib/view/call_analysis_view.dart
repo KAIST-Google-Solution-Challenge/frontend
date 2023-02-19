@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/view/chat_analysis_view.dart';
+import 'package:the_voice/view/report_dialog_view.dart';
 
 class CallAnalysisView extends StatelessWidget {
   static String route = 'call_analysis_view';
@@ -53,7 +54,10 @@ class CallAnalysisView extends StatelessWidget {
               ),
               SizedBox(width: 16),
               FilledButton.icon(
-                onPressed: () {},
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => ReportDialogView(),
+                ),
                 icon: Icon(Icons.report),
                 label: Text('Report'),
               ),

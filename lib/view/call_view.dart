@@ -12,7 +12,7 @@ class CallView extends StatelessWidget {
       appBar: CustomAppBar(
         isBack: false,
         isSurface: true,
-        data: 'Calls',
+        data: 'Call',
       ),
       body: ListView(
         children: <Widget>[

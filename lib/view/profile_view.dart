@@ -47,7 +47,7 @@ class ProfileView extends StatelessWidget {
                     side: BorderSide(
                       color: Theme.of(context).colorScheme.outline,
                     ),
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                   child: Consumer<SettingModel>(
                     builder: (context, value, child) => Column(

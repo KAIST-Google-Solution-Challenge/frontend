@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
+import 'package:the_voice/view/report_dialog_view.dart';
 
 class MessageAnalysisView extends StatelessWidget {
   static String route = 'message_analysis_view';
@@ -41,7 +42,10 @@ class MessageAnalysisView extends StatelessWidget {
             DoughnutChart(radius: 128, probability: 16),
             SizedBox(height: 64),
             FilledButton.icon(
-              onPressed: () {},
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => ReportDialogView(),
+              ),
               icon: Icon(Icons.report),
               label: Text('Report'),
             ),

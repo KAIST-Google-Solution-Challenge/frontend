@@ -12,7 +12,7 @@ class MessageView extends StatelessWidget {
       appBar: CustomAppBar(
         isBack: false,
         isSurface: true,
-        data: 'Messages',
+        data: 'Message',
       ),
       body: ListView(
         children: <Widget>[

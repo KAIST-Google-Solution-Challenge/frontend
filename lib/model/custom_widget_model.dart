@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/view/call_chat_view.dart';
+import 'package:the_voice/view/convert_dialog_view.dart';
 import 'package:the_voice/view/call_view.dart';
 import 'package:the_voice/view/message_chat_view.dart';
 import 'package:the_voice/view/home_view.dart';
@@ -171,15 +172,25 @@ class CustomListTile extends StatelessWidget {
   final bool isDate;
   final bool isName;
 
-  CustomListTile(
-      {super.key,
-      required this.isCall,
-      required this.isDate,
-      required this.isName});
+  CustomListTile({
+    super.key,
+    required this.isCall,
+    required this.isDate,
+    required this.isName,
+  });
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+
+    void onTap() {
+      isCall
+          ? showDialog(
+              context: context,
+              builder: (context) => ConvertDialogView(isName: isName),
+            )
+          : Navigator.pushNamed(context, MessageChatView.route);
+    }
 
     if (isDate && isName) {
       return Column(
@@ -194,9 +205,7 @@ class CustomListTile extends StatelessWidget {
             title: Text('Name'),
             subtitle: Text('010-0000-0000'),
             trailing: Text('Time'),
-            onTap: () => isCall
-                ? Navigator.pushNamed(context, CallChatView.route)
-                : Navigator.pushNamed(context, MessageChatView.route),
+            onTap: () => onTap(),
           ),
         ],
       );
@@ -212,9 +221,7 @@ class CustomListTile extends StatelessWidget {
             leading: Icon(Icons.image),
             title: Text('010-0000-0000'),
             trailing: Text('Time'),
-            onTap: () => isCall
-                ? Navigator.pushNamed(context, CallChatView.route)
-                : Navigator.pushNamed(context, MessageChatView.route),
+            onTap: () => onTap(),
           ),
         ],
       );
@@ -224,18 +231,14 @@ class CustomListTile extends StatelessWidget {
         title: Text('Name'),
         subtitle: Text('010-0000-0000'),
         trailing: Text('Time'),
-        onTap: () => isCall
-            ? Navigator.pushNamed(context, CallChatView.route)
-            : Navigator.pushNamed(context, MessageChatView.route),
+        onTap: () => onTap(),
       );
     } else {
       return ListTile(
         leading: Icon(Icons.image),
         title: Text('010-0000-0000'),
         trailing: Text('Time'),
-        onTap: () => isCall
-            ? Navigator.pushNamed(context, CallChatView.route)
-            : Navigator.pushNamed(context, MessageChatView.route),
+        onTap: () => onTap(),
       );
     }
   }

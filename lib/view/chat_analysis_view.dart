@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/view/report_dialog_view.dart';
 
 // Todo: Add Filter Chip
 class ChatAnalysisView extends StatelessWidget {
@@ -22,7 +23,10 @@ class ChatAnalysisView extends StatelessWidget {
             ? Color(0xFFF4F4F4)
             : Color(0xFF030303),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {},
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) => ReportDialogView(),
+          ),
           icon: Icon(Icons.report),
           label: Text('Report'),
         ),
