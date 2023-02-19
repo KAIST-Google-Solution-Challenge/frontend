@@ -2,27 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:the_voice/view/call_view.dart';
 import 'package:the_voice/view/home_view.dart';
 import 'package:the_voice/view/message_view.dart';
+import 'package:the_voice/view/profile_view.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  late bool isMain; // isMain = isCall || isHome || isMessage
   late int selectedIndex;
 
   CustomAppBar({
     super.key,
+    required this.isMain,
     required this.selectedIndex,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      leading: Icon([Icons.call, Icons.home, Icons.message][selectedIndex]),
-      title: Text(['Call', 'The Voice', 'Message'][selectedIndex]),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.account_circle),
-        )
-      ],
-    );
+    if (isMain) {
+      return AppBar(
+        title: Row(
+          children: [
+            SizedBox(width: 8),
+            Text(['Call', 'The Voice', 'Message'][selectedIndex]),
+          ],
+        ),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, ProfileView.route),
+            icon: Icon(Icons.account_circle),
+          )
+        ],
+      );
+    } else {
+      return AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back),
+        ),
+        title: Text('Profile'),
+      );
+    }
   }
 
   @override
@@ -128,16 +145,16 @@ class CustomSearch extends StatelessWidget {
 }
 
 class CustomListTile extends StatelessWidget {
-  // Todo: handle four cases with cartesian product of 'isDate', and 'isName'.
   late bool isDate;
   late bool isName;
-  CustomListTile({super.key, required this.isDate});
+
+  CustomListTile({super.key, required this.isDate, required this.isName});
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
 
-    if (isDate) {
+    if (isDate && isName) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -153,11 +170,32 @@ class CustomListTile extends StatelessWidget {
           ),
         ],
       );
-    } else {
+    } else if (isDate) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('Date', style: textTheme.labelMedium),
+          ),
+          ListTile(
+            leading: Icon(Icons.image),
+            title: Text('010-0000-0000'),
+            trailing: Text('Time'),
+          ),
+        ],
+      );
+    } else if (isName) {
       return ListTile(
         leading: Icon(Icons.image),
         title: Text('Name'),
         subtitle: Text('010-0000-0000'),
+        trailing: Text('Time'),
+      );
+    } else {
+      return ListTile(
+        leading: Icon(Icons.image),
+        title: Text('010-0000-0000'),
         trailing: Text('Time'),
       );
     }

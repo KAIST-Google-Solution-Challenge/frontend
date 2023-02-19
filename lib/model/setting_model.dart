@@ -6,8 +6,14 @@ enum Language {
 }
 
 class SettingModel extends ChangeNotifier {
+  bool autoAnalysis = false;
   Brightness brightness = Brightness.light;
   Language language = Language.english;
+
+  changeAutoAnalysis() {
+    autoAnalysis = !autoAnalysis;
+    notifyListeners();
+  }
 
   changeBrightness() {
     brightness == Brightness.light
