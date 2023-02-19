@@ -33,7 +33,11 @@ class DoughnutChart extends StatelessWidget {
           width: radius,
           height: radius,
           decoration: BoxDecoration(
-            color: colorScheme.surface,
+            color: ElevationOverlay.applySurfaceTint(
+              colorScheme.background,
+              colorScheme.surfaceTint,
+              1,
+            ),
             borderRadius: BorderRadius.circular(radius / 2),
             // boxShadow: [
             //   BoxShadow(

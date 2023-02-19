@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/model/chart_model.dart';
+import 'package:the_voice/view/call_chat_view.dart';
 import 'package:the_voice/view/call_view.dart';
-import 'package:the_voice/view/chat_analysis_view.dart';
-import 'package:the_voice/view/chat_view.dart';
+import 'package:the_voice/view/message_chat_view.dart';
 import 'package:the_voice/view/home_view.dart';
 import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isBack;
+  final bool isSurface;
   final String data;
 
-  CustomAppBar({super.key, required this.isBack, required this.data});
+  CustomAppBar({
+    super.key,
+    required this.isBack,
+    required this.isSurface,
+    required this.data,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +25,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     if (isBack) {
       return AppBar(
+        backgroundColor: isSurface
+            ? colorScheme.surface
+            : ElevationOverlay.applySurfaceTint(
+                colorScheme.background,
+                colorScheme.surfaceTint,
+                1,
+              ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: Icon(Icons.arrow_back),
@@ -27,6 +40,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       );
     } else {
       return AppBar(
+        backgroundColor: isSurface
+            ? colorScheme.surface
+            : ElevationOverlay.applySurfaceTint(
+                colorScheme.background,
+                colorScheme.surfaceTint,
+                1,
+              ),
         title: Row(
           children: [
             SizedBox(width: 8),
@@ -147,10 +167,15 @@ class CustomSearch extends StatelessWidget {
 }
 
 class CustomListTile extends StatelessWidget {
+  final bool isCall;
   final bool isDate;
   final bool isName;
 
-  CustomListTile({super.key, required this.isDate, required this.isName});
+  CustomListTile(
+      {super.key,
+      required this.isCall,
+      required this.isDate,
+      required this.isName});
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +194,9 @@ class CustomListTile extends StatelessWidget {
             title: Text('Name'),
             subtitle: Text('010-0000-0000'),
             trailing: Text('Time'),
-            onTap: () => Navigator.pushNamed(context, ChatView.route),
+            onTap: () => isCall
+                ? Navigator.pushNamed(context, CallChatView.route)
+                : Navigator.pushNamed(context, MessageChatView.route),
           ),
         ],
       );
@@ -185,7 +212,9 @@ class CustomListTile extends StatelessWidget {
             leading: Icon(Icons.image),
             title: Text('010-0000-0000'),
             trailing: Text('Time'),
-            onTap: () => Navigator.pushNamed(context, ChatView.route),
+            onTap: () => isCall
+                ? Navigator.pushNamed(context, CallChatView.route)
+                : Navigator.pushNamed(context, MessageChatView.route),
           ),
         ],
       );
@@ -195,14 +224,18 @@ class CustomListTile extends StatelessWidget {
         title: Text('Name'),
         subtitle: Text('010-0000-0000'),
         trailing: Text('Time'),
-        onTap: () => Navigator.pushNamed(context, ChatView.route),
+        onTap: () => isCall
+            ? Navigator.pushNamed(context, CallChatView.route)
+            : Navigator.pushNamed(context, MessageChatView.route),
       );
     } else {
       return ListTile(
         leading: Icon(Icons.image),
         title: Text('010-0000-0000'),
         trailing: Text('Time'),
-        onTap: () => Navigator.pushNamed(context, ChatView.route),
+        onTap: () => isCall
+            ? Navigator.pushNamed(context, CallChatView.route)
+            : Navigator.pushNamed(context, MessageChatView.route),
       );
     }
   }

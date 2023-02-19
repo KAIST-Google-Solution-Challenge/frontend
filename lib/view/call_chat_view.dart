@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/view/call_analysis_view.dart';
 
-// Todo: Add Filter Chip
-class ChatAnalysisView extends StatelessWidget {
-  static String route = 'chat_analysis_view';
+class CallChatView extends StatelessWidget {
+  static String route = 'call_chat_view';
 
-  ChatAnalysisView({super.key});
+  CallChatView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +22,12 @@ class ChatAnalysisView extends StatelessWidget {
             ? Color(0xFFF4F4F4)
             : Color(0xFF030303),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {},
-          icon: Icon(Icons.report),
-          label: Text('Report'),
+          onPressed: () => Navigator.pushNamed(
+            context,
+            CallAnalysisView.route,
+          ),
+          icon: Icon(Icons.analytics),
+          label: Text('Analyze'),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: Column(
@@ -35,16 +38,8 @@ class ChatAnalysisView extends StatelessWidget {
                 children: List<Widget>.generate(
                       12,
                       (index) => index % 2 == 0
-                          ? CustomChatAnalysis(
-                              isLeft: true,
-                              data: 'Text',
-                              probability: 64,
-                            )
-                          : CustomChatAnalysis(
-                              isLeft: false,
-                              data: 'Text',
-                              probability: 16,
-                            ),
+                          ? CustomChat(isLeft: true, data: 'Text')
+                          : CustomChat(isLeft: false, data: 'Text'),
                     ) +
                     <Widget>[
                       SizedBox(height: 16),

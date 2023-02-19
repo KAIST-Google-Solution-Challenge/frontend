@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
@@ -15,7 +14,11 @@ class ProfileView extends StatelessWidget {
     TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: CustomAppBar(isBack: true, data: 'Profile'),
+      appBar: CustomAppBar(
+        isBack: true,
+        isSurface: true,
+        data: 'Profile',
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

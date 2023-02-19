@@ -9,7 +9,11 @@ class CallView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(isBack: false, data: 'Calls'),
+      appBar: CustomAppBar(
+        isBack: false,
+        isSurface: true,
+        data: 'Calls',
+      ),
       body: ListView(
         children: <Widget>[
               SizedBox(height: 16),
@@ -18,7 +22,11 @@ class CallView extends StatelessWidget {
             ] +
             List<Widget>.generate(
               12,
-              (index) => CustomListTile(isDate: true, isName: true),
+              (index) => CustomListTile(
+                isCall: true,
+                isDate: true,
+                isName: true,
+              ),
             ),
       ),
       bottomNavigationBar: CustomNavigationBar(selectedIndex: 0),

@@ -9,7 +9,11 @@ class MessageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(isBack: false, data: 'Messages'),
+      appBar: CustomAppBar(
+        isBack: false,
+        isSurface: true,
+        data: 'Messages',
+      ),
       body: ListView(
         children: <Widget>[
               SizedBox(height: 16),
@@ -18,7 +22,11 @@ class MessageView extends StatelessWidget {
             ] +
             List<Widget>.generate(
               12,
-              (index) => CustomListTile(isDate: false, isName: true),
+              (index) => CustomListTile(
+                isCall: false,
+                isDate: false,
+                isName: true,
+              ),
             ),
       ),
       bottomNavigationBar: CustomNavigationBar(selectedIndex: 2),
