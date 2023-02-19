@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:the_voice/view/call_view.dart';
+import 'package:the_voice/view/chat_analysis_view.dart';
+import 'package:the_voice/view/chat_view.dart';
 import 'package:the_voice/view/home_view.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/model/setting_model.dart';
@@ -29,6 +31,8 @@ class TheVoice extends StatelessWidget {
             CallView.route: (context) => CallView(),
             MessageView.route: (context) => MessageView(),
             ProfileView.route: (context) => ProfileView(),
+            ChatView.route: (context) => ChatView(),
+            ChatAnalysisView.route: (context) => ChatAnalysisView(),
           },
           theme: ThemeData(
             useMaterial3: true,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
@@ -10,10 +11,11 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: CustomAppBarProfile(),
+      appBar: CustomAppBar(isBack: true, data: 'Profile'),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -22,7 +24,10 @@ class ProfileView extends StatelessWidget {
           ),
           SizedBox(height: 16),
           Text('Seungho Jang', style: textTheme.headlineSmall),
-          Text('develop0235@gmail.com', style: textTheme.bodySmall),
+          Text('develop0235@gmail.com',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              )),
           SizedBox(height: 16),
           OutlinedButton(
             onPressed: () {},
@@ -78,7 +83,9 @@ class ProfileView extends StatelessWidget {
                             value.language == Language.english
                                 ? 'English'
                                 : 'Korean',
-                            style: textTheme.bodySmall,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
                           trailing: Switch(
                             value: value.language == Language.english

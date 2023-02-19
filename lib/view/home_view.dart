@@ -9,7 +9,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(selectedIndex: 1),
+      appBar: CustomAppBar(isBack: false, data: 'The Voice'),
       bottomNavigationBar: CustomNavigationBar(selectedIndex: 1),
     );
   }

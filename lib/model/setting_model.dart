@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum Language {
-  english,
-  korean,
-}
+enum Language { english, korean }
 
 class SettingModel extends ChangeNotifier {
   bool autoAnalysis = false;

@@ -1,56 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/view/call_view.dart';
+import 'package:the_voice/view/chat_analysis_view.dart';
+import 'package:the_voice/view/chat_view.dart';
 import 'package:the_voice/view/home_view.dart';
 import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  late int selectedIndex;
+  final bool isBack;
+  final String data;
 
-  CustomAppBar({
-    super.key,
-    required this.selectedIndex,
-  });
+  CustomAppBar({super.key, required this.isBack, required this.data});
 
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return AppBar(
-      title: Row(
-        children: [
-          SizedBox(width: 8),
-          Text(['Call', 'The Voice', 'Message'][selectedIndex]),
+    if (isBack) {
+      return AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back),
+        ),
+        title: Text(data),
+      );
+    } else {
+      return AppBar(
+        title: Row(
+          children: [
+            SizedBox(width: 8),
+            Text(data),
+          ],
+        ),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, ProfileView.route),
+            icon: Icon(Icons.account_circle),
+          )
         ],
-      ),
-      actions: [
-        IconButton(
-          onPressed: () => Navigator.pushNamed(context, ProfileView.route),
-          icon: Icon(Icons.account_circle),
-        )
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
-}
-
-class CustomAppBarProfile extends StatelessWidget
-    implements PreferredSizeWidget {
-  CustomAppBarProfile({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    return AppBar(
-      leading: IconButton(
-        onPressed: () => Navigator.pop(context),
-        icon: Icon(Icons.arrow_back),
-      ),
-      title: Text('Profile'),
-    );
+      );
+    }
   }
 
   @override
@@ -58,7 +48,7 @@ class CustomAppBarProfile extends StatelessWidget
 }
 
 class CustomNavigationBar extends StatelessWidget {
-  late int selectedIndex;
+  final int selectedIndex;
 
   CustomNavigationBar({
     super.key,
@@ -92,8 +82,9 @@ class CustomNavigationBar extends StatelessWidget {
   }
 }
 
+// Todo: Implement CustomSearch Functionality
 class CustomSearch extends StatelessWidget {
-  late String hintText;
+  final String hintText;
 
   CustomSearch({
     super.key,
@@ -156,8 +147,8 @@ class CustomSearch extends StatelessWidget {
 }
 
 class CustomListTile extends StatelessWidget {
-  late bool isDate;
-  late bool isName;
+  final bool isDate;
+  final bool isName;
 
   CustomListTile({super.key, required this.isDate, required this.isName});
 
@@ -178,6 +169,7 @@ class CustomListTile extends StatelessWidget {
             title: Text('Name'),
             subtitle: Text('010-0000-0000'),
             trailing: Text('Time'),
+            onTap: () => Navigator.pushNamed(context, ChatView.route),
           ),
         ],
       );
@@ -193,6 +185,7 @@ class CustomListTile extends StatelessWidget {
             leading: Icon(Icons.image),
             title: Text('010-0000-0000'),
             trailing: Text('Time'),
+            onTap: () => Navigator.pushNamed(context, ChatView.route),
           ),
         ],
       );
@@ -202,12 +195,172 @@ class CustomListTile extends StatelessWidget {
         title: Text('Name'),
         subtitle: Text('010-0000-0000'),
         trailing: Text('Time'),
+        onTap: () => Navigator.pushNamed(context, ChatView.route),
       );
     } else {
       return ListTile(
         leading: Icon(Icons.image),
         title: Text('010-0000-0000'),
         trailing: Text('Time'),
+        onTap: () => Navigator.pushNamed(context, ChatView.route),
+      );
+    }
+  }
+}
+
+class CustomChat extends StatelessWidget {
+  final bool isLeft;
+  final String data;
+
+  CustomChat({super.key, required this.isLeft, required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    if (isLeft) {
+      return Column(
+        children: [
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(width: 16),
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    ),
+                    color: colorScheme.surface),
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(data),
+                ),
+              ),
+            ],
+          )
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ),
+                  color: colorScheme.primary.withAlpha(13),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(data),
+                ),
+              ),
+              SizedBox(width: 16),
+            ],
+          )
+        ],
+      );
+    }
+  }
+}
+
+class CustomChatAnalysis extends StatelessWidget {
+  final bool isLeft;
+  final String data;
+  final double probability;
+
+  CustomChatAnalysis({
+    super.key,
+    required this.isLeft,
+    required this.data,
+    required this.probability,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
+
+    if (isLeft) {
+      return Column(
+        children: [
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              SizedBox(width: 16),
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    ),
+                    color: colorScheme.surface),
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(data),
+                ),
+              ),
+              SizedBox(width: 16),
+              DoughnutChart(radius: 10, probability: probability),
+              Text(
+                '$probability%',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          )
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '$probability%',
+                style: textTheme.bodyMedium,
+              ),
+              DoughnutChart(radius: 10, probability: probability),
+              SizedBox(width: 16),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ),
+                  color: colorScheme.primary.withAlpha(13),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    data,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 16),
+            ],
+          )
+        ],
       );
     }
   }

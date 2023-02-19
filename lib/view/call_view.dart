@@ -9,14 +9,14 @@ class CallView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(selectedIndex: 0),
+      appBar: CustomAppBar(isBack: false, data: 'Calls'),
       body: ListView(
         children: <Widget>[
               SizedBox(height: 16),
               CustomSearch(hintText: 'Search in calls'),
               SizedBox(height: 16),
             ] +
-            List.generate(
+            List<Widget>.generate(
               12,
               (index) => CustomListTile(isDate: true, isName: true),
             ),
