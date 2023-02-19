@@ -8,22 +8,20 @@ class MessageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(isMain: true, selectedIndex: 2),
-        body: ListView(
-          children: <Widget>[
-                SizedBox(height: 16),
-                CustomSearch(hintText: 'Search in messages'),
-                SizedBox(height: 16),
-              ] +
-              List.generate(
-                12,
-                (index) => CustomListTile(isDate: false, isName: true),
-              ),
-        ),
-        bottomNavigationBar: CustomNavigationBar(selectedIndex: 2),
+    return Scaffold(
+      appBar: CustomAppBar(selectedIndex: 2),
+      body: ListView(
+        children: <Widget>[
+              SizedBox(height: 16),
+              CustomSearch(hintText: 'Search in messages'),
+              SizedBox(height: 16),
+            ] +
+            List.generate(
+              12,
+              (index) => CustomListTile(isDate: false, isName: true),
+            ),
       ),
+      bottomNavigationBar: CustomNavigationBar(selectedIndex: 2),
     );
   }
 }

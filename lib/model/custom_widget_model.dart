@@ -5,41 +5,52 @@ import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  late bool isMain; // isMain = isCall || isHome || isMessage
   late int selectedIndex;
 
   CustomAppBar({
     super.key,
-    required this.isMain,
     required this.selectedIndex,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (isMain) {
-      return AppBar(
-        title: Row(
-          children: [
-            SizedBox(width: 8),
-            Text(['Call', 'The Voice', 'Message'][selectedIndex]),
-          ],
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, ProfileView.route),
-            icon: Icon(Icons.account_circle),
-          )
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return AppBar(
+      title: Row(
+        children: [
+          SizedBox(width: 8),
+          Text(['Call', 'The Voice', 'Message'][selectedIndex]),
         ],
-      );
-    } else {
-      return AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back),
-        ),
-        title: Text('Profile'),
-      );
-    }
+      ),
+      actions: [
+        IconButton(
+          onPressed: () => Navigator.pushNamed(context, ProfileView.route),
+          icon: Icon(Icons.account_circle),
+        )
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+class CustomAppBarProfile extends StatelessWidget
+    implements PreferredSizeWidget {
+  CustomAppBarProfile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return AppBar(
+      leading: IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: Icon(Icons.arrow_back),
+      ),
+      title: Text('Profile'),
+    );
   }
 
   @override

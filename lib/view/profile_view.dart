@@ -12,92 +12,90 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(isMain: false, selectedIndex: 0),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 64,
-            ),
-            SizedBox(height: 16),
-            Text('Seungho Jang', style: textTheme.headlineSmall),
-            Text('develop0235@gmail.com', style: textTheme.bodySmall),
-            SizedBox(height: 16),
-            OutlinedButton(
-              onPressed: () {},
-              child: Text('Connect with Google'),
-            ),
-            SizedBox(height: 64),
-            Row(
-              children: [
-                SizedBox(width: 32),
-                Expanded(
-                  child: Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      borderRadius: const BorderRadius.all(Radius.circular(12)),
+    return Scaffold(
+      appBar: CustomAppBarProfile(),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 64,
+          ),
+          SizedBox(height: 16),
+          Text('Seungho Jang', style: textTheme.headlineSmall),
+          Text('develop0235@gmail.com', style: textTheme.bodySmall),
+          SizedBox(height: 16),
+          OutlinedButton(
+            onPressed: () {},
+            child: Text('Connect with Google'),
+          ),
+          SizedBox(height: 64),
+          Row(
+            children: [
+              SizedBox(width: 32),
+              Expanded(
+                child: Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
                     ),
-                    child: Consumer<SettingModel>(
-                      builder: (context, value, child) => Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.autorenew),
-                            title: Text(
-                              'Auto Analysis',
-                              style: textTheme.labelLarge,
-                            ),
-                            trailing: Switch(
-                              value: value.autoAnalysis,
-                              onChanged: (_) => value.changeAutoAnalysis(),
-                            ),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                  ),
+                  child: Consumer<SettingModel>(
+                    builder: (context, value, child) => Column(
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.autorenew),
+                          title: Text(
+                            'Auto Analysis',
+                            style: textTheme.labelLarge,
                           ),
-                          ListTile(
-                            leading: Icon(Icons.sunny),
-                            title: Text(
-                              'Dark Mode',
-                              style: textTheme.labelLarge,
-                            ),
-                            trailing: Switch(
-                              value: value.brightness == Brightness.light
-                                  ? false
-                                  : true,
-                              onChanged: (_) => value.changeBrightness(),
-                            ),
+                          trailing: Switch(
+                            value: value.autoAnalysis,
+                            onChanged: (_) => value.changeAutoAnalysis(),
                           ),
-                          ListTile(
-                            leading: Icon(Icons.language),
-                            title: Text(
-                              'Language',
-                              style: textTheme.labelLarge,
-                            ),
-                            subtitle: Text(
-                              value.language == Language.english
-                                  ? 'English'
-                                  : 'Korean',
-                              style: textTheme.bodySmall,
-                            ),
-                            trailing: Switch(
-                              value: value.language == Language.english
-                                  ? false
-                                  : true,
-                              onChanged: (_) => value.changeLanguage(),
-                            ),
-                          )
-                        ],
-                      ),
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.sunny),
+                          title: Text(
+                            'Dark Mode',
+                            style: textTheme.labelLarge,
+                          ),
+                          trailing: Switch(
+                            value: value.brightness == Brightness.light
+                                ? false
+                                : true,
+                            onChanged: (_) => value.changeBrightness(),
+                          ),
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.language),
+                          title: Text(
+                            'Language',
+                            style: textTheme.labelLarge,
+                          ),
+                          subtitle: Text(
+                            value.language == Language.english
+                                ? 'English'
+                                : 'Korean',
+                            style: textTheme.bodySmall,
+                          ),
+                          trailing: Switch(
+                            value: value.language == Language.english
+                                ? false
+                                : true,
+                            onChanged: (_) => value.changeLanguage(),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
-                SizedBox(width: 32),
-              ],
-            )
-          ],
-        ),
+              ),
+              SizedBox(width: 32),
+            ],
+          )
+        ],
       ),
     );
   }

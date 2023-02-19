@@ -8,11 +8,9 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(isMain: true, selectedIndex: 1),
-        bottomNavigationBar: CustomNavigationBar(selectedIndex: 1),
-      ),
+    return Scaffold(
+      appBar: CustomAppBar(selectedIndex: 1),
+      bottomNavigationBar: CustomNavigationBar(selectedIndex: 1),
     );
   }
 }

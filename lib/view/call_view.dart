@@ -8,22 +8,20 @@ class CallView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(isMain: true, selectedIndex: 0),
-        body: ListView(
-          children: <Widget>[
-                SizedBox(height: 16),
-                CustomSearch(hintText: 'Search in calls'),
-                SizedBox(height: 16),
-              ] +
-              List.generate(
-                12,
-                (index) => CustomListTile(isDate: true, isName: true),
-              ),
-        ),
-        bottomNavigationBar: CustomNavigationBar(selectedIndex: 0),
+    return Scaffold(
+      appBar: CustomAppBar(selectedIndex: 0),
+      body: ListView(
+        children: <Widget>[
+              SizedBox(height: 16),
+              CustomSearch(hintText: 'Search in calls'),
+              SizedBox(height: 16),
+            ] +
+            List.generate(
+              12,
+              (index) => CustomListTile(isDate: true, isName: true),
+            ),
       ),
+      bottomNavigationBar: CustomNavigationBar(selectedIndex: 0),
     );
   }
 }
