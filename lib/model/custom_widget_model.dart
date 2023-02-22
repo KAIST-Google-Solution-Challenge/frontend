@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/model/chart_model.dart';
-import 'package:the_voice/view/call_chat_view.dart';
+import 'package:the_voice/view/chat_view.dart';
 import 'package:the_voice/view/convert_dialog_view.dart';
 import 'package:the_voice/view/call_view.dart';
-import 'package:the_voice/view/message_chat_view.dart';
 import 'package:the_voice/view/home_view.dart';
 import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
@@ -55,10 +54,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
         actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, ProfileView.route),
-            icon: Icon(Icons.account_circle),
-          )
+          Row(
+            children: [
+              IconButton(
+                onPressed: () =>
+                    Navigator.pushNamed(context, ProfileView.route),
+                icon: Icon(Icons.account_circle),
+              ),
+              SizedBox(width: 8),
+            ],
+          ),
         ],
       );
     }
@@ -189,7 +194,7 @@ class CustomListTile extends StatelessWidget {
               context: context,
               builder: (context) => ConvertDialogView(isName: isName),
             )
-          : Navigator.pushNamed(context, MessageChatView.route);
+          : Navigator.pushNamed(context, ChatView.route);
     }
 
     if (isDate && isName) {
@@ -201,7 +206,7 @@ class CustomListTile extends StatelessWidget {
             child: Text('Date', style: textTheme.labelMedium),
           ),
           ListTile(
-            leading: Icon(Icons.image),
+            leading: CircleAvatar(radius: 32),
             title: Text('Name'),
             subtitle: Text('010-0000-0000'),
             trailing: Text('Time'),
@@ -218,7 +223,7 @@ class CustomListTile extends StatelessWidget {
             child: Text('Date', style: textTheme.labelMedium),
           ),
           ListTile(
-            leading: Icon(Icons.image),
+            leading: CircleAvatar(radius: 32),
             title: Text('010-0000-0000'),
             trailing: Text('Time'),
             onTap: () => onTap(),
@@ -227,7 +232,7 @@ class CustomListTile extends StatelessWidget {
       );
     } else if (isName) {
       return ListTile(
-        leading: Icon(Icons.image),
+        leading: CircleAvatar(radius: 32),
         title: Text('Name'),
         subtitle: Text('010-0000-0000'),
         trailing: Text('Time'),
@@ -235,7 +240,7 @@ class CustomListTile extends StatelessWidget {
       );
     } else {
       return ListTile(
-        leading: Icon(Icons.image),
+        leading: CircleAvatar(radius: 32),
         title: Text('010-0000-0000'),
         trailing: Text('Time'),
         onTap: () => onTap(),
@@ -348,8 +353,9 @@ class CustomChatAnalysis extends StatelessWidget {
                   child: Text(data),
                 ),
               ),
-              SizedBox(width: 16),
-              DoughnutChart(radius: 10, probability: probability),
+              SizedBox(width: 4),
+              DoughnutChart(isChat: true, radius: 10, probability: probability),
+              SizedBox(width: 4),
               Text(
                 '$probability%',
                 style: textTheme.bodyMedium?.copyWith(
@@ -372,8 +378,9 @@ class CustomChatAnalysis extends StatelessWidget {
                 '$probability%',
                 style: textTheme.bodyMedium,
               ),
-              DoughnutChart(radius: 10, probability: probability),
-              SizedBox(width: 16),
+              SizedBox(width: 4),
+              DoughnutChart(isChat: true, radius: 10, probability: probability),
+              SizedBox(width: 4),
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(

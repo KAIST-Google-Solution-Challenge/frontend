@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:the_voice/view/call_chat_view.dart';
+import 'package:provider/provider.dart';
+import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/view/chat_view.dart';
 
 class ConvertDialogView extends StatelessWidget {
   static String route = 'convert_dialog_view';
@@ -13,59 +15,71 @@ class ConvertDialogView extends StatelessWidget {
     TextTheme textTheme = Theme.of(context).textTheme;
 
     if (isName) {
-      return AlertDialog(
-        icon: Icon(Icons.change_circle),
-        title: Text('Convert?'),
-        content: ListTile(
-          leading: Icon(Icons.image),
-          title: Text('Name'),
-          subtitle: Text('010-0000-0000'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: textTheme.labelLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+      return Consumer<SettingModel>(
+        builder: (context, value, child) => AlertDialog(
+          icon: Icon(Icons.sync),
+          title: Text(
+            value.language == Language.english ? 'Convert?' : '변환하시겠습니까?',
+          ),
+          content: ListTile(
+            leading: CircleAvatar(radius: 32),
+            title: Text('Name'),
+            subtitle: Text('010-0000-0000'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                value.language == Language.english ? 'Cancel' : '취소',
+                style: textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, CallChatView.route);
-            },
-            child: Text('Convert'),
-          ),
-        ],
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, ChatView.route);
+              },
+              child: Text(
+                value.language == Language.english ? 'Convert' : '변환',
+              ),
+            ),
+          ],
+        ),
       );
     } else {
-      return AlertDialog(
-        icon: Icon(Icons.change_circle),
-        title: Text('Convert?'),
-        content: ListTile(
-          leading: Icon(Icons.image),
-          title: Text('010-0000-0000'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: textTheme.labelLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+      return Consumer<SettingModel>(
+        builder: (context, value, child) => AlertDialog(
+          icon: Icon(Icons.change_circle),
+          title: Text(
+            value.language == Language.english ? 'Convert?' : '변환하시겠습니까?',
+          ),
+          content: ListTile(
+            leading: Icon(Icons.image),
+            title: Text('010-0000-0000'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                value.language == Language.english ? 'Cancel' : '취소',
+                style: textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, CallChatView.route);
-            },
-            child: Text('Convert'),
-          ),
-        ],
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, ChatView.route);
+              },
+              child: Text(
+                value.language == Language.english ? 'Convert' : '변환',
+              ),
+            ),
+          ],
+        ),
       );
     }
   }

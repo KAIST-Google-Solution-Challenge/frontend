@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:the_voice/view/call_analysis_view.dart';
-import 'package:the_voice/view/call_chat_view.dart';
+import 'package:the_voice/view/analysis_view.dart';
+import 'package:the_voice/view/chat_view.dart';
 import 'package:the_voice/view/call_view.dart';
-import 'package:the_voice/view/chat_analysis_view.dart';
-import 'package:the_voice/view/message_chat_view.dart';
+import 'package:the_voice/view/case_view.dart';
 import 'package:the_voice/view/home_view.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/model/setting_model.dart';
-import 'package:the_voice/view/message_analysis_view.dart';
 import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
 
@@ -31,14 +29,12 @@ class TheVoice extends StatelessWidget {
           initialRoute: HomeView.route,
           routes: {
             HomeView.route: (context) => HomeView(),
+            ProfileView.route: (context) => ProfileView(),
             CallView.route: (context) => CallView(),
             MessageView.route: (context) => MessageView(),
-            ProfileView.route: (context) => ProfileView(),
-            CallChatView.route: (context) => CallChatView(),
-            MessageChatView.route: (context) => MessageChatView(),
-            ChatAnalysisView.route: (context) => ChatAnalysisView(),
-            CallAnalysisView.route: (context) => CallAnalysisView(),
-            MessageAnalysisView.route: (context) => MessageAnalysisView(),
+            ChatView.route: (context) => ChatView(),
+            AnalysisView.route: (context) => AnalysisView(),
+            CaseView.route: (context) => CaseView(),
           },
           theme: ThemeData(
             useMaterial3: true,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
+import 'package:the_voice/model/setting_model.dart';
 
 class CallView extends StatelessWidget {
   static String route = 'call_view';
@@ -8,28 +10,25 @@ class CallView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        isBack: false,
-        isSurface: true,
-        data: 'Call',
-      ),
-      body: ListView(
-        children: <Widget>[
-              SizedBox(height: 16),
-              CustomSearch(hintText: 'Search in calls'),
-              SizedBox(height: 16),
-            ] +
-            List<Widget>.generate(
-              12,
-              (index) => CustomListTile(
-                isCall: true,
-                isDate: true,
-                isName: true,
-              ),
+    return Consumer<SettingModel>(
+      builder: (context, value, child) => Scaffold(
+        appBar: CustomAppBar(
+          isBack: false,
+          isSurface: true,
+          data: value.language == Language.english ? 'Call' : '전화',
+        ),
+        body: ListView(
+          children: List<Widget>.generate(
+            12,
+            (index) => CustomListTile(
+              isCall: true,
+              isDate: true,
+              isName: true,
             ),
+          ),
+        ),
+        bottomNavigationBar: CustomNavigationBar(selectedIndex: 0),
       ),
-      bottomNavigationBar: CustomNavigationBar(selectedIndex: 0),
     );
   }
 }

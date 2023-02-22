@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
-import 'package:the_voice/view/message_analysis_view.dart';
+import 'package:the_voice/view/analysis_view.dart';
+import 'package:the_voice/view/case_view.dart';
 
-class MessageChatView extends StatelessWidget {
-  static String route = 'message_chat_view';
+class ChatView extends StatelessWidget {
+  static String route = 'chat_view';
 
-  MessageChatView({super.key});
+  ChatView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,25 +22,24 @@ class MessageChatView extends StatelessWidget {
         backgroundColor: value.brightness == Brightness.light
             ? Color(0xFFF4F4F4)
             : Color(0xFF030303),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: FloatingActionButton.large(
           onPressed: () => Navigator.pushNamed(
             context,
-            MessageAnalysisView.route,
+            AnalysisView.route,
           ),
-          icon: Icon(Icons.analytics),
-          label: Text('Analyze'),
+          child: Icon(Icons.search),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               child: ListView(
                 children: List<Widget>.generate(
-                      12,
+                      24,
                       (index) => index % 2 == 0
-                          ? CustomChat(isLeft: true, data: 'Text')
-                          : CustomChat(isLeft: false, data: 'Text'),
+                          ? CustomChat(isLeft: true, data: 'Opponent Text')
+                          : CustomChat(isLeft: false, data: 'My Text'),
                     ) +
                     <Widget>[
                       SizedBox(height: 16),

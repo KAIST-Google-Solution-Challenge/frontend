@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class DoughnutChart extends StatelessWidget {
+  final bool isChat;
   final double radius;
   final double probability;
 
   DoughnutChart({
     super.key,
+    required this.isChat,
     required this.radius,
     required this.probability,
   });
@@ -15,41 +17,66 @@ class DoughnutChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        SweepCircle(
-          radius: 2 * radius,
-          probability: probability - 100,
-          color: colorScheme.primary.withAlpha(163),
-        ),
-        SweepCircle(
-          radius: 2 * radius,
-          probability: probability,
-          color: colorScheme.primary,
-        ),
-        Container(
-          width: radius,
-          height: radius,
-          decoration: BoxDecoration(
-            color: ElevationOverlay.applySurfaceTint(
-              colorScheme.background,
-              colorScheme.surfaceTint,
-              1,
-            ),
-            borderRadius: BorderRadius.circular(radius / 2),
-            // boxShadow: [
-            //   BoxShadow(
-            //     offset: Offset(radius / 64, radius / 64),
-            //     blurRadius: radius / 64,
-            //     blurStyle: BlurStyle.normal,
-            //   )
-            // ],
+    if (isChat) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          SweepCircle(
+            radius: 2 * radius,
+            probability: probability - 100,
+            color: colorScheme.secondary,
           ),
-        ),
-      ],
-    );
+          SweepCircle(
+            radius: 2 * radius,
+            probability: probability,
+            color: colorScheme.primary,
+          ),
+          Container(
+            width: radius,
+            height: radius,
+            decoration: BoxDecoration(
+              color: ElevationOverlay.applySurfaceTint(
+                colorScheme.background,
+                colorScheme.surfaceTint,
+                1,
+              ),
+              borderRadius: BorderRadius.circular(radius / 2),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          SweepCircle(
+            radius: 2 * radius,
+            probability: probability - 100,
+            color: colorScheme.secondary,
+          ),
+          SweepCircle(
+            radius: 2 * radius,
+            probability: probability,
+            color: colorScheme.primary,
+          ),
+          Container(
+            width: radius,
+            height: radius,
+            decoration: BoxDecoration(
+              color: ElevationOverlay.applySurfaceTint(
+                colorScheme.background,
+                colorScheme.surfaceTint,
+                1,
+              ),
+              borderRadius: BorderRadius.circular(radius / 2),
+            ),
+          ),
+          Text(probability.toString(), style: textTheme.displaySmall)
+        ],
+      );
+    }
   }
 }
 
