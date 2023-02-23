@@ -6,7 +6,7 @@ import 'package:the_voice/model/setting_model.dart';
 class MessageView extends StatelessWidget {
   static String route = 'message_view';
 
-  MessageView({super.key});
+  const MessageView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +20,18 @@ class MessageView extends StatelessWidget {
         body: ListView(
           children: List<Widget>.generate(
             12,
-            (index) => CustomListTile(
+            (index) => const CustomListTile(
               isCall: false,
               isDate: false,
               isName: true,
+              date: 'M Date',
+              name: 'M Name',
+              number: 'M 010-0000-0000',
+              time: 'M Time',
             ),
           ),
         ),
-        bottomNavigationBar: CustomNavigationBar(selectedIndex: 2),
+        bottomNavigationBar: const CustomNavigationBar(selectedIndex: 2),
       ),
     );
   }

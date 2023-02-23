@@ -10,31 +10,29 @@ import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
 
-void main() {
+void main() async {
   runApp(const TheVoice());
+  WidgetsFlutterBinding.ensureInitialized();
 }
 
 class TheVoice extends StatelessWidget {
   const TheVoice({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     return ChangeNotifierProvider<SettingModel>(
       create: (context) => SettingModel(),
       child: Consumer<SettingModel>(
         builder: (context, value, child) => MaterialApp(
           initialRoute: HomeView.route,
           routes: {
-            HomeView.route: (context) => HomeView(),
-            ProfileView.route: (context) => ProfileView(),
-            CallView.route: (context) => CallView(),
-            MessageView.route: (context) => MessageView(),
-            ChatView.route: (context) => ChatView(),
-            AnalysisView.route: (context) => AnalysisView(),
-            CaseView.route: (context) => CaseView(),
+            HomeView.route: (context) => const HomeView(),
+            ProfileView.route: (context) => const ProfileView(),
+            CallView.route: (context) => const CallView(),
+            MessageView.route: (context) => const MessageView(),
+            ChatView.route: (context) => const ChatView(),
+            AnalysisView.route: (context) => const AnalysisView(),
+            CaseView.route: (context) => const CaseView(),
           },
           theme: ThemeData(
             useMaterial3: true,

@@ -36,7 +36,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   firebase_core: ^2.6.1
   firebase_auth: ^4.2.8
-  syncfusion_flutter_charts: ^20.4.50
   provider: ^6.0.5
 
 dev_dependencies:

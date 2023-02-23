@@ -6,7 +6,7 @@ import 'package:the_voice/model/setting_model.dart';
 class CallView extends StatelessWidget {
   static String route = 'call_view';
 
-  CallView({super.key});
+  const CallView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +20,18 @@ class CallView extends StatelessWidget {
         body: ListView(
           children: List<Widget>.generate(
             12,
-            (index) => CustomListTile(
+            (index) => const CustomListTile(
               isCall: true,
               isDate: true,
               isName: true,
+              date: 'C Date',
+              name: 'C Name',
+              number: 'C 010-0000-0000',
+              time: 'C Time',
             ),
           ),
         ),
-        bottomNavigationBar: CustomNavigationBar(selectedIndex: 0),
+        bottomNavigationBar: const CustomNavigationBar(selectedIndex: 0),
       ),
     );
   }

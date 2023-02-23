@@ -5,7 +5,7 @@ import 'package:the_voice/model/setting_model.dart';
 class ReportDialogView extends StatelessWidget {
   static String route = 'report_dialog_view';
 
-  ReportDialogView({super.key});
+  const ReportDialogView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +14,12 @@ class ReportDialogView extends StatelessWidget {
 
     return Consumer<SettingModel>(
       builder: (context, value, child) => AlertDialog(
-        icon: Icon(Icons.report),
+        icon: const Icon(Icons.report),
         title: Text(
           value.language == Language.english ? 'Report?' : '신고하시겠습니까?',
         ),
         content: ListTile(
-          leading: CircleAvatar(radius: 32),
+          leading: const CircleAvatar(radius: 32),
           title: Text(
             value.language == Language.english ? 'FSS' : '금융감독원',
           ),
@@ -40,7 +40,7 @@ class ReportDialogView extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Todo: Implement Call to 1332
+              // Todo: Implement Call
             },
             child: Text(
               value.language == Language.english ? 'Report' : '신고',

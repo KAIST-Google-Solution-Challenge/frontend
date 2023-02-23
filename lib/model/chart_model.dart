@@ -7,7 +7,7 @@ class DoughnutChart extends StatelessWidget {
   final double radius;
   final double probability;
 
-  DoughnutChart({
+  const DoughnutChart({
     super.key,
     required this.isChat,
     required this.radius,
@@ -85,7 +85,8 @@ class SweepCircle extends StatelessWidget {
   final double probability;
   final Color color;
 
-  SweepCircle({
+  const SweepCircle({
+    super.key,
     required this.radius,
     required this.probability,
     required this.color,

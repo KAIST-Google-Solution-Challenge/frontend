@@ -12,7 +12,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isSurface;
   final String data;
 
-  CustomAppBar({
+  const CustomAppBar({
     super.key,
     required this.isBack,
     required this.isSurface,
@@ -34,7 +34,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
         ),
         title: Text(data),
       );
@@ -49,7 +49,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
         title: Row(
           children: [
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(data),
           ],
         ),
@@ -59,9 +59,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               IconButton(
                 onPressed: () =>
                     Navigator.pushNamed(context, ProfileView.route),
-                icon: Icon(Icons.account_circle),
+                icon: const Icon(Icons.account_circle),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
             ],
           ),
         ],
@@ -70,13 +70,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class CustomNavigationBar extends StatelessWidget {
   final int selectedIndex;
 
-  CustomNavigationBar({
+  const CustomNavigationBar({
     super.key,
     required this.selectedIndex,
   });
@@ -112,7 +112,7 @@ class CustomNavigationBar extends StatelessWidget {
 class CustomSearch extends StatelessWidget {
   final String hintText;
 
-  CustomSearch({
+  const CustomSearch({
     super.key,
     required this.hintText,
   });
@@ -123,8 +123,8 @@ class CustomSearch extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SizedBox(
         width: double.infinity,
         height: 56,
         child: Material(
@@ -139,13 +139,13 @@ class CustomSearch extends StatelessWidget {
             highlightColor: Colors.transparent,
             splashFactory: InkRipple.splashFactory,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  Icon(Icons.menu),
+                  const Icon(Icons.menu),
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
                         cursorColor: colorScheme.primary,
                         style: textTheme.bodyLarge,
@@ -161,7 +161,7 @@ class CustomSearch extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Icon(Icons.search),
+                  const Icon(Icons.search),
                 ],
               ),
             ),
@@ -176,12 +176,20 @@ class CustomListTile extends StatelessWidget {
   final bool isCall;
   final bool isDate;
   final bool isName;
+  final String date;
+  final String name;
+  final String number;
+  final String time;
 
-  CustomListTile({
+  const CustomListTile({
     super.key,
     required this.isCall,
     required this.isDate,
     required this.isName,
+    this.date = 'Date',
+    this.name = 'Name',
+    this.number = '010-0000-0000',
+    this.time = 'Time',
   });
 
   @override
@@ -202,14 +210,14 @@ class CustomListTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.all(16),
-            child: Text('Date', style: textTheme.labelMedium),
+            padding: const EdgeInsets.all(16),
+            child: Text(date, style: textTheme.labelMedium),
           ),
           ListTile(
-            leading: CircleAvatar(radius: 32),
-            title: Text('Name'),
-            subtitle: Text('010-0000-0000'),
-            trailing: Text('Time'),
+            leading: const CircleAvatar(radius: 32),
+            title: Text(name),
+            subtitle: Text(number),
+            trailing: Text(time),
             onTap: () => onTap(),
           ),
         ],
@@ -219,30 +227,30 @@ class CustomListTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.all(16),
-            child: Text('Date', style: textTheme.labelMedium),
+            padding: const EdgeInsets.all(16),
+            child: Text(date, style: textTheme.labelMedium),
           ),
           ListTile(
-            leading: CircleAvatar(radius: 32),
-            title: Text('010-0000-0000'),
-            trailing: Text('Time'),
+            leading: const CircleAvatar(radius: 32),
+            title: Text(number),
+            trailing: Text(time),
             onTap: () => onTap(),
           ),
         ],
       );
     } else if (isName) {
       return ListTile(
-        leading: CircleAvatar(radius: 32),
-        title: Text('Name'),
-        subtitle: Text('010-0000-0000'),
-        trailing: Text('Time'),
+        leading: const CircleAvatar(radius: 32),
+        title: Text(name),
+        subtitle: Text(number),
+        trailing: Text(time),
         onTap: () => onTap(),
       );
     } else {
       return ListTile(
-        leading: CircleAvatar(radius: 32),
-        title: Text('010-0000-0000'),
-        trailing: Text('Time'),
+        leading: const CircleAvatar(radius: 32),
+        title: Text(number),
+        trailing: Text(time),
         onTap: () => onTap(),
       );
     }
@@ -253,7 +261,7 @@ class CustomChat extends StatelessWidget {
   final bool isLeft;
   final String data;
 
-  CustomChat({super.key, required this.isLeft, required this.data});
+  const CustomChat({super.key, required this.isLeft, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -262,21 +270,21 @@ class CustomChat extends StatelessWidget {
     if (isLeft) {
       return Column(
         children: [
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
                       bottomRight: Radius.circular(16),
                     ),
                     color: colorScheme.surface),
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Text(data),
                 ),
               ),
@@ -287,13 +295,13 @@ class CustomChat extends StatelessWidget {
     } else {
       return Column(
         children: [
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
                     bottomLeft: Radius.circular(16),
@@ -301,11 +309,11 @@ class CustomChat extends StatelessWidget {
                   color: colorScheme.primary.withAlpha(13),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Text(data),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
             ],
           )
         ],
@@ -319,7 +327,7 @@ class CustomChatAnalysis extends StatelessWidget {
   final String data;
   final double probability;
 
-  CustomChatAnalysis({
+  const CustomChatAnalysis({
     super.key,
     required this.isLeft,
     required this.data,
@@ -334,28 +342,28 @@ class CustomChatAnalysis extends StatelessWidget {
     if (isLeft) {
       return Column(
         children: [
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
                       bottomRight: Radius.circular(16),
                     ),
                     color: colorScheme.surface),
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Text(data),
                 ),
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               DoughnutChart(isChat: true, radius: 10, probability: probability),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Text(
                 '$probability%',
                 style: textTheme.bodyMedium?.copyWith(
@@ -369,7 +377,7 @@ class CustomChatAnalysis extends StatelessWidget {
     } else {
       return Column(
         children: [
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -378,12 +386,12 @@ class CustomChatAnalysis extends StatelessWidget {
                 '$probability%',
                 style: textTheme.bodyMedium,
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               DoughnutChart(isChat: true, radius: 10, probability: probability),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
                     bottomLeft: Radius.circular(16),
@@ -391,7 +399,7 @@ class CustomChatAnalysis extends StatelessWidget {
                   color: colorScheme.primary.withAlpha(13),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Text(
                     data,
                     style: textTheme.bodyMedium?.copyWith(
@@ -400,7 +408,7 @@ class CustomChatAnalysis extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
             ],
           )
         ],

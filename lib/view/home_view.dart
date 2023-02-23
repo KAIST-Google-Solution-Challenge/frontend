@@ -6,7 +6,7 @@ import 'package:the_voice/model/setting_model.dart';
 class HomeView extends StatelessWidget {
   static String route = 'home_view';
 
-  HomeView({super.key});
+  const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class HomeView extends StatelessWidget {
     TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         isBack: false,
         isSurface: true,
         data: '',
@@ -22,22 +22,22 @@ class HomeView extends StatelessWidget {
       body: Consumer<SettingModel>(
         builder: (context, value, child) => Column(
           children: [
-            Expanded(flex: 1, child: SizedBox()),
+            const Expanded(flex: 1, child: SizedBox()),
             Text(value.language == Language.english ? 'The Voice' : '그놈 목소리',
                 style: textTheme.headlineLarge?.copyWith(
                   color: colorScheme.onSurface,
                 )),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             CustomSearch(
               hintText: value.language == Language.english
                   ? 'Search phone number'
                   : '전화번호 검색',
             ),
-            Expanded(flex: 4, child: SizedBox()),
+            const Expanded(flex: 4, child: SizedBox()),
           ],
         ),
       ),
-      bottomNavigationBar: CustomNavigationBar(selectedIndex: 1),
+      bottomNavigationBar: const CustomNavigationBar(selectedIndex: 1),
     );
   }
 }

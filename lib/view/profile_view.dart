@@ -6,7 +6,7 @@ import 'package:the_voice/model/setting_model.dart';
 class ProfileView extends StatelessWidget {
   static String route = 'profile_view';
 
-  ProfileView({super.key});
+  const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +23,14 @@ class ProfileView extends StatelessWidget {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(radius: 64),
-            SizedBox(height: 16),
+            const CircleAvatar(radius: 64),
+            const SizedBox(height: 16),
             Text('Seungho Jang', style: textTheme.headlineSmall),
             Text('develop0235@gmail.com',
                 style: textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 )),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             OutlinedButton(
               onPressed: () {},
               child: Text(
@@ -39,10 +39,10 @@ class ProfileView extends StatelessWidget {
                     : '구글 연동',
               ),
             ),
-            SizedBox(height: 64),
+            const SizedBox(height: 64),
             Row(
               children: [
-                SizedBox(width: 32),
+                const SizedBox(width: 32),
                 Expanded(
                   child: Card(
                     elevation: 0,
@@ -50,13 +50,13 @@ class ProfileView extends StatelessWidget {
                       side: BorderSide(
                         color: Theme.of(context).colorScheme.outline,
                       ),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
                     ),
                     child: Consumer<SettingModel>(
                       builder: (context, value, child) => Column(
                         children: [
                           ListTile(
-                            leading: Icon(Icons.autorenew),
+                            leading: const Icon(Icons.autorenew),
                             title: Text(
                               value.language == Language.english
                                   ? 'Auto Analysis'
@@ -69,7 +69,7 @@ class ProfileView extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            leading: Icon(Icons.sunny),
+                            leading: const Icon(Icons.sunny),
                             title: Text(
                               value.language == Language.english
                                   ? 'Dark Mode'
@@ -84,7 +84,7 @@ class ProfileView extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            leading: Icon(Icons.language),
+                            leading: const Icon(Icons.language),
                             title: Text(
                               value.language == Language.english
                                   ? 'Language'
@@ -115,7 +115,7 @@ class ProfileView extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(width: 32),
+                const SizedBox(width: 32),
               ],
             )
           ],

@@ -7,7 +7,7 @@ class ConvertDialogView extends StatelessWidget {
   static String route = 'convert_dialog_view';
   final bool isName;
 
-  ConvertDialogView({super.key, required this.isName});
+  const ConvertDialogView({super.key, required this.isName});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +17,11 @@ class ConvertDialogView extends StatelessWidget {
     if (isName) {
       return Consumer<SettingModel>(
         builder: (context, value, child) => AlertDialog(
-          icon: Icon(Icons.sync),
+          icon: const Icon(Icons.sync),
           title: Text(
             value.language == Language.english ? 'Convert?' : '변환하시겠습니까?',
           ),
-          content: ListTile(
+          content: const ListTile(
             leading: CircleAvatar(radius: 32),
             title: Text('Name'),
             subtitle: Text('010-0000-0000'),
@@ -51,11 +51,11 @@ class ConvertDialogView extends StatelessWidget {
     } else {
       return Consumer<SettingModel>(
         builder: (context, value, child) => AlertDialog(
-          icon: Icon(Icons.change_circle),
+          icon: const Icon(Icons.change_circle),
           title: Text(
             value.language == Language.english ? 'Convert?' : '변환하시겠습니까?',
           ),
-          content: ListTile(
+          content: const ListTile(
             leading: Icon(Icons.image),
             title: Text('010-0000-0000'),
           ),
