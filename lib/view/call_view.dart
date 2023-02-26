@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:the_voice/controller/call_controller.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 
 class CallView extends StatelessWidget {
   static String route = 'call_view';
 
-  const CallView({super.key});
+  CallView({super.key});
+
+  final CallController _callController = Get.put(CallController());
 
   @override
   Widget build(BuildContext context) {
+    _callController.fetchCallLogs();
+    print(_callController.getCallLogs);
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
         appBar: CustomAppBar(

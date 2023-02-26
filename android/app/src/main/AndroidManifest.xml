@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.the_voice">
+
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+
    <application
         android:label="the_voice"
         android:name="${applicationName}"
