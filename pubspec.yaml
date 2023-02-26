@@ -37,6 +37,7 @@ dependencies:
     firebase_auth: ^4.2.8
     provider: ^6.0.5
     get: ^4.6.5
+    dio: ^5.0.1
     call_log: ^4.0.0
 
 dev_dependencies:
