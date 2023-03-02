@@ -15,7 +15,7 @@ class CallView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _callController.fetchCallLogs();
-    print(_callController.getCallLogs);
+    // List<CallLogEntry> calls = _callController.getCallLogs;
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
         appBar: CustomAppBar(

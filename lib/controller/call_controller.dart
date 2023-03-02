@@ -7,7 +7,7 @@ class CallController extends GetxController {
 
   final _callLogs = <CallLogEntry>[].obs;
 
-  List<CallLogEntry> get getCallLogs => _callLogs.value;
+  List<CallLogEntry> get getCalls => _callLogs.value;
 
   @override
   void onInit() {
