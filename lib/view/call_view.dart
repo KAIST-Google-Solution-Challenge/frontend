@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/call_controller.dart';
+import 'package:the_voice/controller/search_controller.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 
@@ -11,11 +12,14 @@ class CallView extends StatelessWidget {
   CallView({super.key});
 
   final CallController _callController = Get.put(CallController());
+  final SearchController _searchController = Get.put(SearchController());
 
   @override
   Widget build(BuildContext context) {
     _callController.fetchCallLogs();
     // List<CallLogEntry> calls = _callController.getCallLogs;
+    _searchController.search('01086043347');
+
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
         appBar: CustomAppBar(
