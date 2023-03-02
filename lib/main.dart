@@ -30,7 +30,7 @@ class TheVoice extends StatelessWidget {
             HomeView.route: (context) => const HomeView(),
             ProfileView.route: (context) => const ProfileView(),
             CallView.route: (context) => CallView(),
-            MessageView.route: (context) => const MessageView(),
+            MessageView.route: (context) => MessageView(),
             ChatView.route: (context) => const ChatView(),
             AnalysisView.route: (context) => const AnalysisView(),
             CaseView.route: (context) => const CaseView(),

@@ -2,6 +2,7 @@
     package="com.example.the_voice">
 
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
 
    <application
         android:label="the_voice"
