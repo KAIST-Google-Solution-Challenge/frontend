@@ -16,9 +16,10 @@ class CallView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _callController.fetchCallLogs();
+    // _callController.fetchCallLogs();
     // List<CallLogEntry> calls = _callController.getCallLogs;
-    _searchController.search('01086043347');
+    // _searchController.search('01086043347');
+    _callController.convert('sample.m4a');
 
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
