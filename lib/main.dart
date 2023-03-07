@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
+import 'package:the_voice/view/search_view.dart';
 
 void main() async {
   runApp(const TheVoice());
@@ -33,6 +34,7 @@ class TheVoice extends StatelessWidget {
             ChatView.route: (context) => const ChatView(),
             AnalysisView.route: (context) => const AnalysisView(),
             CaseView.route: (context) => const CaseView(),
+            SearchView.route: (context) => const SearchView(),
           },
           theme: ThemeData(
             useMaterial3: true,

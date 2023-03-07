@@ -19,7 +19,7 @@ class MessageView extends StatelessWidget {
         ),
         body: ListView(
           children: List<Widget>.generate(
-            12,
+            24,
             (index) => const CustomListTile(
               isCall: false,
               isDate: false,

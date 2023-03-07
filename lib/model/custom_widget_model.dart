@@ -6,6 +6,7 @@ import 'package:the_voice/view/call_view.dart';
 import 'package:the_voice/view/home_view.dart';
 import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
+import 'package:the_voice/view/search_view.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isBack;
@@ -161,7 +162,13 @@ class CustomSearch extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Icon(Icons.search),
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      SearchView.route,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -254,6 +261,37 @@ class CustomListTile extends StatelessWidget {
         onTap: () => onTap(),
       );
     }
+  }
+}
+
+class CustomHistory extends StatelessWidget {
+  final double probability;
+  final String date;
+
+  const CustomHistory({
+    super.key,
+    required this.probability,
+    required this.date,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: DoughnutChart(
+        isChat: true,
+        radius: 24,
+        probability: probability,
+      ),
+      title: Text('$probability%'),
+      contentPadding: const EdgeInsets.only(
+        left: 16,
+        right: 24,
+        top: 8,
+        bottom: 8,
+      ),
+      trailing: Text(date),
+      onTap: () {},
+    );
   }
 }
 
