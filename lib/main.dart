@@ -32,7 +32,6 @@ class TheVoice extends StatelessWidget {
             MessageView.route: (context) => const MessageView(),
             AnalysisView.route: (context) => const AnalysisView(),
             CaseView.route: (context) => const CaseView(),
-            SearchView.route: (context) => const SearchView(),
           },
           theme: ThemeData(
             useMaterial3: true,
