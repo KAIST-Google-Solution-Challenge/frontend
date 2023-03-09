@@ -4,10 +4,24 @@ import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 
-class MessageView extends StatelessWidget {
+class MessageView extends StatefulWidget {
   static String route = 'message_view';
 
   const MessageView({super.key});
+
+  @override
+  State<MessageView> createState() => _MessageViewState();
+}
+
+class _MessageViewState extends State<MessageView> {
+  final MessageController _messageController = MessageController();
+
+  @override
+  void initState() {
+    super.initState();
+    _messageController.init();
+    _messageController.fetchChat();
+  }
 
   @override
   Widget build(BuildContext context) {
