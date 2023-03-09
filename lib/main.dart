@@ -22,7 +22,7 @@ class TheVoice extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<SettingModel>(
       create: (context) => SettingModel(),
-      child: Consumer<SettingModel>(
+      builder: (context, child) => Consumer<SettingModel>(
         builder: (context, value, child) => MaterialApp(
           initialRoute: HomeView.route,
           routes: {
@@ -32,7 +32,6 @@ class TheVoice extends StatelessWidget {
             MessageView.route: (context) => const MessageView(),
             AnalysisView.route: (context) => const AnalysisView(),
             CaseView.route: (context) => const CaseView(),
-            SearchView.route: (context) => const SearchView(),
           },
           theme: ThemeData(
             useMaterial3: true,

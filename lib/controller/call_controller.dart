@@ -7,7 +7,6 @@ import 'package:permission_handler/permission_handler.dart';
 class CallController {
   late d.Dio dio;
 
-  @override
   void init() {
     dio = d.Dio();
     dio.options.baseUrl = 'http://10.0.2.2:3000';

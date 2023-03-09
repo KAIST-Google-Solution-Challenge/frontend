@@ -33,19 +33,41 @@ class _MessageViewState extends State<MessageView> {
           isSurface: true,
           data: value.language == Language.english ? 'Message' : '메시지',
         ),
-        body: ListView(
-          children: List<Widget>.generate(
-            24,
-            (index) => const CustomListTile(
-              isCall: false,
-              isDate: false,
-              isName: true,
-              date: 'M Date',
-              name: 'M Name',
-              number: 'M 010-0000-0000',
-              time: 'M Time',
-            ),
-          ),
+        body: FutureBuilder(
+          future: messageController.fetchMessages(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView(
+                children: List<Widget>.generate(
+                  24,
+                  (index) => const CustomListTile(
+                    isCall: false,
+                    isDate: false,
+                    isName: true,
+                    date: 'M Date',
+                    name: 'M Name',
+                    number: 'M 010-0000-0000',
+                    time: 'M Time',
+                  ),
+                ),
+              );
+            } else {
+              return ListView(
+                children: List<Widget>.generate(
+                  24,
+                  (index) => const CustomListTile(
+                    isCall: false,
+                    isDate: false,
+                    isName: true,
+                    date: 'M Date',
+                    name: 'M Name',
+                    number: 'M 010-0000-0000',
+                    time: 'M Time',
+                  ),
+                ),
+              );
+            }
+          },
         ),
         bottomNavigationBar: const CustomNavigationBar(selectedIndex: 2),
       ),
