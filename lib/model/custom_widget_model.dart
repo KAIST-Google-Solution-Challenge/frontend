@@ -111,8 +111,9 @@ class CustomNavigationBar extends StatelessWidget {
 // Todo: Implement CustomSearch Functionality
 class CustomSearch extends StatelessWidget {
   final String hintText;
+  String text = '';
 
-  const CustomSearch({
+  CustomSearch({
     super.key,
     required this.hintText,
   });
@@ -147,6 +148,7 @@ class CustomSearch extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
+                        onChanged: (value) => text = value,
                         cursorColor: colorScheme.primary,
                         style: textTheme.bodyLarge,
                         textAlignVertical: TextAlignVertical.center,
@@ -163,9 +165,11 @@ class CustomSearch extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.search),
-                    onPressed: () => Navigator.pushNamed(
+                    onPressed: () => Navigator.push(
                       context,
-                      SearchView.route,
+                      MaterialPageRoute(
+                        builder: (context) => SearchView(number: text),
+                      ),
                     ),
                   ),
                 ],
