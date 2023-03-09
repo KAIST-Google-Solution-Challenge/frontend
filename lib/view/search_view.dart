@@ -8,7 +8,7 @@ import 'package:the_voice/model/setting_model.dart';
 class SearchView extends StatefulWidget {
   final String number;
 
-  SearchView({super.key, required this.number});
+  const SearchView({super.key, required this.number});
 
   @override
   State<SearchView> createState() => _SearchViewState();

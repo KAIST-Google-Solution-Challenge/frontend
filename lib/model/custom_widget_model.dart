@@ -108,7 +108,6 @@ class CustomNavigationBar extends StatelessWidget {
   }
 }
 
-// Todo: Implement CustomSearch Functionality
 class CustomSearch extends StatelessWidget {
   final String hintText;
   String text = '';
@@ -263,8 +262,6 @@ class CustomMessageListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-
     void onTap() {
       showDialog(
         context: context,
