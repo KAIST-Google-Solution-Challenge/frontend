@@ -14,7 +14,15 @@ class MessageView extends StatefulWidget {
 }
 
 class _MessageViewState extends State<MessageView> {
-  MessageController messageController = MessageController();
+  final MessageController _messageController = MessageController();
+
+  @override
+  void initState() {
+    super.initState();
+    _messageController.init();
+    // _messageController.fetchChat();
+    _messageController.fetchMessages(3);
+  }
 
   @override
   Widget build(BuildContext context) {

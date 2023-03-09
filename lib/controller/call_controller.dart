@@ -18,7 +18,7 @@ class CallController {
     return callLogs.toList();
   }
 
-  Future<String> getFilePath(String fileName) async {
+  String _getFilePath(String fileName) {
     // const directory = '/root/Voice Recorder';
     // var directory = await getDownloadsDirectory();
     Directory directory = Directory('/storage/emulated/0/Download');
@@ -26,17 +26,17 @@ class CallController {
   }
 
   //! Not Tested
-  Future<void> convert(String fileName) async {
+  Future<void> analyze(String fileName) async {
     try {
       var status = await Permission.storage.status;
       if (!status.isGranted) {
         await Permission.storage.request();
       }
       var formDate = d.FormData.fromMap({
-        'file': await d.MultipartFile.fromFile(await getFilePath(fileName)),
+        'file': await d.MultipartFile.fromFile(_getFilePath(fileName)),
       });
 
-      final response = await dio.post('/stt',
+      final response = await dio.post('/model',
           options: d.Options(headers: {'ContentType': 'audio/mp4'}),
           data: formDate);
       if (response.statusCode == 200) {
