@@ -14,8 +14,6 @@ class MessageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _messageController.fetchMessages();
-    // List<SmsMessage> messages = _messageController.getMessages;
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
         appBar: CustomAppBar(
