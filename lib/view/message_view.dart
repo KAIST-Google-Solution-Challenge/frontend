@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
@@ -14,18 +15,18 @@ class MessageView extends StatefulWidget {
 }
 
 class _MessageViewState extends State<MessageView> {
-  final MessageController _messageController = MessageController();
+  final MessageController messageController = MessageController();
 
   @override
   void initState() {
     super.initState();
-    _messageController.init();
-    // _messageController.fetchChat();
-    _messageController.fetchMessages(3);
+    messageController.init();
   }
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
         appBar: CustomAppBar(
@@ -34,36 +35,27 @@ class _MessageViewState extends State<MessageView> {
           data: value.language == Language.english ? 'Message' : '메시지',
         ),
         body: FutureBuilder(
-          future: messageController.fetchMessages(),
+          future: messageController.fetchChat(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView(
                 children: List<Widget>.generate(
-                  24,
-                  (index) => const CustomListTile(
-                    isCall: false,
-                    isDate: false,
-                    isName: true,
-                    date: 'M Date',
-                    name: 'M Name',
-                    number: 'M 010-0000-0000',
-                    time: 'M Time',
+                  snapshot.data!.length,
+                  (index) => CustomMessageListTile(
+                    threadId: snapshot.data![index].threadId!,
+                    leading: const CircleAvatar(radius: 32),
+                    title: snapshot.data![index].address.toString(),
+                    subtitle:
+                        '${snapshot.data![index].lastMessage.toString().substring(0, 10)}...',
+                    trailing: snapshot.data![index].lastMessageDate.toString(),
                   ),
                 ),
               );
             } else {
-              return ListView(
-                children: List<Widget>.generate(
-                  24,
-                  (index) => const CustomListTile(
-                    isCall: false,
-                    isDate: false,
-                    isName: true,
-                    date: 'M Date',
-                    name: 'M Name',
-                    number: 'M 010-0000-0000',
-                    time: 'M Time',
-                  ),
+              return Center(
+                child: LoadingAnimationWidget.staggeredDotsWave(
+                  color: colorScheme.primary,
+                  size: 32,
                 ),
               );
             }

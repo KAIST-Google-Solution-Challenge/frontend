@@ -182,24 +182,22 @@ class CustomSearch extends StatelessWidget {
   }
 }
 
-class CustomListTile extends StatelessWidget {
-  final bool isCall;
-  final bool isDate;
-  final bool isName;
-  final String date;
-  final String name;
-  final String number;
-  final String time;
+class CustomCallListTile extends StatelessWidget {
+  final bool isHeader;
+  final Widget leading;
+  final String header;
+  final String title;
+  final String subtitle;
+  final String trailing;
 
-  const CustomListTile({
+  const CustomCallListTile({
     super.key,
-    required this.isCall,
-    required this.isDate,
-    required this.isName,
-    this.date = 'Date',
-    this.name = 'Name',
-    this.number = '010-0000-0000',
-    this.time = 'Time',
+    required this.isHeader,
+    required this.leading,
+    required this.header,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
   });
 
   @override
@@ -209,62 +207,84 @@ class CustomListTile extends StatelessWidget {
     void onTap() {
       showDialog(
         context: context,
-        builder: (context) => ConvertDialogView(
-          isName: isName,
-          isCall: isCall,
+        builder: (context) => ConvertCallDialogView(
+          leading: leading,
+          title: title,
+          subtitle: subtitle,
+          trailing: trailing,
         ),
       );
     }
 
-    if (isDate && isName) {
+    if (isHeader) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text(date, style: textTheme.labelMedium),
+            child: Text(header, style: textTheme.labelMedium),
           ),
           ListTile(
-            leading: const CircleAvatar(radius: 32),
-            title: Text(name),
-            subtitle: Text(number),
-            trailing: Text(time),
+            leading: leading,
+            title: Text(title),
+            subtitle: Text(subtitle),
+            trailing: Text(trailing),
             onTap: () => onTap(),
           ),
         ],
-      );
-    } else if (isDate) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(date, style: textTheme.labelMedium),
-          ),
-          ListTile(
-            leading: const CircleAvatar(radius: 32),
-            title: Text(number),
-            trailing: Text(time),
-            onTap: () => onTap(),
-          ),
-        ],
-      );
-    } else if (isName) {
-      return ListTile(
-        leading: const CircleAvatar(radius: 32),
-        title: Text(name),
-        subtitle: Text(number),
-        trailing: Text(time),
-        onTap: () => onTap(),
       );
     } else {
       return ListTile(
-        leading: const CircleAvatar(radius: 32),
-        title: Text(number),
-        trailing: Text(time),
+        leading: leading,
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: Text(trailing),
         onTap: () => onTap(),
       );
     }
+  }
+}
+
+class CustomMessageListTile extends StatelessWidget {
+  final int threadId;
+  final Widget leading;
+  final String title;
+  final String subtitle;
+  final String trailing;
+
+  const CustomMessageListTile({
+    super.key,
+    required this.threadId,
+    required this.leading,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+
+    void onTap() {
+      showDialog(
+        context: context,
+        builder: (context) => ConvertMessageDialogView(
+          threadId: threadId,
+          leading: leading,
+          title: title,
+          subtitle: subtitle,
+          trailing: trailing,
+        ),
+      );
+    }
+
+    return ListTile(
+      leading: leading,
+      title: Text(title),
+      subtitle: Text(subtitle),
+      trailing: Text(trailing),
+      onTap: () => onTap(),
+    );
   }
 }
 

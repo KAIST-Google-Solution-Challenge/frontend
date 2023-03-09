@@ -25,8 +25,10 @@ class MessageController {
 
     for (var chat in chats) {
       List<SmsMessage> messages = await telephony.getInboxSms(
-          filter: SmsFilter.where(SmsColumn.THREAD_ID)
-              .equals(chat.threadId.toString()));
+        filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
+          chat.threadId.toString(),
+        ),
+      );
       ChatModel chatModel = ChatModel(
           threadId: chat.threadId,
           address: messages[0].address,
@@ -39,16 +41,20 @@ class MessageController {
 
   Future<List<SmsMessage>> fetchMessages(int threadId) async {
     List<SmsMessage> messages = await telephony.getInboxSms(
-        filter:
-            SmsFilter.where(SmsColumn.THREAD_ID).equals(threadId.toString()));
+      filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(threadId.toString()),
+      sortOrder: [OrderBy(SmsColumn.DATE, sort: Sort.ASC)],
+    );
     return messages;
   }
 
   Future<void> analyze(List<String> messages) async {
     try {
-      final response = await dio.post('/model/messages/', data: {
-        messages: messages,
-      });
+      final response = await dio.post(
+        '/model/messages/',
+        data: {
+          messages: messages,
+        },
+      );
       if (response.statusCode == 200) {
         print('Messages analyzed successfully');
       } else {

@@ -6,9 +6,9 @@ import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/report_dialog_view.dart';
 
 class AnalysisView extends StatelessWidget {
-  static String route = 'analysis_view';
+  final String number;
 
-  const AnalysisView({super.key});
+  const AnalysisView({super.key, required this.number});
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +22,10 @@ class AnalysisView extends StatelessWidget {
           colorScheme.surfaceTint,
           1,
         ),
-        appBar: const CustomAppBar(
+        appBar: CustomAppBar(
           isBack: true,
           isSurface: false,
-          data: '010-0000-0000',
+          data: number,
         ),
         floatingActionButton: FloatingActionButton.large(
           onPressed: () => showDialog(

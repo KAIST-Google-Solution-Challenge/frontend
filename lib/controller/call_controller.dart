@@ -32,9 +32,11 @@ class CallController {
       if (!status.isGranted) {
         await Permission.storage.request();
       }
-      var formDate = d.FormData.fromMap({
-        'file': await d.MultipartFile.fromFile(_getFilePath(fileName)),
-      });
+      var formDate = d.FormData.fromMap(
+        {
+          'file': await d.MultipartFile.fromFile(_getFilePath(fileName)),
+        },
+      );
 
       final response = await dio.post('/model',
           options: d.Options(headers: {'ContentType': 'audio/mp4'}),
