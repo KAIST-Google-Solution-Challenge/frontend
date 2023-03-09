@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 
 class MessageView extends StatelessWidget {
   static String route = 'message_view';
 
-  const MessageView({super.key});
+  MessageView({super.key});
+
+  final MessageController _messageController = Get.put(MessageController());
 
   @override
   Widget build(BuildContext context) {

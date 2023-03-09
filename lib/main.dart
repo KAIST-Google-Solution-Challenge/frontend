@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:the_voice/view/analysis_view.dart';
 import 'package:the_voice/view/call_view.dart';
 import 'package:the_voice/view/case_view.dart';
@@ -11,7 +12,7 @@ import 'package:the_voice/view/profile_view.dart';
 import 'package:the_voice/view/search_view.dart';
 
 void main() async {
-  runApp(const TheVoice());
+  runApp(const GetMaterialApp(home: TheVoice()));
   WidgetsFlutterBinding.ensureInitialized();
 }
 
@@ -28,8 +29,8 @@ class TheVoice extends StatelessWidget {
           routes: {
             HomeView.route: (context) => const HomeView(),
             ProfileView.route: (context) => const ProfileView(),
-            CallView.route: (context) => const CallView(),
-            MessageView.route: (context) => const MessageView(),
+            CallView.route: (context) => CallView(),
+            MessageView.route: (context) => MessageView(),
             AnalysisView.route: (context) => const AnalysisView(),
             CaseView.route: (context) => const CaseView(),
             SearchView.route: (context) => const SearchView(),
