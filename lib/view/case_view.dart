@@ -29,32 +29,27 @@ class CaseView extends StatelessWidget {
           child: const Icon(Icons.report_outlined),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        body: Stack(
-          alignment: AlignmentDirectional.center,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: ListView(
-                    children: List<Widget>.generate(
-                          24,
-                          (index) => index % 2 == 0
-                              ? const CustomChatAnalysis(
-                                  isLeft: true,
-                                  data: 'Opponent Text',
-                                  probability: 64,
-                                )
-                              : const CustomChatAnalysis(
-                                  isLeft: false,
-                                  data: 'My Text',
-                                  probability: 16,
-                                ),
-                        ) +
-                        <Widget>[const SizedBox(height: 16)],
-                  ),
-                ),
-              ],
+            Expanded(
+              child: ListView(
+                children: List<Widget>.generate(
+                      24,
+                      (index) => index % 2 == 0
+                          ? const CustomChatAnalysis(
+                              isLeft: true,
+                              data: 'Opponent Text',
+                              probability: 64,
+                            )
+                          : const CustomChatAnalysis(
+                              isLeft: false,
+                              data: 'My Text',
+                              probability: 16,
+                            ),
+                    ) +
+                    <Widget>[const SizedBox(height: 16)],
+              ),
             ),
           ],
         ),

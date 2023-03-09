@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
-import 'package:the_voice/view/case_view.dart';
+import 'package:the_voice/view/report_dialog_view.dart';
 
 class AnalysisView extends StatelessWidget {
   static String route = 'analysis_view';
@@ -28,8 +28,11 @@ class AnalysisView extends StatelessWidget {
           data: '010-0000-0000',
         ),
         floatingActionButton: FloatingActionButton.large(
-          onPressed: () => Navigator.pushNamed(context, CaseView.route),
-          child: const Icon(Icons.manage_search),
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) => const ReportDialogView(),
+          ),
+          child: const Icon(Icons.report_outlined),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         body: Center(
