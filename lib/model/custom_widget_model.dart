@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/model/chart_model.dart';
-import 'package:the_voice/view/chat_view.dart';
 import 'package:the_voice/view/convert_dialog_view.dart';
 import 'package:the_voice/view/call_view.dart';
 import 'package:the_voice/view/home_view.dart';
@@ -204,12 +203,13 @@ class CustomListTile extends StatelessWidget {
     TextTheme textTheme = Theme.of(context).textTheme;
 
     void onTap() {
-      isCall
-          ? showDialog(
-              context: context,
-              builder: (context) => ConvertDialogView(isName: isName),
-            )
-          : Navigator.pushNamed(context, ChatView.route);
+      showDialog(
+        context: context,
+        builder: (context) => ConvertDialogView(
+          isName: isName,
+          isCall: isCall,
+        ),
+      );
     }
 
     if (isDate && isName) {

@@ -10,18 +10,11 @@ class SearchView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
-        backgroundColor: ElevationOverlay.applySurfaceTint(
-          colorScheme.background,
-          colorScheme.surfaceTint,
-          1,
-        ),
         appBar: const CustomAppBar(
           isBack: true,
-          isSurface: false,
+          isSurface: true,
           data: '010-0000-0000',
         ),
         body: ListView(

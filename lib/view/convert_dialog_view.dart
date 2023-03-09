@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/model/setting_model.dart';
-import 'package:the_voice/view/chat_view.dart';
+import 'package:the_voice/view/analysis_view.dart';
+import 'package:the_voice/view/case_view.dart';
 
 class ConvertDialogView extends StatelessWidget {
   static String route = 'convert_dialog_view';
   final bool isName;
+  final bool isCall;
 
-  const ConvertDialogView({super.key, required this.isName});
+  const ConvertDialogView({
+    super.key,
+    required this.isName,
+    required this.isCall,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,7 @@ class ConvertDialogView extends StatelessWidget {
         builder: (context, value, child) => AlertDialog(
           icon: const Icon(Icons.sync),
           title: Text(
-            value.language == Language.english ? 'Convert?' : '변환하시겠습니까?',
+            value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
           ),
           content: const ListTile(
             leading: CircleAvatar(radius: 32),
@@ -37,12 +43,17 @@ class ConvertDialogView extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, ChatView.route);
-              },
+              onPressed: isCall
+                  ? () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, AnalysisView.route);
+                    }
+                  : () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, CaseView.route);
+                    },
               child: Text(
-                value.language == Language.english ? 'Convert' : '변환',
+                value.language == Language.english ? 'Analysis' : '분석',
               ),
             ),
           ],
@@ -53,7 +64,7 @@ class ConvertDialogView extends StatelessWidget {
         builder: (context, value, child) => AlertDialog(
           icon: const Icon(Icons.change_circle),
           title: Text(
-            value.language == Language.english ? 'Convert?' : '변환하시겠습니까?',
+            value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
           ),
           content: const ListTile(
             leading: Icon(Icons.image),
@@ -72,10 +83,10 @@ class ConvertDialogView extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.pushNamed(context, ChatView.route);
+                Navigator.pushNamed(context, AnalysisView.route);
               },
               child: Text(
-                value.language == Language.english ? 'Convert' : '변환',
+                value.language == Language.english ? 'Analysis' : '분석',
               ),
             ),
           ],
