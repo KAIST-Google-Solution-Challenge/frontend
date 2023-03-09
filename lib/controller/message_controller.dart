@@ -37,6 +37,13 @@ class MessageController {
     return results;
   }
 
+  Future<List<SmsMessage>> fetchMessages(int threadId) async {
+    List<SmsMessage> messages = await telephony.getInboxSms(
+        filter:
+            SmsFilter.where(SmsColumn.THREAD_ID).equals(threadId.toString()));
+    return messages;
+  }
+
   Future<void> analyze(List<String> messages) async {
     try {
       final response = await dio.post('/model/messages/', data: {

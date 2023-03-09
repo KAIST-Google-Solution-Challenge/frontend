@@ -20,7 +20,8 @@ class _MessageViewState extends State<MessageView> {
   void initState() {
     super.initState();
     _messageController.init();
-    _messageController.fetchChat();
+    // _messageController.fetchChat();
+    _messageController.fetchMessages(3);
   }
 
   @override
