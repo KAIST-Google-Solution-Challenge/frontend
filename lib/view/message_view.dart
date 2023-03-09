@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 

@@ -11,7 +11,7 @@ import 'package:the_voice/view/profile_view.dart';
 import 'package:the_voice/view/search_view.dart';
 
 void main() async {
-  runApp(const MaterialApp(home: TheVoice()));
+  runApp(const TheVoice());
   WidgetsFlutterBinding.ensureInitialized();
 }
 
@@ -22,7 +22,7 @@ class TheVoice extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<SettingModel>(
       create: (context) => SettingModel(),
-      child: Consumer<SettingModel>(
+      builder: (context, child) => Consumer<SettingModel>(
         builder: (context, value, child) => MaterialApp(
           initialRoute: HomeView.route,
           routes: {
