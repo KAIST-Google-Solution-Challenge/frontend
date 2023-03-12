@@ -26,7 +26,7 @@ class CallController {
   }
 
   //! Not Tested
-  Future<void> analyze(String fileName) async {
+  Future<double> analyze(String fileName) async {
     try {
       var status = await Permission.storage.status;
       if (!status.isGranted) {
@@ -43,11 +43,14 @@ class CallController {
           data: formDate);
       if (response.statusCode == 200) {
         print('File uploaded successfully');
+        return 1;
       } else {
         print('File upload failed');
+        return 2;
       }
     } catch (e) {
       print(e);
+      return 3;
     }
   }
 }
