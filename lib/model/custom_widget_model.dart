@@ -194,6 +194,7 @@ class CustomCallListTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final String trailing;
+  final String datetime;
 
   const CustomCallListTile({
     super.key,
@@ -203,6 +204,7 @@ class CustomCallListTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.trailing,
+    required this.datetime,
   });
 
   @override
@@ -217,6 +219,7 @@ class CustomCallListTile extends StatelessWidget {
           title: title,
           subtitle: subtitle,
           trailing: trailing,
+          datetime: datetime,
         ),
       );
     }

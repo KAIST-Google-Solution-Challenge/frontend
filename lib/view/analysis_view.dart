@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/call_controller.dart';
+import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
@@ -9,8 +10,13 @@ import 'package:the_voice/view/report_dialog_view.dart';
 
 class AnalysisView extends StatefulWidget {
   final String number;
+  final String datetime;
 
-  const AnalysisView({super.key, required this.number});
+  const AnalysisView({
+    super.key,
+    required this.number,
+    required this.datetime,
+  });
 
   @override
   State<AnalysisView> createState() => _AnalysisViewState();
@@ -52,8 +58,7 @@ class _AnalysisViewState extends State<AnalysisView> {
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         body: Center(
           child: FutureBuilder(
-            future: callController
-                .analyze('통화 녹음 변경호(카이, 일화실 7조)_230312_161137.m4a'),
+            future: callController.analyze(widget.number, widget.datetime),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Column(

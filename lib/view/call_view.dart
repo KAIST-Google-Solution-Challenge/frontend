@@ -58,6 +58,9 @@ class _CallViewState extends State<CallView> {
                           .substring(9)
                           .toLowerCase(),
                       trailing: snapshot.data![index].duration.toString(),
+                      datetime: DateTime.fromMillisecondsSinceEpoch(
+                        snapshot.data![index].timestamp!,
+                      ).toIso8601String(),
                     );
 
                     currHeader = nextHeader;

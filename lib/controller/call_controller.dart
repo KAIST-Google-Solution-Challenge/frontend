@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:call_log/call_log.dart';
 import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:the_voice/controller/contact_controller.dart';
 
 class CallController {
   late d.Dio dio;
@@ -25,10 +26,38 @@ class CallController {
   }
 
   //! Not Tested
-  Future<double> analyze(String fileName) async {
+  Future<double> analyze(String number, String datetime) async {
     try {
-      var status = await Permission.storage.status;
-      if (!status.isGranted) {
+      print('[log] analyze');
+
+      var contactsStatus = await Permission.contacts.status.isGranted;
+
+      print('[log] contactsStatus = $contactsStatus');
+
+      if (!contactsStatus) {
+        await Permission.storage.request();
+        print('[log] permmision request');
+      }
+
+      print('[log] permission acquired');
+
+      ContactController contactController = ContactController();
+      await contactController.init();
+
+      String name = contactController.getName(number);
+      String date = datetime.substring(2, 4) +
+          datetime.substring(5, 7) +
+          datetime.substring(8, 10);
+      String time = datetime.substring(11, 13) +
+          datetime.substring(14, 16) +
+          datetime.substring(17, 19);
+      String fileName =
+          '통화 녹음 ${name == '' ? number : name}_${date}_${time}.m4a';
+
+      print('[log] $fileName');
+
+      var storageStatus = await Permission.storage.status;
+      if (!storageStatus.isGranted) {
         await Permission.storage.request();
       }
       var formDate = d.FormData.fromMap(

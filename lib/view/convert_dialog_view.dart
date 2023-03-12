@@ -10,6 +10,7 @@ class ConvertCallDialogView extends StatelessWidget {
   final String title;
   final String subtitle;
   final String trailing;
+  final String datetime;
 
   const ConvertCallDialogView({
     super.key,
@@ -17,6 +18,7 @@ class ConvertCallDialogView extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.trailing,
+    required this.datetime,
   });
 
   @override
@@ -51,7 +53,10 @@ class ConvertCallDialogView extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AnalysisView(number: title),
+                  builder: (context) => AnalysisView(
+                    number: title,
+                    datetime: datetime,
+                  ),
                 ),
               );
             },
