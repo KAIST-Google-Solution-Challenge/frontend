@@ -12,7 +12,7 @@ class CallController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'http://143.248.77.70:3000';
+    dio.options.baseUrl = 'http://172.20.10.2:3000';
   }
 
   Future<List<CallLogEntry>> fetchCalls() async {
@@ -20,9 +20,34 @@ class CallController {
     return callLogs.toList();
   }
 
-  Future<String> _getFilePath(String fileName) async {
+  Future<String> _getFilePath(String number, String datetime) async {
     Directory directory = Directory('/storage/emulated/0/Recordings/Call');
-    return "${directory.path}/$fileName";
+
+    ContactController contactController = ContactController();
+    await contactController.init();
+
+    String fileName = '';
+    String name = contactController.getName(number);
+    String date = datetime.substring(2, 4) +
+        datetime.substring(5, 7) +
+        datetime.substring(8, 10);
+    String time = datetime.substring(11, 13) +
+        datetime.substring(14, 16) +
+        datetime.substring(17, 19);
+    for (var i = 0; i < 10; i++) {
+      time = (int.parse(time) + 1).toString();
+      String file =
+          "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
+      if (File(file).existsSync()) {
+        fileName = file;
+        break;
+      }
+    }
+
+    if (fileName == '') {
+      print("File not found");
+    }
+    return fileName;
   }
 
   //! Not Tested
@@ -33,28 +58,14 @@ class CallController {
         await Permission.contacts.request();
       }
 
-      ContactController contactController = ContactController();
-      await contactController.init();
-
-      String name = contactController.getName(number);
-      String date = datetime.substring(2, 4) +
-          datetime.substring(5, 7) +
-          datetime.substring(8, 10);
-      String time = datetime.substring(11, 13) +
-          datetime.substring(14, 16) +
-          datetime.substring(17, 19);
-      String fileName =
-          '통화 녹음 ${name == '' ? number : name}_${date}_${time}.m4a';
-
-      print('[log] $fileName');
-
       var storageStatus = await Permission.storage.status;
       if (!storageStatus.isGranted) {
         await Permission.storage.request();
       }
       var formDate = d.FormData.fromMap(
         {
-          'file': await d.MultipartFile.fromFile(await _getFilePath(fileName)),
+          'file': await d.MultipartFile.fromFile(
+              await _getFilePath(number, datetime)),
         },
       );
 

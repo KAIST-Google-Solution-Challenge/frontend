@@ -32,8 +32,10 @@ class _CaseViewState extends State<CaseView> {
     messageController.init();
   }
 
-  Future<void> future() async {
+  Future<bool> future() async {
+    print('[debug] 1');
     messages = await messageController.fetchMessages(widget.threadId);
+    print('[debug] $messages');
     List<RequestModel> requests = List.generate(
       messages.length,
       (index) => RequestModel(
@@ -41,7 +43,10 @@ class _CaseViewState extends State<CaseView> {
         content: messages[index].smsMessage.body!,
       ),
     );
+    print('[debug] ${requests[0].content} ${requests[0].id}');
     probabilities = await messageController.analyze(requests);
+    print('[debug] $probabilities');
+    return true;
   }
 
   @override

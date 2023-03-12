@@ -12,7 +12,7 @@ class MessageController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'http://143.248.77.70:3000';
+    dio.options.baseUrl = 'http://172.20.10.2:3000';
   }
 
   Future<List<ChatModel>> fetchChat() async {
@@ -79,12 +79,14 @@ class MessageController {
 
   Future<List<dynamic>> analyze(List<RequestModel> messages) async {
     try {
+      print('[debug] ${messages.map((element) => element.toJson()).toList()}');
       final response = await dio.post(
-        '/model/messages/',
+        '/model/messages',
         data: {
-          messages: messages,
+          'messages': messages.map((element) => element.toJson()).toList()
         },
       );
+      print('[debug] statusCode: ${response.statusCode}');
       if (response.statusCode == 200) {
         print('Messages analyzed successfully');
         print(response.data);
@@ -94,7 +96,7 @@ class MessageController {
         return [];
       }
     } catch (e) {
-      print(e);
+      print('[debug] $e');
       return [];
     }
   }
