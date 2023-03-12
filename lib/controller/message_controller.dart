@@ -10,8 +10,9 @@ class MessageController {
 
   void init() {
     dio = d.Dio();
-    dio.options.baseUrl = 'http://10.0.2.2:3000';
+    // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
+    dio.options.baseUrl = 'http://143.248.77.70:3000';
   }
 
   Future<List<ChatModel>> fetchChat() async {
@@ -24,26 +25,39 @@ class MessageController {
     List<SmsConversation> chats = await telephony.getConversations();
 
     for (var chat in chats) {
-      List<SmsMessage> messages = await telephony.getInboxSms(
-        filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
-          chat.threadId.toString(),
-        ),
-      );
-      ChatModel chatModel = ChatModel(
-          threadId: chat.threadId,
-          address: messages[0].address,
-          lastMessage: messages[0].body,
-          lastMessageDate: messages[0].date);
-      results.add(chatModel);
+      try {
+        List<SmsMessage> messages = await telephony.getInboxSms(
+          filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
+            chat.threadId.toString(),
+          ),
+        );
+        ChatModel chatModel = ChatModel(
+            threadId: chat.threadId,
+            address: messages[0].address,
+            lastMessage: messages[0].body,
+            lastMessageDate: messages[0].date);
+        results.add(chatModel);
+      } catch (e) {
+        print(e);
+      }
     }
+    results.sort((a, b) => b.lastMessageDate!.compareTo(a.lastMessageDate!));
     return results;
   }
 
   Future<List<SmsMessage>> fetchMessages(int threadId) async {
-    List<SmsMessage> messages = await telephony.getInboxSms(
+    List<SmsMessage> receivedMessages = await telephony.getInboxSms(
       filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(threadId.toString()),
       sortOrder: [OrderBy(SmsColumn.DATE, sort: Sort.ASC)],
     );
+    List<SmsMessage> sentMessages = await telephony.getSentSms(
+      filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
+        threadId.toString(),
+      ),
+    );
+
+    List<SmsMessage> messages = receivedMessages + sentMessages;
+    messages.sort((a, b) => a.date!.compareTo(b.date!));
     return messages;
   }
 
