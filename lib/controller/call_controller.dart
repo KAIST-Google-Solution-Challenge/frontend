@@ -9,8 +9,9 @@ class CallController {
 
   void init() {
     dio = d.Dio();
-    dio.options.baseUrl = 'http://10.0.2.2:3000';
+    // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
+    dio.options.baseUrl = 'http://143.248.77.70:3000';
   }
 
   Future<List<CallLogEntry>> fetchCalls() async {
@@ -18,10 +19,8 @@ class CallController {
     return callLogs.toList();
   }
 
-  String _getFilePath(String fileName) {
-    // const directory = '/root/Voice Recorder';
-    // var directory = await getDownloadsDirectory();
-    Directory directory = Directory('/storage/Recordings/Call');
+  Future<String> _getFilePath(String fileName) async {
+    Directory directory = Directory('/storage/emulated/0/Recordings/Call');
     return "${directory.path}/$fileName";
   }
 
@@ -34,7 +33,7 @@ class CallController {
       }
       var formDate = d.FormData.fromMap(
         {
-          'file': await d.MultipartFile.fromFile(_getFilePath(fileName)),
+          'file': await d.MultipartFile.fromFile(await _getFilePath(fileName)),
         },
       );
 
