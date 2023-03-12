@@ -108,14 +108,20 @@ class CustomNavigationBar extends StatelessWidget {
   }
 }
 
-class CustomSearch extends StatelessWidget {
+class CustomSearch extends StatefulWidget {
   final String hintText;
-  String text = '';
 
-  CustomSearch({
+  const CustomSearch({
     super.key,
     required this.hintText,
   });
+
+  @override
+  State<CustomSearch> createState() => _CustomSearchState();
+}
+
+class _CustomSearchState extends State<CustomSearch> {
+  String text = '';
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +160,7 @@ class CustomSearch extends StatelessWidget {
                         decoration: InputDecoration(
                           isCollapsed: true,
                           border: InputBorder.none,
-                          hintText: hintText,
+                          hintText: widget.hintText,
                           hintStyle: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),

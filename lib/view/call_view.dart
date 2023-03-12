@@ -26,6 +26,8 @@ class _CallViewState extends State<CallView> {
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    String currHeader = '';
+    String nextHeader = '';
 
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
@@ -41,17 +43,27 @@ class _CallViewState extends State<CallView> {
               return ListView(
                 children: List<Widget>.generate(
                   snapshot.data!.length,
-                  (index) => CustomCallListTile(
-                    leading: const CircleAvatar(radius: 32),
-                    isHeader: true,
-                    header: snapshot.data![index].timestamp.toString(),
-                    title: snapshot.data![index].number.toString(),
-                    subtitle: snapshot.data![index].callType
-                        .toString()
-                        .substring(9)
-                        .toLowerCase(),
-                    trailing: snapshot.data![index].duration.toString(),
-                  ),
+                  (index) {
+                    nextHeader = DateTime.fromMillisecondsSinceEpoch(
+                      snapshot.data![index].timestamp!,
+                    ).toIso8601String().substring(0, 10);
+
+                    CustomCallListTile customCallListTile = CustomCallListTile(
+                      leading: const CircleAvatar(radius: 32),
+                      isHeader: currHeader != nextHeader,
+                      header: nextHeader,
+                      title: snapshot.data![index].number!,
+                      subtitle: snapshot.data![index].callType
+                          .toString()
+                          .substring(9)
+                          .toLowerCase(),
+                      trailing: snapshot.data![index].duration.toString(),
+                    );
+
+                    currHeader = nextHeader;
+
+                    return customCallListTile;
+                  },
                 ),
               );
             } else {

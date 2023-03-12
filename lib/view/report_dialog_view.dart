@@ -19,7 +19,6 @@ class ReportDialogView extends StatelessWidget {
           value.language == Language.english ? 'Report?' : '신고하시겠습니까?',
         ),
         content: ListTile(
-          leading: const CircleAvatar(radius: 32),
           title: Text(
             value.language == Language.english ? 'FSS' : '금융감독원',
           ),

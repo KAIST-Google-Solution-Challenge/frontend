@@ -53,10 +53,17 @@ class _SearchViewState extends State<SearchView> {
             ),
           );
         } else {
-          return Center(
-            child: LoadingAnimationWidget.staggeredDotsWave(
-              color: colorScheme.primary,
-              size: 32,
+          return Scaffold(
+            appBar: CustomAppBar(
+              isBack: true,
+              isSurface: true,
+              data: widget.number,
+            ),
+            body: Center(
+              child: LoadingAnimationWidget.staggeredDotsWave(
+                color: colorScheme.primary,
+                size: 32,
+              ),
             ),
           );
         }

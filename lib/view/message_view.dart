@@ -39,17 +39,21 @@ class _MessageViewState extends State<MessageView> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView(
-                children: List<Widget>.generate(
-                  snapshot.data!.length,
-                  (index) => CustomMessageListTile(
+                children: List<Widget>.generate(snapshot.data!.length, (index) {
+                  String lastMessage = snapshot.data![index].lastMessage!;
+
+                  return CustomMessageListTile(
                     threadId: snapshot.data![index].threadId!,
                     leading: const CircleAvatar(radius: 32),
-                    title: snapshot.data![index].address.toString(),
-                    subtitle:
-                        '${snapshot.data![index].lastMessage.toString().substring(0, 10)}...',
-                    trailing: snapshot.data![index].lastMessageDate.toString(),
-                  ),
-                ),
+                    title: snapshot.data![index].address!,
+                    subtitle: lastMessage.length > 24
+                        ? '${lastMessage.substring(0, 24)}...'
+                        : lastMessage,
+                    trailing: DateTime.fromMillisecondsSinceEpoch(
+                      snapshot.data![index].lastMessageDate!,
+                    ).toIso8601String().substring(0, 10),
+                  );
+                }),
               );
             } else {
               return Center(

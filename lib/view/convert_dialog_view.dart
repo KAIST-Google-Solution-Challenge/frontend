@@ -31,7 +31,6 @@ class ConvertCallDialogView extends StatelessWidget {
           value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
         ),
         content: ListTile(
-          leading: leading,
           title: Text(title),
           subtitle: Text(subtitle),
           trailing: Text(trailing),
@@ -95,7 +94,6 @@ class ConvertMessageDialogView extends StatelessWidget {
           value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
         ),
         content: ListTile(
-          leading: leading,
           title: Text(title),
           subtitle: Text(subtitle),
           trailing: Text(trailing),
