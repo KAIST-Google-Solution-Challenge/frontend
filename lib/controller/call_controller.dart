@@ -21,7 +21,7 @@ class CallController {
   String _getFilePath(String fileName) {
     // const directory = '/root/Voice Recorder';
     // var directory = await getDownloadsDirectory();
-    Directory directory = Directory('/storage/emulated/0/Download');
+    Directory directory = Directory('/storage/Recordings/Call');
     return "${directory.path}/$fileName";
   }
 
@@ -43,14 +43,14 @@ class CallController {
           data: formDate);
       if (response.statusCode == 200) {
         print('File uploaded successfully');
-        return 1;
+        return double.parse(response.data);
       } else {
         print('File upload failed');
-        return 2;
+        return 50;
       }
     } catch (e) {
       print(e);
-      return 3;
+      return 50;
     }
   }
 }
