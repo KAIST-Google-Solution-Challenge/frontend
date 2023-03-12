@@ -28,18 +28,10 @@ class CallController {
   //! Not Tested
   Future<double> analyze(String number, String datetime) async {
     try {
-      print('[log] analyze');
-
       var contactsStatus = await Permission.contacts.status.isGranted;
-
-      print('[log] contactsStatus = $contactsStatus');
-
       if (!contactsStatus) {
-        await Permission.storage.request();
-        print('[log] permmision request');
+        await Permission.contacts.request();
       }
-
-      print('[log] permission acquired');
 
       ContactController contactController = ContactController();
       await contactController.init();
