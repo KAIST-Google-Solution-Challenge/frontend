@@ -45,10 +45,11 @@ class MessageController {
     return results;
   }
 
-  Future<List<SmsMessage>> fetchMessages(int threadId) async {
+  Future<List<MessageModel>> fetchMessages(int threadId) async {
     List<SmsMessage> receivedMessages = await telephony.getInboxSms(
-      filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(threadId.toString()),
-      sortOrder: [OrderBy(SmsColumn.DATE, sort: Sort.ASC)],
+      filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
+        threadId.toString(),
+      ),
     );
     List<SmsMessage> sentMessages = await telephony.getSentSms(
       filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
@@ -56,12 +57,27 @@ class MessageController {
       ),
     );
 
-    List<SmsMessage> messages = receivedMessages + sentMessages;
-    messages.sort((a, b) => a.date!.compareTo(b.date!));
+    List<MessageModel> receivedMessageModel = List.generate(
+      receivedMessages.length,
+      (index) => MessageModel(
+        smsMessage: receivedMessages[index],
+        sender: Sender.opponent,
+      ),
+    );
+    List<MessageModel> sentMessageModel = List.generate(
+      sentMessages.length,
+      (index) => MessageModel(
+        smsMessage: sentMessages[index],
+        sender: Sender.user,
+      ),
+    );
+
+    List<MessageModel> messages = receivedMessageModel + sentMessageModel;
+    messages.sort((a, b) => a.smsMessage.date!.compareTo(b.smsMessage.date!));
     return messages;
   }
 
-  Future<void> analyze(List<String> messages) async {
+  Future<List<dynamic>> analyze(List<RequestModel> messages) async {
     try {
       final response = await dio.post(
         '/model/messages/',
@@ -71,9 +87,15 @@ class MessageController {
       );
       if (response.statusCode == 200) {
         print('Messages analyzed successfully');
+        print(response.data);
+        return [];
       } else {
         print('Messages not analyzed');
+        return [];
       }
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+      return [];
+    }
   }
 }

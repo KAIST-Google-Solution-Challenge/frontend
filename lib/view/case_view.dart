@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/message_controller.dart';
+import 'package:the_voice/model/chat_model.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/report_dialog_view.dart';
@@ -22,11 +23,25 @@ class CaseView extends StatefulWidget {
 
 class _CaseViewState extends State<CaseView> {
   MessageController messageController = MessageController();
+  late List<MessageModel> messages;
+  late List<dynamic> probabilities;
 
   @override
   void initState() {
     super.initState();
     messageController.init();
+  }
+
+  Future<void> future() async {
+    messages = await messageController.fetchMessages(widget.threadId);
+    List<RequestModel> requests = List.generate(
+      messages.length,
+      (index) => RequestModel(
+        id: index,
+        content: messages[index].smsMessage.body!,
+      ),
+    );
+    probabilities = await messageController.analyze(requests);
   }
 
   @override
@@ -52,7 +67,7 @@ class _CaseViewState extends State<CaseView> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         body: FutureBuilder(
-          future: messageController.fetchMessages(widget.threadId),
+          future: future(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Column(
@@ -61,19 +76,22 @@ class _CaseViewState extends State<CaseView> {
                   Expanded(
                     child: ListView(
                       children: List<Widget>.generate(
-                            snapshot.data!.length,
-                            (index) =>
-                                snapshot.data![index].address == widget.number
-                                    ? CustomChatAnalysis(
-                                        isLeft: true,
-                                        data: snapshot.data![index].body!,
-                                        probability: 64,
-                                      )
-                                    : CustomChatAnalysis(
-                                        isLeft: false,
-                                        data: snapshot.data![index].body!,
-                                        probability: 16,
-                                      ),
+                            messages.length,
+                            (index) {
+                              return messages[index].sender == Sender.opponent
+                                  ? CustomChatAnalysis(
+                                      isLeft: true,
+                                      isAnalyzed: false,
+                                      data: messages[index].smsMessage.body!,
+                                      probability: 64,
+                                    )
+                                  : CustomChatAnalysis(
+                                      isLeft: false,
+                                      isAnalyzed: true,
+                                      data: messages[index].smsMessage.body!,
+                                      probability: 16,
+                                    );
+                            },
                           ) +
                           <Widget>[const SizedBox(height: 16)],
                     ),

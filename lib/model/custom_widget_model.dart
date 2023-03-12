@@ -392,12 +392,14 @@ class CustomChat extends StatelessWidget {
 
 class CustomChatAnalysis extends StatelessWidget {
   final bool isLeft;
+  final bool isAnalyzed;
   final String data;
   final double probability;
 
   const CustomChatAnalysis({
     super.key,
     required this.isLeft,
+    required this.isAnalyzed,
     required this.data,
     required this.probability,
   });
@@ -429,15 +431,22 @@ class CustomChatAnalysis extends StatelessWidget {
                   child: Text(data),
                 ),
               ),
-              const SizedBox(width: 4),
-              DoughnutChart(isChat: true, radius: 10, probability: probability),
-              const SizedBox(width: 4),
-              Text(
-                '$probability%',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
+              isAnalyzed
+                  ? Row(
+                      children: [
+                        const SizedBox(width: 4),
+                        DoughnutChart(
+                            isChat: true, radius: 10, probability: probability),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$probability%',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox()
             ],
           )
         ],
@@ -450,13 +459,20 @@ class CustomChatAnalysis extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '$probability%',
-                style: textTheme.bodyMedium,
-              ),
-              const SizedBox(width: 4),
-              DoughnutChart(isChat: true, radius: 10, probability: probability),
-              const SizedBox(width: 4),
+              isAnalyzed
+                  ? Row(
+                      children: [
+                        Text(
+                          '$probability%',
+                          style: textTheme.bodyMedium,
+                        ),
+                        const SizedBox(width: 4),
+                        DoughnutChart(
+                            isChat: true, radius: 10, probability: probability),
+                        const SizedBox(width: 4),
+                      ],
+                    )
+                  : SizedBox(),
               Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
