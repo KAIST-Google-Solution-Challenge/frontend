@@ -108,14 +108,20 @@ class CustomNavigationBar extends StatelessWidget {
   }
 }
 
-// Todo: Implement CustomSearch Functionality
-class CustomSearch extends StatelessWidget {
+class CustomSearch extends StatefulWidget {
   final String hintText;
 
   const CustomSearch({
     super.key,
     required this.hintText,
   });
+
+  @override
+  State<CustomSearch> createState() => _CustomSearchState();
+}
+
+class _CustomSearchState extends State<CustomSearch> {
+  String text = '';
 
   @override
   Widget build(BuildContext context) {
@@ -147,13 +153,14 @@ class CustomSearch extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
+                        onChanged: (value) => text = value,
                         cursorColor: colorScheme.primary,
                         style: textTheme.bodyLarge,
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
                           isCollapsed: true,
                           border: InputBorder.none,
-                          hintText: hintText,
+                          hintText: widget.hintText,
                           hintStyle: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -163,9 +170,11 @@ class CustomSearch extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.search),
-                    onPressed: () => Navigator.pushNamed(
+                    onPressed: () => Navigator.push(
                       context,
-                      SearchView.route,
+                      MaterialPageRoute(
+                        builder: (context) => SearchView(number: text),
+                      ),
                     ),
                   ),
                 ],
@@ -178,24 +187,24 @@ class CustomSearch extends StatelessWidget {
   }
 }
 
-class CustomListTile extends StatelessWidget {
-  final bool isCall;
-  final bool isDate;
-  final bool isName;
-  final String date;
-  final String name;
-  final String number;
-  final String time;
+class CustomCallListTile extends StatelessWidget {
+  final bool isHeader;
+  final Widget leading;
+  final String header;
+  final String title;
+  final String subtitle;
+  final String trailing;
+  final String datetime;
 
-  const CustomListTile({
+  const CustomCallListTile({
     super.key,
-    required this.isCall,
-    required this.isDate,
-    required this.isName,
-    this.date = 'Date',
-    this.name = 'Name',
-    this.number = '010-0000-0000',
-    this.time = 'Time',
+    required this.isHeader,
+    required this.leading,
+    required this.header,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+    required this.datetime,
   });
 
   @override
@@ -205,62 +214,83 @@ class CustomListTile extends StatelessWidget {
     void onTap() {
       showDialog(
         context: context,
-        builder: (context) => ConvertDialogView(
-          isName: isName,
-          isCall: isCall,
+        builder: (context) => ConvertCallDialogView(
+          leading: leading,
+          title: title,
+          subtitle: subtitle,
+          trailing: trailing,
+          datetime: datetime,
         ),
       );
     }
 
-    if (isDate && isName) {
+    if (isHeader) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text(date, style: textTheme.labelMedium),
+            child: Text(header, style: textTheme.labelMedium),
           ),
           ListTile(
-            leading: const CircleAvatar(radius: 32),
-            title: Text(name),
-            subtitle: Text(number),
-            trailing: Text(time),
+            leading: leading,
+            title: Text(title),
+            subtitle: Text(subtitle),
+            trailing: Text(trailing),
             onTap: () => onTap(),
           ),
         ],
-      );
-    } else if (isDate) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(date, style: textTheme.labelMedium),
-          ),
-          ListTile(
-            leading: const CircleAvatar(radius: 32),
-            title: Text(number),
-            trailing: Text(time),
-            onTap: () => onTap(),
-          ),
-        ],
-      );
-    } else if (isName) {
-      return ListTile(
-        leading: const CircleAvatar(radius: 32),
-        title: Text(name),
-        subtitle: Text(number),
-        trailing: Text(time),
-        onTap: () => onTap(),
       );
     } else {
       return ListTile(
-        leading: const CircleAvatar(radius: 32),
-        title: Text(number),
-        trailing: Text(time),
+        leading: leading,
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: Text(trailing),
         onTap: () => onTap(),
       );
     }
+  }
+}
+
+class CustomMessageListTile extends StatelessWidget {
+  final int threadId;
+  final Widget leading;
+  final String title;
+  final String subtitle;
+  final String trailing;
+
+  const CustomMessageListTile({
+    super.key,
+    required this.threadId,
+    required this.leading,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    void onTap() {
+      showDialog(
+        context: context,
+        builder: (context) => ConvertMessageDialogView(
+          threadId: threadId,
+          leading: leading,
+          title: title,
+          subtitle: subtitle,
+          trailing: trailing,
+        ),
+      );
+    }
+
+    return ListTile(
+      leading: leading,
+      title: Text(title),
+      subtitle: Text(subtitle),
+      trailing: Text(trailing),
+      onTap: () => onTap(),
+    );
   }
 }
 
@@ -362,12 +392,14 @@ class CustomChat extends StatelessWidget {
 
 class CustomChatAnalysis extends StatelessWidget {
   final bool isLeft;
+  final bool isAnalyzed;
   final String data;
   final double probability;
 
   const CustomChatAnalysis({
     super.key,
     required this.isLeft,
+    required this.isAnalyzed,
     required this.data,
     required this.probability,
   });
@@ -399,15 +431,22 @@ class CustomChatAnalysis extends StatelessWidget {
                   child: Text(data),
                 ),
               ),
-              const SizedBox(width: 4),
-              DoughnutChart(isChat: true, radius: 10, probability: probability),
-              const SizedBox(width: 4),
-              Text(
-                '$probability%',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
+              isAnalyzed
+                  ? Row(
+                      children: [
+                        const SizedBox(width: 4),
+                        DoughnutChart(
+                            isChat: true, radius: 10, probability: probability),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$probability%',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox()
             ],
           )
         ],
@@ -420,13 +459,20 @@ class CustomChatAnalysis extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '$probability%',
-                style: textTheme.bodyMedium,
-              ),
-              const SizedBox(width: 4),
-              DoughnutChart(isChat: true, radius: 10, probability: probability),
-              const SizedBox(width: 4),
+              isAnalyzed
+                  ? Row(
+                      children: [
+                        Text(
+                          '$probability%',
+                          style: textTheme.bodyMedium,
+                        ),
+                        const SizedBox(width: 4),
+                        DoughnutChart(
+                            isChat: true, radius: 10, probability: probability),
+                        const SizedBox(width: 4),
+                      ],
+                    )
+                  : SizedBox(),
               Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(

@@ -4,15 +4,21 @@ import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/analysis_view.dart';
 import 'package:the_voice/view/case_view.dart';
 
-class ConvertDialogView extends StatelessWidget {
+class ConvertCallDialogView extends StatelessWidget {
   static String route = 'convert_dialog_view';
-  final bool isName;
-  final bool isCall;
+  final Widget leading;
+  final String title;
+  final String subtitle;
+  final String trailing;
+  final String datetime;
 
-  const ConvertDialogView({
+  const ConvertCallDialogView({
     super.key,
-    required this.isName,
-    required this.isCall,
+    required this.leading,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+    required this.datetime,
   });
 
   @override
@@ -20,78 +26,112 @@ class ConvertDialogView extends StatelessWidget {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
 
-    if (isName) {
-      return Consumer<SettingModel>(
-        builder: (context, value, child) => AlertDialog(
-          icon: const Icon(Icons.sync),
-          title: Text(
-            value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
-          ),
-          content: const ListTile(
-            leading: CircleAvatar(radius: 32),
-            title: Text('Name'),
-            subtitle: Text('010-0000-0000'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                value.language == Language.english ? 'Cancel' : '취소',
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: isCall
-                  ? () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(context, AnalysisView.route);
-                    }
-                  : () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(context, CaseView.route);
-                    },
-              child: Text(
-                value.language == Language.english ? 'Analysis' : '분석',
-              ),
-            ),
-          ],
+    return Consumer<SettingModel>(
+      builder: (context, value, child) => AlertDialog(
+        icon: const Icon(Icons.sync),
+        title: Text(
+          value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
         ),
-      );
-    } else {
-      return Consumer<SettingModel>(
-        builder: (context, value, child) => AlertDialog(
-          icon: const Icon(Icons.change_circle),
-          title: Text(
-            value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
-          ),
-          content: const ListTile(
-            leading: Icon(Icons.image),
-            title: Text('010-0000-0000'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                value.language == Language.english ? 'Cancel' : '취소',
-                style: textTheme.labelLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, AnalysisView.route);
-              },
-              child: Text(
-                value.language == Language.english ? 'Analysis' : '분석',
-              ),
-            ),
-          ],
+        content: ListTile(
+          title: Text(title),
+          subtitle: Text(subtitle),
+          trailing: Text(trailing),
         ),
-      );
-    }
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              value.language == Language.english ? 'Cancel' : '취소',
+              style: textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AnalysisView(
+                    number: title,
+                    datetime: datetime,
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              value.language == Language.english ? 'Analysis' : '분석',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ConvertMessageDialogView extends StatelessWidget {
+  static String route = 'convert_dialog_view';
+  final int threadId;
+  final Widget leading;
+  final String title;
+  final String subtitle;
+  final String trailing;
+
+  const ConvertMessageDialogView({
+    super.key,
+    required this.threadId,
+    required this.leading,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Consumer<SettingModel>(
+      builder: (context, value, child) => AlertDialog(
+        icon: const Icon(Icons.sync),
+        title: Text(
+          value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
+        ),
+        content: ListTile(
+          title: Text(title),
+          subtitle: Text(subtitle),
+          trailing: Text(trailing),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              value.language == Language.english ? 'Cancel' : '취소',
+              style: textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CaseView(
+                    number: title,
+                    threadId: threadId,
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              value.language == Language.english ? 'Analysis' : '분석',
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
