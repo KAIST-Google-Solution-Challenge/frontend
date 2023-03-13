@@ -9,8 +9,9 @@ class CallController {
 
   void init() {
     dio = d.Dio();
-    dio.options.baseUrl = 'http://10.0.2.2:3000';
+    // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
+    dio.options.baseUrl = 'https://9d1e-110-76-108-201.jp.ngrok.io';
   }
 
   Future<List<CallLogEntry>> fetchCalls() async {
@@ -71,9 +72,12 @@ class CallController {
         data: formDate,
       );
 
-      return response.statusCode == 200
-          ? double.parse(response.data.toString().substring(0, 4))
-          : 0.0;
+      if (response.statusCode == 200) {
+        // firebase
+        return double.parse(response.data.toString().substring(0, 4));
+      } else {
+        return 0.0;
+      }
     } catch (e) {
       return 0.0;
     }

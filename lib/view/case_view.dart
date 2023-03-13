@@ -34,17 +34,19 @@ class _CaseViewState extends State<CaseView> {
 
   Future<bool> future() async {
     messages = await messageController.fetchMessages(widget.threadId);
-    List<dynamic> requests = List.generate(
-      messages.length,
-      (index) {
-        if (messages[index].smsMessage.body!.length > 50) {
-          return {
-            'id': messages[index].smsMessage.id!,
-            'content': messages[index].smsMessage.body!
-          };
-        }
-      },
-    );
+    List<dynamic> requests = [];
+
+    for (int i = 0; i < messages.length; i++) {
+      if (messages[i].smsMessage.body!.length > 50) {
+        requests.add(
+          {
+            'id': messages[i].smsMessage.id!,
+            'content': messages[i].smsMessage.body!
+          },
+        );
+      }
+    }
+
     probabilities = await messageController.analyze(requests);
     return true;
   }

@@ -8,8 +8,8 @@ import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
 
 void main() async {
-  runApp(const TheVoice());
   WidgetsFlutterBinding.ensureInitialized();
+  runApp(const TheVoice());
 }
 
 class TheVoice extends StatelessWidget {
