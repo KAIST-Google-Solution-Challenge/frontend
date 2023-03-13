@@ -17,7 +17,6 @@ class MessageController {
 
   Future<List<ChatModel>> fetchChat() async {
     if (!await Permission.sms.request().isGranted) {
-      print("Permission denied");
       throw Error();
     }
 
@@ -37,10 +36,10 @@ class MessageController {
             lastMessage: messages[0].body,
             lastMessageDate: messages[0].date);
         results.add(chatModel);
-      } catch (e) {
-        print(e);
-      }
+        // ignore: empty_catches
+      } catch (e) {}
     }
+
     results.sort((a, b) => b.lastMessageDate!.compareTo(a.lastMessageDate!));
     return results;
   }
@@ -77,27 +76,31 @@ class MessageController {
     return messages;
   }
 
-  Future<List<dynamic>> analyze(List<RequestModel> messages) async {
-    try {
-      print('[debug] ${messages.map((element) => element.toJson()).toList()}');
-      final response = await dio.post(
-        '/model/messages',
-        data: {
-          'messages': messages.map((element) => element.toJson()).toList()
-        },
-      );
-      print('[debug] statusCode: ${response.statusCode}');
-      if (response.statusCode == 200) {
-        print('Messages analyzed successfully');
-        print(response.data);
-        return [];
-      } else {
-        print('Messages not analyzed');
-        return [];
-      }
-    } catch (e) {
-      print('[debug] $e');
-      return [];
-    }
+  Future<List<double>> analyze(List<RequestModel> messages) async {
+    return List.generate(
+      messages.length,
+      (index) => 32.0,
+    );
+    // try {
+    //   print('[debug] ${messages.map((element) => element.toJson()).toList()}');
+    //   final response = await dio.post(
+    //     '/model/messages',
+    //     data: {
+    //       'messages': messages.map((element) => element.toJson()).toList()
+    //     },
+    //   );
+    //   print('[debug] statusCode: ${response.statusCode}');
+    //   if (response.statusCode == 200) {
+    //     print('Messages analyzed successfully');
+    //     print(response.data);
+    //     return [];
+    //   } else {
+    //     print('Messages not analyzed');
+    //     return [];
+    //   }
+    // } catch (e) {
+    //   print('[debug] $e');
+    //   return [];
+    // }
   }
 }

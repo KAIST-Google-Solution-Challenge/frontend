@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/call_controller.dart';
-import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';

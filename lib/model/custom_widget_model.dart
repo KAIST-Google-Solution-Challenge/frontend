@@ -404,6 +404,18 @@ class CustomChatAnalysis extends StatelessWidget {
     required this.probability,
   });
 
+  String process(String data) {
+    List<String> lines = [];
+
+    for (int i = 0; i < data.length; i += 24) {
+      String line =
+          data.length < i + 24 ? data.substring(i) : data.substring(i, i + 24);
+      lines.add(line);
+    }
+
+    return lines.join('\n');
+  }
+
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -428,7 +440,7 @@ class CustomChatAnalysis extends StatelessWidget {
                     color: colorScheme.surface),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(data),
+                  child: Text(process(data)),
                 ),
               ),
               isAnalyzed
@@ -472,7 +484,7 @@ class CustomChatAnalysis extends StatelessWidget {
                         const SizedBox(width: 4),
                       ],
                     )
-                  : SizedBox(),
+                  : const SizedBox(),
               Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
@@ -485,7 +497,7 @@ class CustomChatAnalysis extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    data,
+                    process(data),
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),

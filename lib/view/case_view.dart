@@ -33,9 +33,7 @@ class _CaseViewState extends State<CaseView> {
   }
 
   Future<bool> future() async {
-    print('[debug] 1');
     messages = await messageController.fetchMessages(widget.threadId);
-    print('[debug] $messages');
     List<RequestModel> requests = List.generate(
       messages.length,
       (index) => RequestModel(
@@ -43,9 +41,7 @@ class _CaseViewState extends State<CaseView> {
         content: messages[index].smsMessage.body!,
       ),
     );
-    print('[debug] ${requests[0].content} ${requests[0].id}');
     probabilities = await messageController.analyze(requests);
-    print('[debug] $probabilities');
     return true;
   }
 
@@ -86,15 +82,15 @@ class _CaseViewState extends State<CaseView> {
                               return messages[index].sender == Sender.opponent
                                   ? CustomChatAnalysis(
                                       isLeft: true,
-                                      isAnalyzed: false,
+                                      isAnalyzed: true,
                                       data: messages[index].smsMessage.body!,
-                                      probability: 64,
+                                      probability: probabilities[index],
                                     )
                                   : CustomChatAnalysis(
                                       isLeft: false,
-                                      isAnalyzed: true,
+                                      isAnalyzed: false,
                                       data: messages[index].smsMessage.body!,
-                                      probability: 16,
+                                      probability: 0,
                                     );
                             },
                           ) +

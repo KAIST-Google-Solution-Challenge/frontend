@@ -42,11 +42,8 @@ class _SearchViewState extends State<SearchView> {
                 children: List.generate(
                   snapshot.data!.length,
                   (index) => CustomHistory(
-                    probability: 100 *
-                        double.parse(snapshot.data![index]['probability']),
-                    date: snapshot.data![index]['createdAt']
-                        .toString()
-                        .substring(0, 10),
+                    probability: snapshot.data![index]['probability'],
+                    date: snapshot.data![index]['timestamp'],
                   ),
                 ),
               ),
