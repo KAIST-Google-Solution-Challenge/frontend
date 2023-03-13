@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'package:call_log/call_log.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/contact_controller.dart';
 
 class CallController {
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   late d.Dio dio;
 
   void init() {
@@ -73,7 +75,15 @@ class CallController {
       );
 
       if (response.statusCode == 200) {
-        // firebase
+        final Map<String, dynamic> document = {
+          'number': number,
+          'probability': double.parse(response.data.toString().substring(0, 4)),
+          'timestamp':
+              Timestamp.now().toDate().toIso8601String().substring(0, 10),
+        };
+
+        firebaseFirestore.collection('phishing_probability').add(document);
+
         return double.parse(response.data.toString().substring(0, 4));
       } else {
         return 0.0;

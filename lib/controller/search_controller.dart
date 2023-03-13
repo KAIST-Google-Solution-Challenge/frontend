@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 
 class SearchController {
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   late Dio dio;
 
   void init() {
@@ -12,26 +14,27 @@ class SearchController {
 
   Future<List<dynamic>> search(String number) async {
     try {
-      // firebase
-      final response = await dio.get('/records/$number');
+      List<dynamic> documents = [];
 
-      return response.statusCode == 200
-          ? response.data
-          : List.generate(
-              16,
-              (index) => {
-                "number": number,
-                "probability": 0.0,
-                "timestamp": "timestamp",
-              },
-            );
+      await firebaseFirestore.collection('phishing_probability').get().then(
+        (value) {
+          for (dynamic document in value.docs) {
+            if (document['number'] == number) {
+              documents.add(document);
+            }
+          }
+        },
+      );
+
+      return documents;
     } catch (e) {
       return List.generate(
         16,
         (index) => {
           "number": number,
           "probability": 0.0,
-          "timestamp": "timestamp",
+          "timestamp":
+              Timestamp.now().toDate().toIso8601String().substring(0, 10),
         },
       );
     }
