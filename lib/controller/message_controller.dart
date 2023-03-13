@@ -10,14 +10,14 @@ class MessageController {
 
   void init() {
     dio = d.Dio();
-    // dio.options.baseUrl = 'http://10.0.2.2:3000';
+    dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'http://172.20.10.2:3000';
   }
 
   Future<List<ChatModel>> fetchChat() async {
-    if (!await Permission.sms.request().isGranted) {
-      throw Error();
+    var smsStatus = await Permission.sms.status.isGranted;
+    if (!smsStatus) {
+      await Permission.sms.request();
     }
 
     List<ChatModel> results = [];
@@ -76,31 +76,32 @@ class MessageController {
     return messages;
   }
 
-  Future<List<double>> analyze(List<RequestModel> messages) async {
-    return List.generate(
-      messages.length,
-      (index) => 32.0,
-    );
-    // try {
-    //   print('[debug] ${messages.map((element) => element.toJson()).toList()}');
-    //   final response = await dio.post(
-    //     '/model/messages',
-    //     data: {
-    //       'messages': messages.map((element) => element.toJson()).toList()
-    //     },
-    //   );
-    //   print('[debug] statusCode: ${response.statusCode}');
-    //   if (response.statusCode == 200) {
-    //     print('Messages analyzed successfully');
-    //     print(response.data);
-    //     return [];
-    //   } else {
-    //     print('Messages not analyzed');
-    //     return [];
-    //   }
-    // } catch (e) {
-    //   print('[debug] $e');
-    //   return [];
-    // }
+  Future<List<dynamic>> analyze(List<dynamic> messages) async {
+    try {
+      final response = await dio.post(
+        '/model/messages',
+        data: {
+          'messages': messages,
+        },
+      );
+
+      return response.statusCode == 200
+          ? response.data
+          : List.generate(
+              messages.length,
+              (index) => {
+                'id': messages[index]['id'],
+                'probability': 0.0,
+              },
+            );
+    } catch (e) {
+      return List.generate(
+        messages.length,
+        (index) => {
+          'id': messages[index]['id'],
+          'probability': 0.0,
+        },
+      );
+    }
   }
 }

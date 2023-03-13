@@ -25,15 +25,3 @@ class MessageModel {
 
   MessageModel({required this.smsMessage, required this.sender});
 }
-
-class RequestModel {
-  final int id;
-  final String content;
-
-  RequestModel({required this.id, required this.content});
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'content': content,
-      };
-}

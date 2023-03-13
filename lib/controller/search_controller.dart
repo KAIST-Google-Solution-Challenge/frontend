@@ -10,20 +10,28 @@ class SearchController {
   }
 
   Future<List<dynamic>> search(String number) async {
-    return [
-      {"number": number, "probability": 16.0, "timestamp": ""},
-      {"number": number, "probability": 16.0, "timestamp": ""},
-    ];
-    // try {
-    //   final response = await dio.get('/records/$number');
-    //   if (response.statusCode == 200) {
-    //     print(response.data);
-    //     return response.data;
-    //   }
-    //   return [];
-    // } catch (error) {
-    //   print(error);
-    //   return [];
-    // }
+    try {
+      final response = await dio.get('/records/$number');
+
+      return response.statusCode == 200
+          ? response.data
+          : List.generate(
+              16,
+              (index) => {
+                "number": number,
+                "probability": 0.0,
+                "timestamp": "timestamp",
+              },
+            );
+    } catch (e) {
+      return List.generate(
+        16,
+        (index) => {
+          "number": number,
+          "probability": 0.0,
+          "timestamp": "timestamp",
+        },
+      );
+    }
   }
 }

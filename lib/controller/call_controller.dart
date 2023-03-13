@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:call_log/call_log.dart';
 import 'package:dio/dio.dart' as d;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/contact_controller.dart';
 
 class CallController {
@@ -46,38 +47,35 @@ class CallController {
   }
 
   Future<double> analyze(String number, String datetime) async {
-    return 64.0;
-    // try {
-    //   var contactsStatus = await Permission.contacts.status.isGranted;
-    //   if (!contactsStatus) {
-    //     await Permission.contacts.request();
-    //   }
+    try {
+      var contactsStatus = await Permission.contacts.status.isGranted;
+      if (!contactsStatus) {
+        await Permission.contacts.request();
+      }
 
-    //   var storageStatus = await Permission.storage.status;
-    //   if (!storageStatus.isGranted) {
-    //     await Permission.storage.request();
-    //   }
+      var storageStatus = await Permission.storage.status;
+      if (!storageStatus.isGranted) {
+        await Permission.storage.request();
+      }
 
-    //   var formDate = d.FormData.fromMap(
-    //     {
-    //       'file': await d.MultipartFile.fromFile(
-    //           await _getFilePath(number, datetime)),
-    //     },
-    //   );
+      var formDate = d.FormData.fromMap(
+        {
+          'file': await d.MultipartFile.fromFile(
+              await _getFilePath(number, datetime)),
+        },
+      );
 
-    //   final response = await dio.post('/model',
-    //       options: d.Options(headers: {'ContentType': 'audio/mp4'}),
-    //       data: formDate);
-    //   if (response.statusCode == 200) {
-    //     print('File uploaded successfully');
-    //     return double.parse(response.data);
-    //   } else {
-    //     print('File upload failed');
-    //     return 50;
-    //   }
-    // } catch (e) {
-    //   print(e);
-    //   return 50;
-    // }
+      final response = await dio.post(
+        '/model',
+        options: d.Options(headers: {'ContentType': 'audio/mp4'}),
+        data: formDate,
+      );
+
+      return response.statusCode == 200
+          ? double.parse(response.data.toString().substring(0, 4))
+          : 0.0;
+    } catch (e) {
+      return 0.0;
+    }
   }
 }

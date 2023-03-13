@@ -34,12 +34,16 @@ class _CaseViewState extends State<CaseView> {
 
   Future<bool> future() async {
     messages = await messageController.fetchMessages(widget.threadId);
-    List<RequestModel> requests = List.generate(
+    List<dynamic> requests = List.generate(
       messages.length,
-      (index) => RequestModel(
-        id: index,
-        content: messages[index].smsMessage.body!,
-      ),
+      (index) {
+        if (messages[index].smsMessage.body!.length > 50) {
+          return {
+            'id': messages[index].smsMessage.id!,
+            'content': messages[index].smsMessage.body!
+          };
+        }
+      },
     );
     probabilities = await messageController.analyze(requests);
     return true;
@@ -79,19 +83,34 @@ class _CaseViewState extends State<CaseView> {
                       children: List<Widget>.generate(
                             messages.length,
                             (index) {
-                              return messages[index].sender == Sender.opponent
-                                  ? CustomChatAnalysis(
+                              if (messages[index].sender == Sender.opponent) {
+                                for (int i = 0; i < probabilities.length; i++) {
+                                  if (messages[index].smsMessage.id! ==
+                                      probabilities[i]['id']) {
+                                    return CustomChatAnalysis(
                                       isLeft: true,
                                       isAnalyzed: true,
                                       data: messages[index].smsMessage.body!,
-                                      probability: probabilities[index],
-                                    )
-                                  : CustomChatAnalysis(
-                                      isLeft: false,
-                                      isAnalyzed: false,
-                                      data: messages[index].smsMessage.body!,
-                                      probability: 0,
+                                      probability: probabilities[i]
+                                          ['probability'],
                                     );
+                                  }
+                                }
+
+                                return CustomChatAnalysis(
+                                  isLeft: true,
+                                  isAnalyzed: false,
+                                  data: messages[index].smsMessage.body!,
+                                  probability: 0.0,
+                                );
+                              } else {
+                                return CustomChatAnalysis(
+                                  isLeft: false,
+                                  isAnalyzed: false,
+                                  data: messages[index].smsMessage.body!,
+                                  probability: 0.0,
+                                );
+                              }
                             },
                           ) +
                           <Widget>[const SizedBox(height: 16)],
