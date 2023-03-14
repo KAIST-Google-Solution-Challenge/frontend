@@ -6,9 +6,11 @@ import 'package:provider/provider.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const TheVoice());
 }
 
