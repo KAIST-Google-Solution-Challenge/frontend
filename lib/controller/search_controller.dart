@@ -9,7 +9,7 @@ class SearchController {
     dio = Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://9d1e-110-76-108-201.jp.ngrok.io';
+    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
   }
 
   Future<List<dynamic>> search(String number) async {
@@ -20,7 +20,12 @@ class SearchController {
         (value) {
           for (dynamic document in value.docs) {
             if (document['number'] == number) {
-              documents.add(document);
+              documents.add(
+                {
+                  'probability': double.parse(document['probability']),
+                  'timestamp': document['timestamp'],
+                },
+              );
             }
           }
         },
@@ -28,15 +33,7 @@ class SearchController {
 
       return documents;
     } catch (e) {
-      return List.generate(
-        16,
-        (index) => {
-          "number": number,
-          "probability": 0.0,
-          "timestamp":
-              Timestamp.now().toDate().toIso8601String().substring(0, 10),
-        },
-      );
+      return [];
     }
   }
 }

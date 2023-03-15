@@ -13,7 +13,7 @@ class CallController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://9d1e-110-76-108-201.jp.ngrok.io';
+    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
   }
 
   Future<List<CallLogEntry>> fetchCalls() async {
@@ -51,8 +51,8 @@ class CallController {
 
   Future<double> analyze(String number, String datetime) async {
     try {
-      var contactsStatus = await Permission.contacts.status.isGranted;
-      if (!contactsStatus) {
+      var contactsStatus = await Permission.contacts.status;
+      if (!contactsStatus.isGranted) {
         await Permission.contacts.request();
       }
 
@@ -61,30 +61,48 @@ class CallController {
         await Permission.storage.request();
       }
 
-      var formDate = d.FormData.fromMap(
+      var audioStatus = await Permission.manageExternalStorage.status;
+      if (!audioStatus.isGranted) {
+        await Permission.manageExternalStorage.request();
+      }
+
+      var formData = d.FormData.fromMap(
         {
           'file': await d.MultipartFile.fromFile(
-              await _getFilePath(number, datetime)),
+            await _getFilePath(number, datetime),
+          ),
         },
       );
 
+      // var formData = d.FormData.fromMap(
+      //   {
+      //     'file': await d.MultipartFile.fromFile(
+      //       '/storage/emulated/0/Recordings/Call/sample.m4a',
+      //     )
+      //   },
+      // );
+
       final response = await dio.post(
         '/model',
-        options: d.Options(headers: {'ContentType': 'audio/mp4'}),
-        data: formDate,
+        options: d.Options(
+          headers: {'ContentType': 'audio/mp4'},
+        ),
+        data: formData,
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> document = {
           'number': number,
-          'probability': double.parse(response.data.toString().substring(0, 4)),
+          'probability': response.data.toString().substring(0, 4),
           'timestamp':
               Timestamp.now().toDate().toIso8601String().substring(0, 10),
         };
 
         firebaseFirestore.collection('phishing_probability').add(document);
 
-        return double.parse(response.data.toString().substring(0, 4));
+        return double.parse(
+          response.data.toString().substring(0, 4),
+        );
       } else {
         return 0.0;
       }

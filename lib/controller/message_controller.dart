@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:telephony/telephony.dart';
@@ -14,12 +12,12 @@ class MessageController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://9d1e-110-76-108-201.jp.ngrok.io';
+    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
   }
 
   Future<List<ChatModel>> fetchChat() async {
-    var smsStatus = await Permission.sms.status.isGranted;
-    if (!smsStatus) {
+    var smsStatus = await Permission.sms.status;
+    if (!smsStatus.isGranted) {
       await Permission.sms.request();
     }
 

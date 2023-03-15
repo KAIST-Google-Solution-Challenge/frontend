@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "28208195456",
+    "project_id": "the-voice-0235",
+    "storage_bucket": "the-voice-0235.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28208195456:android:4b42252cc2d309f6d24365",
+        "android_client_info": {
+          "package_name": "com.develop0235.the_voice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "28208195456-b8bbmtpdm9umanq6ekp1j8p6473qpvnj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeWNiJ-iNVf6gScP4xPCnA07Kg3Bn5oZw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "28208195456-8ksnniuq3m2c9gvpgfqe4tkceuovn979.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
