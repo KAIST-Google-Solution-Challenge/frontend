@@ -12,7 +12,7 @@ class MessageController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
+    dio.options.baseUrl = 'https://f0de-110-76-108-201.jp.ngrok.io';
   }
 
   Future<List<ChatModel>> fetchChat() async {

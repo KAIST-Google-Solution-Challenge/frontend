@@ -37,7 +37,7 @@ class _CaseViewState extends State<CaseView> {
     List<dynamic> requests = [];
 
     for (int i = 0; i < messages.length; i++) {
-      if (messages[i].smsMessage.body!.length > 50) {
+      if (messages[i].smsMessage.body!.length > 20) {
         requests.add(
           {
             'id': messages[i].smsMessage.id!,

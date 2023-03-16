@@ -18,12 +18,6 @@ class _SearchViewState extends State<SearchView> {
   SearchController searchController = SearchController();
 
   @override
-  void initState() {
-    super.initState();
-    searchController.init();
-  }
-
-  @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 

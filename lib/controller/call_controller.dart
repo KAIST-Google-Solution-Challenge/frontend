@@ -13,22 +13,36 @@ class CallController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
+    dio.options.baseUrl = 'https://f0de-110-76-108-201.jp.ngrok.io';
   }
 
   Future<List<CallLogEntry>> fetchCalls() async {
-    final callLogs = await CallLog.get();
-    return callLogs.toList();
+    final callLog = await CallLog.get();
+    List<CallLogEntry> callLogEntryList = callLog.toList();
+
+    ContactController contactController = ContactController();
+    await contactController.init();
+
+    for (CallLogEntry callLogEntry in callLogEntryList) {
+      if (callLogEntry.number![0] == '+') {
+        callLogEntry.number = callLogEntry.number!.substring(1);
+      } else if (callLogEntry.number![3] == '-' &&
+          callLogEntry.number![8] == '-') {
+        callLogEntry.number = callLogEntry.number!.substring(0, 3) +
+            callLogEntry.number!.substring(4, 8) +
+            callLogEntry.number!.substring(9, 13);
+      }
+
+      callLogEntry.number = contactController.getName(callLogEntry.number!);
+    }
+
+    return callLogEntryList;
   }
 
   Future<String> _getFilePath(String number, String datetime) async {
     Directory directory = Directory('/storage/emulated/0/Recordings/Call');
 
-    ContactController contactController = ContactController();
-    await contactController.init();
-
     String fileName = '';
-    String name = contactController.getName(number);
     String date = datetime.substring(2, 4) +
         datetime.substring(5, 7) +
         datetime.substring(8, 10);
@@ -38,8 +52,7 @@ class CallController {
 
     for (var i = 0; i < 10; i++) {
       time = (int.parse(time) + 1).toString();
-      String file =
-          "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
+      String file = "${directory.path}/${'통화 녹음 ${number}_${date}_$time.m4a'}";
       if (File(file).existsSync()) {
         fileName = file;
         break;
@@ -51,11 +64,6 @@ class CallController {
 
   Future<double> analyze(String number, String datetime) async {
     try {
-      var contactsStatus = await Permission.contacts.status;
-      if (!contactsStatus.isGranted) {
-        await Permission.contacts.request();
-      }
-
       var storageStatus = await Permission.storage.status;
       if (!storageStatus.isGranted) {
         await Permission.storage.request();
@@ -66,21 +74,21 @@ class CallController {
         await Permission.manageExternalStorage.request();
       }
 
-      var formData = d.FormData.fromMap(
-        {
-          'file': await d.MultipartFile.fromFile(
-            await _getFilePath(number, datetime),
-          ),
-        },
-      );
-
       // var formData = d.FormData.fromMap(
       //   {
       //     'file': await d.MultipartFile.fromFile(
-      //       '/storage/emulated/0/Recordings/Call/sample.m4a',
-      //     )
+      //       await _getFilePath(number, datetime),
+      //     ),
       //   },
       // );
+
+      var formData = d.FormData.fromMap(
+        {
+          'file': await d.MultipartFile.fromFile(
+            '/storage/emulated/0/Recordings/Call/sample.m4a',
+          )
+        },
+      );
 
       final response = await dio.post(
         '/model',
