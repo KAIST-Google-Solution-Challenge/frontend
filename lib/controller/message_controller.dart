@@ -12,7 +12,7 @@ class MessageController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
+    dio.options.baseUrl = 'https://eac9-110-76-108-201.jp.ngrok.io';
   }
 
   Future<List<ChatModel>> fetchChat() async {
@@ -111,6 +111,33 @@ class MessageController {
           'probability': 0.0,
         },
       );
+    }
+  }
+
+  Future<dynamic> analyzeSingle(String message) async {
+    try {
+      dio = d.Dio();
+      // dio.options.baseUrl = 'http://10.0.2.2:3000';
+      // dio.options.baseUrl = 'http://localhost:3000';
+      dio.options.baseUrl = 'https://eac9-110-76-108-201.jp.ngrok.io';
+      final response = await dio.post(
+        '/model/messages',
+        data: {
+          'messages': [
+            {'id': 1, 'content': message}
+          ],
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print(response.data);
+        return response.data[0]['probability'];
+      } else {
+        return -1;
+      }
+    } catch (e) {
+      print(e);
+      return -1;
     }
   }
 }

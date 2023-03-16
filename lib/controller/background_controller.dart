@@ -6,13 +6,16 @@ import 'package:flutter_background_service_android/flutter_background_service_an
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:phone_state/phone_state.dart';
+import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/call_controller.dart';
+import 'package:the_voice/controller/message_controller.dart';
 
 class BackgroundController {
   PhoneStateStatus status = PhoneStateStatus.NOTHING;
   bool granted = false;
 
   final service = FlutterBackgroundService();
+  final telephony = Telephony.instance;
 
   static const notificationChannelId = 'the-voice';
   static const notificationId = 888;
@@ -20,6 +23,7 @@ class BackgroundController {
 
   Future<void> init() async {
     await _setStream();
+    _setSmsStream();
     await _initBackService();
   }
 
@@ -50,6 +54,30 @@ class BackgroundController {
         return false;
       case PermissionStatus.granted:
         return true;
+    }
+  }
+
+  void _setSmsStream() {
+    telephony.listenIncomingSms(
+        onNewMessage: (SmsMessage message) async {
+          // Handle message
+          print(message.body);
+          if (message.body!.length > 20) {
+            final messageController = MessageController();
+            await messageController.analyzeSingle(message.body!);
+          }
+        },
+        onBackgroundMessage: BackgroundController.backgroundMessageHandler);
+  }
+
+  static void backgroundMessageHandler(SmsMessage message) async {
+    //Handle background message
+    print(message.body);
+    if (message.body!.length > 20) {
+      final messageController = MessageController();
+      print("reach here");
+      final response = await messageController.analyzeSingle(message.body!);
+      print(response);
     }
   }
 
