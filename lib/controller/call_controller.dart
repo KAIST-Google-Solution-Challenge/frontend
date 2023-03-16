@@ -13,12 +13,23 @@ class CallController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
+    dio.options.baseUrl = 'https://eac9-110-76-108-201.jp.ngrok.io';
   }
 
   Future<List<CallLogEntry>> fetchCalls() async {
     final callLogs = await CallLog.get();
     return callLogs.toList();
+  }
+
+  Future<CallLogEntry> fetchLastCall() async {
+    var now = DateTime.now();
+    int from = now.subtract(const Duration(days: 1)).millisecondsSinceEpoch;
+    final lastCallLog =
+        await CallLog.query(dateFrom: from, type: CallType.incoming);
+    if (lastCallLog.isEmpty) {
+      throw Exception('No calls found');
+    }
+    return lastCallLog.first;
   }
 
   Future<String> _getFilePath(String number, String datetime) async {
