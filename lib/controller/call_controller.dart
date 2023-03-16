@@ -13,7 +13,7 @@ class CallController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://f0de-110-76-108-201.jp.ngrok.io';
+    dio.options.baseUrl = 'https://eac9-110-76-108-201.jp.ngrok.io';
   }
 
   Future<List<CallLogEntry>> fetchCalls() async {
@@ -39,7 +39,7 @@ class CallController {
     return callLogEntryList;
   }
 
-  Future<String> _getFilePath(String number, String datetime) async {
+  Future<String> getFilePath(String number, String datetime) async {
     Directory directory = Directory('/storage/emulated/0/Recordings/Call');
 
     String fileName = '';
@@ -74,10 +74,14 @@ class CallController {
         await Permission.manageExternalStorage.request();
       }
 
+      // final String fileName = await getFilePath(number, datetime);
+
+      // if (fileName == '') return -1.0;
+
       // var formData = d.FormData.fromMap(
       //   {
       //     'file': await d.MultipartFile.fromFile(
-      //       await _getFilePath(number, datetime),
+      //       fileName,
       //     ),
       //   },
       // );
@@ -112,10 +116,10 @@ class CallController {
           response.data.toString().substring(0, 4),
         );
       } else {
-        return 0.0;
+        return -response.statusCode!.toDouble();
       }
     } catch (e) {
-      return 0.0;
+      return -2.0;
     }
   }
 }

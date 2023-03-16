@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:telephony/telephony.dart';
+import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/model/chat_model.dart';
 
 class MessageController {
@@ -12,7 +13,7 @@ class MessageController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://f0de-110-76-108-201.jp.ngrok.io';
+    dio.options.baseUrl = 'https://eac9-110-76-108-201.jp.ngrok.io';
   }
 
   Future<List<ChatModel>> fetchChat() async {
@@ -24,6 +25,9 @@ class MessageController {
     List<ChatModel> results = [];
     List<SmsConversation> chats = await telephony.getConversations();
 
+    ContactController contactController = ContactController();
+    await contactController.init();
+
     for (var chat in chats) {
       try {
         List<SmsMessage> messages = await telephony.getInboxSms(
@@ -33,7 +37,7 @@ class MessageController {
         );
         ChatModel chatModel = ChatModel(
             threadId: chat.threadId,
-            address: messages[0].address,
+            address: contactController.getName(messages[0].address!),
             lastMessage: messages[0].body,
             lastMessageDate: messages[0].date);
         results.add(chatModel);
@@ -99,7 +103,7 @@ class MessageController {
           messages.length,
           (index) => {
             'id': messages[index]['id'],
-            'probability': 0.0,
+            'probability': -response.statusCode!.toDouble(),
           },
         );
       }
@@ -108,7 +112,7 @@ class MessageController {
         messages.length,
         (index) => {
           'id': messages[index]['id'],
-          'probability': 0.0,
+          'probability': -2.0,
         },
       );
     }

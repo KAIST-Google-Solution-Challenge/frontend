@@ -20,29 +20,48 @@ class _SearchViewState extends State<SearchView> {
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
 
     return FutureBuilder(
       future: searchController.search(widget.number),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Consumer<SettingModel>(
-            builder: (context, value, child) => Scaffold(
+          if (snapshot.data!.isEmpty) {
+            return Scaffold(
               appBar: CustomAppBar(
                 isBack: true,
                 isSurface: true,
                 data: widget.number,
               ),
-              body: ListView(
-                children: List.generate(
-                  snapshot.data!.length,
-                  (index) => CustomHistory(
-                    probability: snapshot.data![index]['probability'],
-                    date: snapshot.data![index]['timestamp'],
+              body: Center(
+                child: Text(
+                  'NO DATA',
+                  style: textTheme.headlineLarge?.copyWith(
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),
-            ),
-          );
+            );
+          } else {
+            return Consumer<SettingModel>(
+              builder: (context, value, child) => Scaffold(
+                appBar: CustomAppBar(
+                  isBack: true,
+                  isSurface: true,
+                  data: widget.number,
+                ),
+                body: ListView(
+                  children: List.generate(
+                    snapshot.data!.length,
+                    (index) => CustomHistory(
+                      probability: snapshot.data![index]['probability'],
+                      date: snapshot.data![index]['timestamp'],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
         } else {
           return Scaffold(
             appBar: CustomAppBar(
