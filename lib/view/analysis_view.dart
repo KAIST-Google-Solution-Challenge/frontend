@@ -79,17 +79,7 @@ class _AnalysisViewState extends State<AnalysisView> {
                       ),
                       const SizedBox(height: 64),
                       Text(
-                        value.language == Language.english
-                            ? '35 Other Phishing Cases'
-                            : '35개의 보이스피싱 사례가',
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      Text(
-                        value.language == Language.english
-                            ? 'Detected With This Number!'
-                            : '이 번호로 탐지되었습니다!',
+                        'Explainalbe AI',
                         style: textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),

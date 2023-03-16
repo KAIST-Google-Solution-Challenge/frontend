@@ -74,25 +74,25 @@ class CallController {
         await Permission.manageExternalStorage.request();
       }
 
-      // final String fileName = await getFilePath(number, datetime);
+      final String fileName = await getFilePath(number, datetime);
 
-      // if (fileName == '') return -1.0;
-
-      // var formData = d.FormData.fromMap(
-      //   {
-      //     'file': await d.MultipartFile.fromFile(
-      //       fileName,
-      //     ),
-      //   },
-      // );
+      if (fileName == '') return -1.0;
 
       var formData = d.FormData.fromMap(
         {
           'file': await d.MultipartFile.fromFile(
-            '/storage/emulated/0/Recordings/Call/sample.m4a',
-          )
+            fileName,
+          ),
         },
       );
+
+      // var formData = d.FormData.fromMap(
+      //   {
+      //     'file': await d.MultipartFile.fromFile(
+      //       '/storage/emulated/0/Recordings/Call/sample.m4a',
+      //     )
+      //   },
+      // );
 
       final response = await dio.post(
         '/model',
