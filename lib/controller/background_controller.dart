@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -9,6 +10,7 @@ import 'package:phone_state/phone_state.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/call_controller.dart';
 import 'package:the_voice/controller/message_controller.dart';
+import 'package:the_voice/util/constant.dart';
 
 class BackgroundController {
   PhoneStateStatus status = PhoneStateStatus.NOTHING;
@@ -22,24 +24,11 @@ class BackgroundController {
   static const notificationTitle = 'The Voice';
 
   Future<void> init() async {
-    await _setStream();
-    _setSmsStream();
-    await _initBackService();
-  }
-
-  Future<void> _setStream() async {
-    if (await requestPermission()) {
-      PhoneState.phoneStateStream.listen((event) {
-        if (event != null) {
-          print(event);
-          if (event == PhoneStateStatus.CALL_ENDED) {
-            Future.delayed(const Duration(seconds: 10), analyzeCall);
-          }
-          status = event;
-        }
-      });
-    } else {
-      print('Permission denied.');
+    var permission = await requestPermission();
+    if (permission) {
+      _setCallStream();
+      _setSmsStream();
+      await _initBackService();
     }
   }
 
@@ -57,28 +46,69 @@ class BackgroundController {
     }
   }
 
+  void _setCallStream() {
+    PhoneState.phoneStateStream.listen((event) {
+      if (event != null) {
+        print('Call event occur: $event');
+        if (event == PhoneStateStatus.CALL_ENDED) {
+          Future.delayed(const Duration(seconds: 10), analyzeCall);
+        }
+        status = event;
+      }
+    });
+  }
+
   void _setSmsStream() {
     telephony.listenIncomingSms(
         onNewMessage: (SmsMessage message) async {
-          // Handle message
-          print(message.body);
-          if (message.body!.length > 20) {
-            final messageController = MessageController();
-            await messageController.analyzeSingle(message.body!);
-          }
+          messageHandler(message);
         },
-        onBackgroundMessage: BackgroundController.backgroundMessageHandler);
+        onBackgroundMessage: messageHandler);
   }
 
-  static void backgroundMessageHandler(SmsMessage message) async {
+  static void messageHandler(SmsMessage message) async {
     //Handle background message
-    print(message.body);
+    print('Message incoming: ${message.body}');
     if (message.body!.length > 20) {
-      final messageController = MessageController();
-      print("reach here");
-      final response = await messageController.analyzeSingle(message.body!);
-      print(response);
+      final response = await MessageController.analyzeSingle(message.body!);
+      if (response == -1) {
+        return;
+      }
+
+      if (double.parse(response) > THREASHOLD) {
+        alertPhishing();
+      }
     }
+  }
+
+  void analyzeCall() async {
+    final callLog = await CallController.fetchLastCall();
+    print('Incoming call from: ${callLog.number}');
+    final datetime = DateTime.fromMillisecondsSinceEpoch(callLog.timestamp!)
+        .toIso8601String();
+    final result = await CallController.analyze(callLog.number!, datetime);
+    if (result > THREASHOLD) {
+      alertPhishing();
+    }
+  }
+
+  static void alertPhishing() {
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin.show(
+      888,
+      notificationTitle,
+      'Voice Phishing Detected!!!',
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          notificationTitle,
+          'Voice Phishing Detected!!!',
+          icon: 'ic_bg_service_small',
+          color: Colors.red,
+          ongoing: true,
+        ),
+      ),
+    );
   }
 
   Future<void> _initBackService() async {
@@ -138,9 +168,6 @@ class BackgroundController {
     // We have to register the plugin manually
 
     /// OPTIONAL when use custom notification
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
@@ -154,33 +181,5 @@ class BackgroundController {
     service.on('stopService').listen((event) {
       service.stopSelf();
     });
-  }
-
-  void analyzeCall() async {
-    /// OPTIONAL when use custom notification
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
-    final callController = CallController();
-    final callLog = await callController.fetchLastCall();
-    print(callLog.number);
-    final datetime = DateTime.fromMillisecondsSinceEpoch(callLog.timestamp!)
-        .toIso8601String();
-    final result = await callController.analyze(callLog.number!, datetime);
-    if (result > 90.0) {
-      flutterLocalNotificationsPlugin.show(
-        888,
-        notificationTitle,
-        'Voice Phishing Detected!!!',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            notificationTitle,
-            'Voice Phishing Detected!!!',
-            icon: 'ic_bg_service_small',
-            ongoing: true,
-          ),
-        ),
-      );
-    }
   }
 }

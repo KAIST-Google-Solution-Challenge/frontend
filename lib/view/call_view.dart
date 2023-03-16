@@ -15,12 +15,9 @@ class CallView extends StatefulWidget {
 }
 
 class _CallViewState extends State<CallView> {
-  CallController callController = CallController();
-
   @override
   void initState() {
     super.initState();
-    callController.init();
   }
 
   String processTitle(String title) {
@@ -49,7 +46,7 @@ class _CallViewState extends State<CallView> {
           data: value.language == Language.english ? 'Call' : '전화',
         ),
         body: FutureBuilder(
-          future: callController.fetchCalls(),
+          future: CallController.fetchCalls(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView(

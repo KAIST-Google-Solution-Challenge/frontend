@@ -22,12 +22,9 @@ class AnalysisView extends StatefulWidget {
 }
 
 class _AnalysisViewState extends State<AnalysisView> {
-  CallController callController = CallController();
-
   @override
   void initState() {
     super.initState();
-    callController.init();
   }
 
   @override
@@ -57,7 +54,7 @@ class _AnalysisViewState extends State<AnalysisView> {
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         body: Center(
           child: FutureBuilder(
-            future: callController.analyze(widget.number, widget.datetime),
+            future: CallController.analyze(widget.number, widget.datetime),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Column(

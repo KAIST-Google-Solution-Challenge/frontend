@@ -15,12 +15,9 @@ class MessageView extends StatefulWidget {
 }
 
 class _MessageViewState extends State<MessageView> {
-  final MessageController messageController = MessageController();
-
   @override
   void initState() {
     super.initState();
-    messageController.init();
   }
 
   @override
@@ -35,7 +32,7 @@ class _MessageViewState extends State<MessageView> {
           data: value.language == Language.english ? 'Message' : '메시지',
         ),
         body: FutureBuilder(
-          future: messageController.fetchChat(),
+          future: MessageController.fetchChat(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView(

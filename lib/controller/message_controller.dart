@@ -2,50 +2,48 @@ import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/model/chat_model.dart';
+import 'package:the_voice/util/constant.dart';
 
 class MessageController {
-  late d.Dio dio;
+  static Future<List<ChatModel>> fetchChat() async {
+    final telephony = Telephony.instance;
 
-  final telephony = Telephony.instance;
-
-  void init() {
-    dio = d.Dio();
-    // dio.options.baseUrl = 'http://10.0.2.2:3000';
-    // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://eac9-110-76-108-201.jp.ngrok.io';
-  }
-
-  Future<List<ChatModel>> fetchChat() async {
     var smsStatus = await Permission.sms.status;
     if (!smsStatus.isGranted) {
       await Permission.sms.request();
     }
 
     List<ChatModel> results = [];
-    List<SmsConversation> chats = await telephony.getConversations();
+    if (smsStatus.isGranted) {
+      // Get All Conversations from device
+      List<SmsConversation> chats = await telephony.getConversations();
 
-    for (var chat in chats) {
-      try {
+      for (var chat in chats) {
+        // Get inbox messages according to conversation id
         List<SmsMessage> messages = await telephony.getInboxSms(
           filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
             chat.threadId.toString(),
           ),
         );
+
         ChatModel chatModel = ChatModel(
             threadId: chat.threadId,
-            address: messages[0].address,
-            lastMessage: messages[0].body,
-            lastMessageDate: messages[0].date);
+            address: messages[0].address ?? 'undefined',
+            lastMessage: messages[0].body ?? 'undefined',
+            lastMessageDate: messages[0].date ?? 0);
         results.add(chatModel);
-        // ignore: empty_catches
-      } catch (e) {}
+      }
     }
-
+    if (results.isEmpty) {
+      return results;
+    }
     results.sort((a, b) => b.lastMessageDate!.compareTo(a.lastMessageDate!));
     return results;
   }
 
-  Future<List<MessageModel>> fetchMessages(int threadId) async {
+  static Future<List<MessageModel>> fetchMessages(int threadId) async {
+    final telephony = Telephony.instance;
+
     List<SmsMessage> receivedMessages = await telephony.getInboxSms(
       filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
         threadId.toString(),
@@ -77,8 +75,10 @@ class MessageController {
     return messages;
   }
 
-  Future<List<dynamic>> analyze(List<dynamic> messages) async {
+  static Future<List<dynamic>> analyze(List<dynamic> messages) async {
     try {
+      final dio = d.Dio();
+      dio.options.baseUrl = BASEURL;
       final response = await dio.post(
         '/model/messages',
         data: {
@@ -114,12 +114,11 @@ class MessageController {
     }
   }
 
-  Future<dynamic> analyzeSingle(String message) async {
+  static Future<dynamic> analyzeSingle(String message) async {
     try {
-      dio = d.Dio();
-      // dio.options.baseUrl = 'http://10.0.2.2:3000';
-      // dio.options.baseUrl = 'http://localhost:3000';
-      dio.options.baseUrl = 'https://eac9-110-76-108-201.jp.ngrok.io';
+      final dio = d.Dio();
+      dio.options.baseUrl = BASEURL;
+
       final response = await dio.post(
         '/model/messages',
         data: {

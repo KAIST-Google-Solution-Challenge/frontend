@@ -4,24 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/contact_controller.dart';
+import 'package:the_voice/util/constant.dart';
 
 class CallController {
-  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  late d.Dio dio;
-
-  void init() {
-    dio = d.Dio();
-    // dio.options.baseUrl = 'http://10.0.2.2:3000';
-    // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://eac9-110-76-108-201.jp.ngrok.io';
-  }
-
-  Future<List<CallLogEntry>> fetchCalls() async {
+  static Future<List<CallLogEntry>> fetchCalls() async {
     final callLogs = await CallLog.get();
     return callLogs.toList();
   }
 
-  Future<CallLogEntry> fetchLastCall() async {
+  static Future<CallLogEntry> fetchLastCall() async {
     var now = DateTime.now();
     int from = now.subtract(const Duration(days: 1)).millisecondsSinceEpoch;
     final lastCallLog =
@@ -32,7 +23,7 @@ class CallController {
     return lastCallLog.first;
   }
 
-  Future<String> _getFilePath(String number, String datetime) async {
+  static Future<String> getFilePath(String number, String datetime) async {
     Directory directory = Directory('/storage/emulated/0/Recordings/Call');
 
     ContactController contactController = ContactController();
@@ -60,27 +51,31 @@ class CallController {
     return fileName;
   }
 
-  Future<double> analyze(String number, String datetime) async {
+  static Future<double> analyze(String number, String datetime) async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    final dio = d.Dio();
+    dio.options.baseUrl = BASEURL;
+
+    var contactsStatus = await Permission.contacts.status;
+    if (!contactsStatus.isGranted) {
+      await Permission.contacts.request();
+    }
+
+    var storageStatus = await Permission.storage.status;
+    if (!storageStatus.isGranted) {
+      await Permission.storage.request();
+    }
+
+    var audioStatus = await Permission.manageExternalStorage.status;
+    if (!audioStatus.isGranted) {
+      await Permission.manageExternalStorage.request();
+    }
+
     try {
-      var contactsStatus = await Permission.contacts.status;
-      if (!contactsStatus.isGranted) {
-        await Permission.contacts.request();
-      }
-
-      var storageStatus = await Permission.storage.status;
-      if (!storageStatus.isGranted) {
-        await Permission.storage.request();
-      }
-
-      var audioStatus = await Permission.manageExternalStorage.status;
-      if (!audioStatus.isGranted) {
-        await Permission.manageExternalStorage.request();
-      }
-
       var formData = d.FormData.fromMap(
         {
           'file': await d.MultipartFile.fromFile(
-            await _getFilePath(number, datetime),
+            await getFilePath(number, datetime),
           ),
         },
       );

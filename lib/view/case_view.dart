@@ -22,18 +22,16 @@ class CaseView extends StatefulWidget {
 }
 
 class _CaseViewState extends State<CaseView> {
-  MessageController messageController = MessageController();
   late List<MessageModel> messages;
   late List<dynamic> probabilities;
 
   @override
   void initState() {
     super.initState();
-    messageController.init();
   }
 
   Future<bool> future() async {
-    messages = await messageController.fetchMessages(widget.threadId);
+    messages = await MessageController.fetchMessages(widget.threadId);
     List<dynamic> requests = [];
 
     for (int i = 0; i < messages.length; i++) {
@@ -47,7 +45,7 @@ class _CaseViewState extends State<CaseView> {
       }
     }
 
-    probabilities = await messageController.analyze(requests);
+    probabilities = await MessageController.analyze(requests);
     return true;
   }
 
