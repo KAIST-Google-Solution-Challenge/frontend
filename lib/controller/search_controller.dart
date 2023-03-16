@@ -5,13 +5,6 @@ class SearchController {
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   late Dio dio;
 
-  void init() {
-    dio = Dio();
-    // dio.options.baseUrl = 'http://10.0.2.2:3000';
-    // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
-  }
-
   Future<List<dynamic>> search(String number) async {
     try {
       List<dynamic> documents = [];

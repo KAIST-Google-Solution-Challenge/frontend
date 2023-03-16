@@ -20,18 +20,6 @@ class _CallViewState extends State<CallView> {
     super.initState();
   }
 
-  String processTitle(String title) {
-    if (title[0] == '+') {
-      title = title.substring(1);
-    } else if (title[3] == '-' && title[8] == '-') {
-      title = title.substring(0, 3) +
-          title.substring(4, 8) +
-          title.substring(9, 13);
-    }
-
-    return title;
-  }
-
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -61,12 +49,13 @@ class _CallViewState extends State<CallView> {
                       leading: const CircleAvatar(radius: 32),
                       isHeader: currHeader != nextHeader,
                       header: nextHeader,
-                      title: processTitle(snapshot.data![index].number!),
+                      title: snapshot.data![index].number!,
                       subtitle: snapshot.data![index].callType
                           .toString()
                           .substring(9)
                           .toLowerCase(),
-                      trailing: snapshot.data![index].duration.toString(),
+                      trailing:
+                          '${snapshot.data![index].duration! ~/ 60}:${snapshot.data![index].duration! % 60}',
                       datetime: DateTime.fromMillisecondsSinceEpoch(
                         snapshot.data![index].timestamp!,
                       ).toIso8601String(),

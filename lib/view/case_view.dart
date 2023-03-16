@@ -35,7 +35,7 @@ class _CaseViewState extends State<CaseView> {
     List<dynamic> requests = [];
 
     for (int i = 0; i < messages.length; i++) {
-      if (messages[i].smsMessage.body!.length > 50) {
+      if (messages[i].smsMessage.body!.length > 20) {
         requests.add(
           {
             'id': messages[i].smsMessage.id!,
@@ -52,6 +52,7 @@ class _CaseViewState extends State<CaseView> {
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
 
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
@@ -75,49 +76,94 @@ class _CaseViewState extends State<CaseView> {
           future: future(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: ListView(
-                      children: List<Widget>.generate(
-                            messages.length,
-                            (index) {
-                              if (messages[index].sender == Sender.opponent) {
-                                for (int i = 0; i < probabilities.length; i++) {
-                                  if (messages[index].smsMessage.id! ==
-                                      probabilities[i]['id']) {
-                                    return CustomChatAnalysis(
-                                      isLeft: true,
-                                      isAnalyzed: true,
-                                      data: messages[index].smsMessage.body!,
-                                      probability: probabilities[i]
-                                          ['probability'],
-                                    );
+              if (probabilities.isEmpty ||
+                  probabilities[0]['probability'] >= 0.0) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        children: List<Widget>.generate(
+                              messages.length,
+                              (index) {
+                                if (messages[index].sender == Sender.opponent) {
+                                  for (int i = 0;
+                                      i < probabilities.length;
+                                      i++) {
+                                    if (messages[index].smsMessage.id! ==
+                                        probabilities[i]['id']) {
+                                      return CustomChatAnalysis(
+                                        isLeft: true,
+                                        isAnalyzed: true,
+                                        data: messages[index].smsMessage.body!,
+                                        probability: probabilities[i]
+                                            ['probability'],
+                                      );
+                                    }
                                   }
-                                }
 
-                                return CustomChatAnalysis(
-                                  isLeft: true,
-                                  isAnalyzed: false,
-                                  data: messages[index].smsMessage.body!,
-                                  probability: 0.0,
-                                );
-                              } else {
-                                return CustomChatAnalysis(
-                                  isLeft: false,
-                                  isAnalyzed: false,
-                                  data: messages[index].smsMessage.body!,
-                                  probability: 0.0,
-                                );
-                              }
-                            },
-                          ) +
-                          <Widget>[const SizedBox(height: 16)],
+                                  return CustomChatAnalysis(
+                                    isLeft: true,
+                                    isAnalyzed: false,
+                                    data: messages[index].smsMessage.body!,
+                                    probability: 0.0,
+                                  );
+                                } else {
+                                  return CustomChatAnalysis(
+                                    isLeft: false,
+                                    isAnalyzed: false,
+                                    data: messages[index].smsMessage.body!,
+                                    probability: 0.0,
+                                  );
+                                }
+                              },
+                            ) +
+                            <Widget>[const SizedBox(height: 16)],
+                      ),
                     ),
+                  ],
+                );
+              } else if (probabilities[0]['probability'] == -2.0) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'ERROR',
+                        style: textTheme.headlineLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        'SERVER',
+                        style: textTheme.displayLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      )
+                    ],
                   ),
-                ],
-              );
+                );
+              } else {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'ERROR',
+                        style: textTheme.headlineLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        (-probabilities[0]['probability'].toInt()).toString(),
+                        style: textTheme.displayLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              }
             } else {
               return Center(
                 child: LoadingAnimationWidget.staggeredDotsWave(

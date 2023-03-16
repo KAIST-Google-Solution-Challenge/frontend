@@ -99,7 +99,7 @@ class MessageController {
           messages.length,
           (index) => {
             'id': messages[index]['id'],
-            'probability': 0.0,
+            'probability': -response.statusCode!.toDouble(),
           },
         );
       }
@@ -108,7 +108,7 @@ class MessageController {
         messages.length,
         (index) => {
           'id': messages[index]['id'],
-          'probability': 0.0,
+          'probability': -2.0,
         },
       );
     }

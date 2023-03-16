@@ -75,7 +75,7 @@ class BackgroundController {
         return;
       }
 
-      if (double.parse(response) > THREASHOLD) {
+      if (response > THREASHOLD) {
         alertPhishing();
       }
     }

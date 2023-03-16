@@ -57,41 +57,87 @@ class _AnalysisViewState extends State<AnalysisView> {
             future: CallController.analyze(widget.number, widget.datetime),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.gpp_bad, size: 32),
-                    const SizedBox(height: 16),
-                    Text(
-                        value.language == Language.english
-                            ? 'Phishing Probability'
-                            : '보이스피싱 확률',
-                        style: textTheme.headlineSmall),
-                    const SizedBox(height: 64),
-                    DoughnutChart(
-                      isChat: false,
-                      radius: 128,
-                      probability: snapshot.data!,
-                    ),
-                    const SizedBox(height: 64),
-                    Text(
-                      value.language == Language.english
-                          ? '35 Other Phishing Cases'
-                          : '35개의 보이스피싱 사례가',
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                if (snapshot.data! >= 0.0) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.gpp_bad, size: 32),
+                      const SizedBox(height: 16),
+                      Text(
+                          value.language == Language.english
+                              ? 'Phishing Probability'
+                              : '보이스피싱 확률',
+                          style: textTheme.headlineSmall),
+                      const SizedBox(height: 64),
+                      DoughnutChart(
+                        isChat: false,
+                        radius: 128,
+                        probability: snapshot.data!,
                       ),
-                    ),
-                    Text(
-                      value.language == Language.english
-                          ? 'Detected With This Number!'
-                          : '이 번호로 탐지되었습니다!',
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                      const SizedBox(height: 64),
+                      Text(
+                        'Explainalbe AI',
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                  ],
-                );
+                    ],
+                  );
+                } else if (snapshot.data! == -1.0) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'ERROR',
+                        style: textTheme.headlineLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        'NO FILE',
+                        style: textTheme.displayLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      )
+                    ],
+                  );
+                } else if (snapshot.data! == -2.0) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'ERROR',
+                        style: textTheme.headlineLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        'SERVER',
+                        style: textTheme.displayLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      )
+                    ],
+                  );
+                } else {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'ERROR',
+                        style: textTheme.headlineLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        (-snapshot.data!.toInt()).toString(),
+                        style: textTheme.displayLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      )
+                    ],
+                  );
+                }
               } else {
                 return LoadingAnimationWidget.staggeredDotsWave(
                   color: colorScheme.primary,

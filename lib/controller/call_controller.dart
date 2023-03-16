@@ -8,8 +8,26 @@ import 'package:the_voice/util/constant.dart';
 
 class CallController {
   static Future<List<CallLogEntry>> fetchCalls() async {
-    final callLogs = await CallLog.get();
-    return callLogs.toList();
+    final callLog = await CallLog.get();
+    List<CallLogEntry> callLogEntryList = callLog.toList();
+
+    ContactController contactController = ContactController();
+    await contactController.init();
+
+    for (CallLogEntry callLogEntry in callLogEntryList) {
+      if (callLogEntry.number![0] == '+') {
+        callLogEntry.number = callLogEntry.number!.substring(1);
+      } else if (callLogEntry.number![3] == '-' &&
+          callLogEntry.number![8] == '-') {
+        callLogEntry.number = callLogEntry.number!.substring(0, 3) +
+            callLogEntry.number!.substring(4, 8) +
+            callLogEntry.number!.substring(9, 13);
+      }
+
+      callLogEntry.number = contactController.getName(callLogEntry.number!);
+    }
+
+    return callLogEntryList;
   }
 
   static Future<CallLogEntry> fetchLastCall() async {
@@ -26,11 +44,7 @@ class CallController {
   static Future<String> getFilePath(String number, String datetime) async {
     Directory directory = Directory('/storage/emulated/0/Recordings/Call');
 
-    ContactController contactController = ContactController();
-    await contactController.init();
-
     String fileName = '';
-    String name = contactController.getName(number);
     String date = datetime.substring(2, 4) +
         datetime.substring(5, 7) +
         datetime.substring(8, 10);
@@ -40,8 +54,7 @@ class CallController {
 
     for (var i = 0; i < 10; i++) {
       time = (int.parse(time) + 1).toString();
-      String file =
-          "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
+      String file = "${directory.path}/${'통화 녹음 ${number}_${date}_$time.m4a'}";
       if (File(file).existsSync()) {
         fileName = file;
         break;
@@ -72,10 +85,24 @@ class CallController {
     }
 
     try {
+      var storageStatus = await Permission.storage.status;
+      if (!storageStatus.isGranted) {
+        await Permission.storage.request();
+      }
+
+      var audioStatus = await Permission.manageExternalStorage.status;
+      if (!audioStatus.isGranted) {
+        await Permission.manageExternalStorage.request();
+      }
+
+      final String fileName = await getFilePath(number, datetime);
+
+      if (fileName == '') return -1.0;
+
       var formData = d.FormData.fromMap(
         {
           'file': await d.MultipartFile.fromFile(
-            await getFilePath(number, datetime),
+            fileName,
           ),
         },
       );
@@ -110,10 +137,10 @@ class CallController {
           response.data.toString().substring(0, 4),
         );
       } else {
-        return 0.0;
+        return -response.statusCode!.toDouble();
       }
     } catch (e) {
-      return 0.0;
+      return -2.0;
     }
   }
 }
