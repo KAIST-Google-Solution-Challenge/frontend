@@ -24,9 +24,17 @@ class _CallViewState extends State<CallView> {
   }
 
   String processTitle(String title) {
+    // print("title accessing...");
+    // print(title.length);
+    // print(title);
     if (title[0] == '+') {
+      // print(0);
       title = title.substring(1);
+    } else if(title.length < 4){
+      return title;
     } else if (title[3] == '-' && title[8] == '-') {
+      // print(3);
+      // print(8);
       title = title.substring(0, 3) +
           title.substring(4, 8) +
           title.substring(9, 13);
@@ -52,10 +60,15 @@ class _CallViewState extends State<CallView> {
           future: callController.fetchCalls(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              print(("data returned!"));
+              print(snapshot.data!.length);
               return ListView(
                 children: List<Widget>.generate(
                   snapshot.data!.length,
                   (index) {
+                    // print("index: $index");
+                    // print(snapshot.data![index]);
+                    // print(snapshot.data![index].number!);
                     nextHeader = DateTime.fromMillisecondsSinceEpoch(
                       snapshot.data![index].timestamp!,
                     ).toIso8601String().substring(0, 10);
@@ -82,6 +95,7 @@ class _CallViewState extends State<CallView> {
                 ),
               );
             } else {
+              print(("data not yet returned!"));
               return Center(
                 child: LoadingAnimationWidget.staggeredDotsWave(
                   color: colorScheme.primary,

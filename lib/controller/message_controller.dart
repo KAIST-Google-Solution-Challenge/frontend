@@ -2,6 +2,7 @@ import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/model/chat_model.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 
 class MessageController {
   late d.Dio dio;
@@ -20,6 +21,7 @@ class MessageController {
     if (!smsStatus.isGranted) {
       await Permission.sms.request();
     }
+    // FlutterSms
 
     List<ChatModel> results = [];
     List<SmsConversation> chats = await telephony.getConversations();
@@ -42,6 +44,8 @@ class MessageController {
     }
 
     results.sort((a, b) => b.lastMessageDate!.compareTo(a.lastMessageDate!));
+
+    print("(fetchChat) ${results}");
     return results;
   }
 
