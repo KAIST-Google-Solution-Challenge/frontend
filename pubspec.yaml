@@ -45,7 +45,7 @@ dependencies:
     contacts_service: ^0.6.3
     url_launcher: ^6.1.10
     cloud_firestore: ^4.4.4
-    flutter_sms: ^2.3.3
+#    flutter_sms: ^2.3.3
 
 dev_dependencies:
     flutter_test:

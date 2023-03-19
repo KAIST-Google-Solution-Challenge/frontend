@@ -13,7 +13,8 @@ class CallController {
     dio = d.Dio();
     // dio.options.baseUrl = 'http://10.0.2.2:3000';
     // dio.options.baseUrl = 'http://localhost:3000';
-    dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
+    // dio.options.baseUrl = 'https://dccf-110-76-108-201.jp.ngrok.io/';
+    dio.options.baseUrl = 'http://35.216.49.87:3000/';
   }
 
   Future<List<CallLogEntry>> fetchCalls() async {
@@ -41,8 +42,9 @@ class CallController {
         datetime.substring(14, 16) +
         datetime.substring(17, 19);
     print("(getFilePath) check1!");
+    print("(getFilePath) initial time: $time");
 
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 1000; i++) {
       time = (int.parse(time) + 1).toString();
       String fileKor = "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
       String fileEng = "${directory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
