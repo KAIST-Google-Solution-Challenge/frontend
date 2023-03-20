@@ -26,12 +26,14 @@ class MessageController {
           ),
         );
 
-        ChatModel chatModel = ChatModel(
-            threadId: chat.threadId,
-            address: messages[0].address ?? 'undefined',
-            lastMessage: messages[0].body ?? 'undefined',
-            lastMessageDate: messages[0].date ?? 0);
-        results.add(chatModel);
+        if (messages.isNotEmpty) {
+          ChatModel chatModel = ChatModel(
+              threadId: chat.threadId,
+              address: messages[0].address ?? 'undefined',
+              lastMessage: messages[0].body ?? 'undefined',
+              lastMessageDate: messages[0].date ?? 0);
+          results.add(chatModel);
+        }
       }
     }
     if (results.isEmpty) {

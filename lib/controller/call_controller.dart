@@ -17,6 +17,8 @@ class CallController {
     for (CallLogEntry callLogEntry in callLogEntryList) {
       if (callLogEntry.number![0] == '+') {
         callLogEntry.number = callLogEntry.number!.substring(1);
+      } else if (callLogEntry.number!.length < 4) {
+        //
       } else if (callLogEntry.number![3] == '-' &&
           callLogEntry.number![8] == '-') {
         callLogEntry.number = callLogEntry.number!.substring(0, 3) +
