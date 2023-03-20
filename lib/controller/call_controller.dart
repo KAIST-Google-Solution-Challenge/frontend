@@ -8,30 +8,23 @@ import 'package:the_voice/util/constant.dart';
 
 class CallController {
   static Future<List<CallLogEntry>> fetchCalls() async {
-    final callLog = await CallLog.get();
-    List<CallLogEntry> callLogEntryList = callLog.toList();
+    // Fetch call logs from device
+    final callLogs = (await CallLog.get()).toList();
 
-    ContactController contactController = ContactController();
-    print("(getFilePath) check0");
-    await contactController.init();
-    print("(getFilePath) check1");
-
-    for (CallLogEntry callLogEntry in callLogEntryList) {
-      if (callLogEntry.number![0] == '+') {
-        callLogEntry.number = callLogEntry.number!.substring(1);
-      } else if (callLogEntry.number!.length < 4) {
-        //
-      } else if (callLogEntry.number![3] == '-' &&
-          callLogEntry.number![8] == '-') {
-        callLogEntry.number = callLogEntry.number!.substring(0, 3) +
-            callLogEntry.number!.substring(4, 8) +
-            callLogEntry.number!.substring(9, 13);
+    for (var callLogEntry in callLogs) {
+      // number of call log is undefined
+      if (callLogEntry.number == null) {
+        continue;
       }
 
-      callLogEntry.number = contactController.getName(callLogEntry.number!);
-    }
+      callLogEntry.number!.replaceAll('+', '');
+      callLogEntry.number!.replaceAll('-', '');
 
-    return callLogEntryList;
+      // If number registered in contacts, fetch the display name
+      callLogEntry.number =
+          await ContactController.getName(callLogEntry.number!);
+    }
+    return callLogs;
   }
 
   static Future<CallLogEntry> fetchLastCall() async {
@@ -39,6 +32,7 @@ class CallController {
     int from = now.subtract(const Duration(days: 1)).millisecondsSinceEpoch;
     final lastCallLog =
         await CallLog.query(dateFrom: from, type: CallType.incoming);
+
     if (lastCallLog.isEmpty) {
       throw Exception('No calls found');
     }
@@ -46,12 +40,11 @@ class CallController {
   }
 
   static Future<String> getFilePath(String number, String datetime) async {
-    Directory directory = Directory('/storage/emulated/0/Recordings/Call');
+    Directory directory = Directory(EngDir);
 
     String fileName = '';
 
-    ContactController contactController = ContactController();
-    String name = contactController.getName(number);
+    String name = await ContactController.getName(number);
     print("name: $name");
     String date = datetime.substring(2, 4) +
         datetime.substring(5, 7) +
@@ -60,7 +53,6 @@ class CallController {
     String time = datetime.substring(11, 13) +
         datetime.substring(14, 16) +
         datetime.substring(17, 19);
-    print("(getFilePath) check1!");
     print("(getFilePath) initial time: $time");
 
     for (var i = 0; i < 1000; i++) {
@@ -69,22 +61,18 @@ class CallController {
           "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
       String fileEng =
           "${directory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
-      print("(getFilePath) file: $fileKor");
+
       if (File(fileKor).existsSync()) {
-        print("exists!");
         fileName = fileKor;
         break;
       }
-      print("(getFilePath) file: $fileEng");
       if (File(fileEng).existsSync()) {
-        print("exists!");
         fileName = fileEng;
         break;
       }
     }
 
     print("(getFilePath) fileName : $fileName");
-
     return fileName;
   }
 
@@ -109,18 +97,7 @@ class CallController {
     }
 
     try {
-      var storageStatus = await Permission.storage.status;
-      if (!storageStatus.isGranted) {
-        await Permission.storage.request();
-      }
-
-      var audioStatus = await Permission.manageExternalStorage.status;
-      if (!audioStatus.isGranted) {
-        await Permission.manageExternalStorage.request();
-      }
-
       final String fileName = await getFilePath(number, datetime);
-
       if (fileName == '') return -1.0;
 
       var formData = d.FormData.fromMap(
@@ -130,14 +107,6 @@ class CallController {
           ),
         },
       );
-
-      // var formData = d.FormData.fromMap(
-      //   {
-      //     'file': await d.MultipartFile.fromFile(
-      //       '/storage/emulated/0/Recordings/Call/sample.m4a',
-      //     )
-      //   },
-      // );
 
       print("(analyze) requesting...");
 
@@ -150,7 +119,7 @@ class CallController {
       );
 
       if (response.statusCode == 200) {
-        print("(analyze) good!");
+        print("(analyze) success!");
         final Map<String, dynamic> document = {
           'number': number,
           'probability': response.data.toString().substring(0, 4),
@@ -164,7 +133,7 @@ class CallController {
           response.data.toString().substring(0, 4),
         );
       } else {
-        return -response.statusCode!.toDouble();
+        throw Exception('Request failed');
       }
     } catch (e) {
       return -2.0;

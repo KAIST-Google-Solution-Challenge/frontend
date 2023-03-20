@@ -82,13 +82,17 @@ class BackgroundController {
   }
 
   void analyzeCall() async {
-    final callLog = await CallController.fetchLastCall();
-    print('Incoming call from: ${callLog.number}');
-    final datetime = DateTime.fromMillisecondsSinceEpoch(callLog.timestamp!)
-        .toIso8601String();
-    final result = await CallController.analyze(callLog.number!, datetime);
-    if (result > THREASHOLD) {
-      alertPhishing();
+    try {
+      final callLog = await CallController.fetchLastCall();
+      print('Incoming call from: ${callLog.number}');
+      final datetime = DateTime.fromMillisecondsSinceEpoch(callLog.timestamp!)
+          .toIso8601String();
+      final result = await CallController.analyze(callLog.number!, datetime);
+      if (result > THREASHOLD) {
+        alertPhishing();
+      }
+    } catch (e) {
+      print("Error: $e");
     }
   }
 
