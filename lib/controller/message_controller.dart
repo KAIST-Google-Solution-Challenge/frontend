@@ -40,6 +40,8 @@ class MessageController {
       return results;
     }
     results.sort((a, b) => b.lastMessageDate!.compareTo(a.lastMessageDate!));
+
+    print("(fetchChat) $results");
     return results;
   }
 

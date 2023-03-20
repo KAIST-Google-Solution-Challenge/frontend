@@ -12,7 +12,9 @@ class CallController {
     List<CallLogEntry> callLogEntryList = callLog.toList();
 
     ContactController contactController = ContactController();
+    print("(getFilePath) check0");
     await contactController.init();
+    print("(getFilePath) check1");
 
     for (CallLogEntry callLogEntry in callLogEntryList) {
       if (callLogEntry.number![0] == '+') {
@@ -47,21 +49,41 @@ class CallController {
     Directory directory = Directory('/storage/emulated/0/Recordings/Call');
 
     String fileName = '';
+
+    ContactController contactController = ContactController();
+    String name = contactController.getName(number);
+    print("name: $name");
     String date = datetime.substring(2, 4) +
         datetime.substring(5, 7) +
         datetime.substring(8, 10);
+    print("date: $date");
     String time = datetime.substring(11, 13) +
         datetime.substring(14, 16) +
         datetime.substring(17, 19);
+    print("(getFilePath) check1!");
+    print("(getFilePath) initial time: $time");
 
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 1000; i++) {
       time = (int.parse(time) + 1).toString();
-      String file = "${directory.path}/${'통화 녹음 ${number}_${date}_$time.m4a'}";
-      if (File(file).existsSync()) {
-        fileName = file;
+      String fileKor =
+          "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
+      String fileEng =
+          "${directory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
+      print("(getFilePath) file: $fileKor");
+      if (File(fileKor).existsSync()) {
+        print("exists!");
+        fileName = fileKor;
+        break;
+      }
+      print("(getFilePath) file: $fileEng");
+      if (File(fileEng).existsSync()) {
+        print("exists!");
+        fileName = fileEng;
         break;
       }
     }
+
+    print("(getFilePath) fileName : $fileName");
 
     return fileName;
   }
@@ -117,6 +139,8 @@ class CallController {
       //   },
       // );
 
+      print("(analyze) requesting...");
+
       final response = await dio.post(
         '/model',
         options: d.Options(
@@ -126,6 +150,7 @@ class CallController {
       );
 
       if (response.statusCode == 200) {
+        print("(analyze) good!");
         final Map<String, dynamic> document = {
           'number': number,
           'probability': response.data.toString().substring(0, 4),

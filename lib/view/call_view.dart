@@ -37,10 +37,15 @@ class _CallViewState extends State<CallView> {
           future: CallController.fetchCalls(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              print(("data returned!"));
+              print(snapshot.data!.length);
               return ListView(
                 children: List<Widget>.generate(
                   snapshot.data!.length,
                   (index) {
+                    // print("index: $index");
+                    // print(snapshot.data![index]);
+                    // print(snapshot.data![index].number!);
                     nextHeader = DateTime.fromMillisecondsSinceEpoch(
                       snapshot.data![index].timestamp!,
                     ).toIso8601String().substring(0, 10);
@@ -68,6 +73,7 @@ class _CallViewState extends State<CallView> {
                 ),
               );
             } else {
+              print(("data not yet returned!"));
               return Center(
                 child: LoadingAnimationWidget.staggeredDotsWave(
                   color: colorScheme.primary,
