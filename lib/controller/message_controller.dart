@@ -86,15 +86,19 @@ class MessageController {
       final response = await dio.post(
         '/model/messages',
         data: {
-          'messages': messages,
+          'messages': messages.sublist(messages.length - 10),
         },
       );
 
+      List<double> results = [];
       if (response.statusCode == 200) {
         for (int i = 0; i < response.data.length; i++) {
-          response.data[i]['probability'] = double.parse(
+          if (response.data[i]['probability'] == null) {
+            continue;
+          }
+          results.add(double.parse(
             response.data[i]['probability'].toString().substring(0, 4),
-          );
+          ));
         }
 
         return response.data;
