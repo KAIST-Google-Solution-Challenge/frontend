@@ -17,6 +17,7 @@ class MessageController {
     if (smsStatus.isGranted) {
       // Get All Conversations from device
       List<SmsConversation> chats = await telephony.getConversations();
+      chats = chats.sublist(chats.length - 60);
 
       for (var chat in chats) {
         // Get inbox messages according to conversation id
@@ -76,6 +77,10 @@ class MessageController {
 
     List<MessageModel> messages = receivedMessageModel + sentMessageModel;
     messages.sort((a, b) => a.smsMessage.date!.compareTo(b.smsMessage.date!));
+    if (messages.length > 5) {
+      messages = messages.sublist(messages.length - 5);
+    }
+    print(messages);
     return messages;
   }
 
@@ -86,9 +91,11 @@ class MessageController {
       final response = await dio.post(
         '/model/messages',
         data: {
-          'messages': messages.sublist(messages.length - 10),
+          'messages': messages,
         },
       );
+
+      print(response.data);
 
       List<double> results = [];
       if (response.statusCode == 200) {
@@ -112,6 +119,7 @@ class MessageController {
         );
       }
     } catch (e) {
+      print(e);
       return List.generate(
         messages.length,
         (index) => {
