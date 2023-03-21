@@ -103,17 +103,14 @@ class CallController {
 
     var contactsStatus = await Permission.contacts.status;
     if (!contactsStatus.isGranted) {
+      print('No contact permission granted');
       await Permission.contacts.request();
     }
 
     var storageStatus = await Permission.storage.status;
     if (!storageStatus.isGranted) {
+      print('No storage permission granted');
       await Permission.storage.request();
-    }
-
-    var audioStatus = await Permission.manageExternalStorage.status;
-    if (!audioStatus.isGranted) {
-      await Permission.manageExternalStorage.request();
     }
 
     try {
