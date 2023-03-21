@@ -29,6 +29,7 @@ class TheVoice extends StatelessWidget {
       create: (context) => SettingModel(),
       builder: (context, child) => Consumer<SettingModel>(
         builder: (context, value, child) => MaterialApp(
+          debugShowCheckedModeBanner: false,
           initialRoute: HomeView.route,
           routes: {
             HomeView.route: (context) => const HomeView(),

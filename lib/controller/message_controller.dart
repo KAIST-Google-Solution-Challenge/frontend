@@ -80,7 +80,6 @@ class MessageController {
     if (messages.length > 5) {
       messages = messages.sublist(messages.length - 5);
     }
-    print(messages);
     return messages;
   }
 
@@ -88,14 +87,13 @@ class MessageController {
     try {
       final dio = d.Dio();
       dio.options.baseUrl = BASEURL;
+
       final response = await dio.post(
         '/model/messages',
         data: {
           'messages': messages,
         },
       );
-
-      print(response.data);
 
       List<double> results = [];
       if (response.statusCode == 200) {
@@ -109,24 +107,17 @@ class MessageController {
         }
 
         return response.data;
-      } else {
-        return List.generate(
-          messages.length,
-          (index) => {
-            'id': messages[index]['id'],
-            'probability': -response.statusCode!.toDouble(),
-          },
-        );
       }
-    } catch (e) {
-      print(e);
       return List.generate(
         messages.length,
         (index) => {
           'id': messages[index]['id'],
-          'probability': -2.0,
+          'probability': -response.statusCode!.toDouble(),
         },
       );
+    } catch (e) {
+      print(e);
+      return [];
     }
   }
 
