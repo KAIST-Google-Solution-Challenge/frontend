@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_voice/controller/authentication_controller.dart';
 import 'package:the_voice/model/custom_widget_model.dart';
 import 'package:the_voice/model/setting_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:math';
 
 class ProfileView extends StatelessWidget {
   static String route = 'profile_view';
@@ -10,6 +13,9 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AuthenticationController authenticationController =
+        AuthenticationController();
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
 
@@ -23,16 +29,27 @@ class ProfileView extends StatelessWidget {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(radius: 64),
+            firebaseAuth.currentUser == null
+                ? const CircleAvatar(radius: 64)
+                : const CircleAvatar(radius: 64),
             const SizedBox(height: 16),
-            Text('Seungho Jang', style: textTheme.headlineSmall),
-            Text('develop0235@gmail.com',
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                )),
+            Text(
+              firebaseAuth.currentUser == null
+                  ? 'Guest'
+                  : firebaseAuth.currentUser!.displayName!,
+              style: textTheme.headlineSmall,
+            ),
+            Text(
+              firebaseAuth.currentUser == null
+                  ? 'guest${Random().nextInt(9999) + 1}@the-voice.app'
+                  : firebaseAuth.currentUser!.email!,
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: 16),
             OutlinedButton(
-              onPressed: () {},
+              onPressed: () => authenticationController.signInWithGoogle(),
               child: Text(
                 value.language == Language.english
                     ? 'Connect with Google'
