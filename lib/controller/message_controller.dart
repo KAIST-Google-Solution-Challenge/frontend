@@ -17,8 +17,9 @@ class MessageController {
     if (smsStatus.isGranted) {
       // Get All Conversations from device
       List<SmsConversation> chats = await telephony.getConversations();
-      // bug if chats.length < 60
-      // chats = chats.sublist(chats.length - 60);
+      if (chats.length > 60) {
+        chats = chats.sublist(chats.length - 60);
+      }
 
       for (var chat in chats) {
         // Get inbox messages according to conversation id
@@ -78,8 +79,8 @@ class MessageController {
 
     List<MessageModel> messages = receivedMessageModel + sentMessageModel;
     messages.sort((a, b) => a.smsMessage.date!.compareTo(b.smsMessage.date!));
-    if (messages.length > 5) {
-      messages = messages.sublist(messages.length - 5);
+    if (messages.length > 10) {
+      messages = messages.sublist(messages.length - 10);
     }
     return messages;
   }

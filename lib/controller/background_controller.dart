@@ -109,9 +109,13 @@ class BackgroundController {
         android: AndroidNotificationDetails(
           notificationTitle,
           'Voice Phishing Detected!!!',
+          importance: Importance.max,
+          priority: Priority.high,
           icon: 'ic_bg_service_small',
           color: Colors.red,
           ongoing: true,
+          styleInformation: BigTextStyleInformation('보이스 피싱이 감지되었습니다!'),
+          showWhen: true,
         ),
       ),
     );
@@ -122,7 +126,7 @@ class BackgroundController {
       notificationChannelId, // id
       notificationTitle, // title
       description: 'Detecting Incoming voice phishing', // description
-      importance: Importance.high, // importance must be at low or higher level
+      importance: Importance.max, // importance must be at low or higher level
     );
 
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -140,7 +144,7 @@ class BackgroundController {
 
         // auto start service
         autoStart: true,
-        isForegroundMode: true,
+        isForegroundMode: false,
 
         notificationChannelId: notificationChannelId,
         initialNotificationTitle: notificationTitle,

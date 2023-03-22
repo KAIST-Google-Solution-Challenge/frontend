@@ -25,8 +25,9 @@ class CallController {
 
     // Fetch call logs from device
     var callLogs = (await CallLog.get()).toList();
-    // bug if callLogs.length < 60
-    // callLogs = callLogs.sublist(0, 60);
+    if (callLogs.length > 60) {
+      callLogs = callLogs.sublist(0, 60);
+    }
     final contacts = await ContactsService.getContacts(withThumbnails: false);
 
     for (var callLogEntry in callLogs) {

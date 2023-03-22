@@ -35,6 +35,9 @@ class _CaseViewState extends State<CaseView> {
     List<dynamic> requests = [];
 
     for (int i = 0; i < messages.length; i++) {
+      if (messages[i].sender == Sender.user) {
+        continue;
+      }
       requests.add(
         {
           'id': messages[i].smsMessage.id!,
