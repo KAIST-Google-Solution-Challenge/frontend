@@ -17,6 +17,7 @@ class MessageController {
     if (smsStatus.isGranted) {
       // Get All Conversations from device
       List<SmsConversation> chats = await telephony.getConversations();
+      chats = chats.sublist(chats.length - 60);
 
       for (var chat in chats) {
         // Get inbox messages according to conversation id
@@ -76,6 +77,9 @@ class MessageController {
 
     List<MessageModel> messages = receivedMessageModel + sentMessageModel;
     messages.sort((a, b) => a.smsMessage.date!.compareTo(b.smsMessage.date!));
+    if (messages.length > 5) {
+      messages = messages.sublist(messages.length - 5);
+    }
     return messages;
   }
 
@@ -83,10 +87,11 @@ class MessageController {
     try {
       final dio = d.Dio();
       dio.options.baseUrl = BASEURL;
+
       final response = await dio.post(
         '/model/messages',
         data: {
-          'messages': messages.sublist(messages.length - 10),
+          'messages': messages,
         },
       );
 
@@ -102,23 +107,17 @@ class MessageController {
         }
 
         return response.data;
-      } else {
-        return List.generate(
-          messages.length,
-          (index) => {
-            'id': messages[index]['id'],
-            'probability': -response.statusCode!.toDouble(),
-          },
-        );
       }
-    } catch (e) {
       return List.generate(
         messages.length,
         (index) => {
           'id': messages[index]['id'],
-          'probability': -2.0,
+          'probability': -response.statusCode!.toDouble(),
         },
       );
+    } catch (e) {
+      print(e);
+      return [];
     }
   }
 

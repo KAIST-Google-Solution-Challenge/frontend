@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:call_log/call_log.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/contact_controller.dart';
@@ -8,8 +9,24 @@ import 'package:the_voice/util/constant.dart';
 
 class CallController {
   static Future<List<CallLogEntry>> fetchCalls() async {
+    var contactsStatus = await Permission.contacts.status;
+    if (!contactsStatus.isGranted) {
+      await Permission.contacts.request();
+    }
+
+    var phoneStatus = await Permission.phone.status;
+    if (!phoneStatus.isGranted) {
+      await Permission.phone.request();
+    }
+
+    if (!contactsStatus.isGranted || !phoneStatus.isGranted) {
+      return [];
+    }
+
     // Fetch call logs from device
-    final callLogs = (await CallLog.get()).toList();
+    var callLogs = (await CallLog.get()).toList();
+    callLogs = callLogs.sublist(0, 60);
+    final contacts = await ContactsService.getContacts(withThumbnails: false);
 
     for (var callLogEntry in callLogs) {
       // number of call log is undefined
@@ -22,7 +39,7 @@ class CallController {
 
       // If number registered in contacts, fetch the display name
       callLogEntry.number =
-          await ContactController.getName(callLogEntry.number!);
+          ContactController.getName(contacts, callLogEntry.number!);
     }
     return callLogs;
   }
@@ -44,7 +61,8 @@ class CallController {
 
     String fileName = '';
 
-    String name = await ContactController.getName(number);
+    final contacts = await ContactsService.getContacts(withThumbnails: false);
+    String name = ContactController.getName(contacts, number);
     print("name: $name");
     String date = datetime.substring(2, 4) +
         datetime.substring(5, 7) +
@@ -57,11 +75,13 @@ class CallController {
 
     for (var i = 0; i < 1000; i++) {
       time = (int.parse(time) + 1).toString();
+      while (time.length < 6) {
+        time = '0$time';
+      }
       String fileKor =
           "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
       String fileEng =
           "${directory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
-
       if (File(fileKor).existsSync()) {
         fileName = fileKor;
         break;
@@ -83,17 +103,14 @@ class CallController {
 
     var contactsStatus = await Permission.contacts.status;
     if (!contactsStatus.isGranted) {
+      print('No contact permission granted');
       await Permission.contacts.request();
     }
 
     var storageStatus = await Permission.storage.status;
     if (!storageStatus.isGranted) {
+      print('No storage permission granted');
       await Permission.storage.request();
-    }
-
-    var audioStatus = await Permission.manageExternalStorage.status;
-    if (!audioStatus.isGranted) {
-      await Permission.manageExternalStorage.request();
     }
 
     try {

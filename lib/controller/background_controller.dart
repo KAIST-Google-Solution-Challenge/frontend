@@ -87,7 +87,9 @@ class BackgroundController {
       print('Incoming call from: ${callLog.number}');
       final datetime = DateTime.fromMillisecondsSinceEpoch(callLog.timestamp!)
           .toIso8601String();
+      print('Incoming call datetime: $datetime');
       final result = await CallController.analyze(callLog.number!, datetime);
+      print(result);
       if (result > THREASHOLD) {
         alertPhishing();
       }
