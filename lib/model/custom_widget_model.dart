@@ -410,10 +410,14 @@ class CustomChatAnalysis extends StatelessWidget {
     int cnt = 0;
     String line = "";
     for (int i = 0; i < data.length; i += 1) {
-      if (cnt == 20 || data[i] == '\n') {
+      if (i == data.length - 1) {
+        cnt += 1;
+        line += data[i];
         lines.add(line);
-        cnt = 0;
-        line = "";
+      } else if (cnt == 20 || data[i] == '\n') {
+        lines.add(line);
+        cnt = 1;
+        line = data[i];
       } else {
         cnt += 1;
         line += data[i];

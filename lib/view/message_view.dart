@@ -43,8 +43,8 @@ class _MessageViewState extends State<MessageView> {
                     threadId: snapshot.data![index].threadId!,
                     leading: const CircleAvatar(radius: 32),
                     title: snapshot.data![index].address!,
-                    subtitle: lastMessage.length > 12
-                        ? '${lastMessage.substring(0, 12)}...'
+                    subtitle: lastMessage.length > 8
+                        ? '${lastMessage.substring(0, 8)}...'
                         : lastMessage,
                     trailing: DateTime.fromMillisecondsSinceEpoch(
                       snapshot.data![index].lastMessageDate!,

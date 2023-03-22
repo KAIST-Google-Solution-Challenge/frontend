@@ -17,7 +17,8 @@ class MessageController {
     if (smsStatus.isGranted) {
       // Get All Conversations from device
       List<SmsConversation> chats = await telephony.getConversations();
-      chats = chats.sublist(chats.length - 60);
+      // bug if chats.length < 60
+      // chats = chats.sublist(chats.length - 60);
 
       for (var chat in chats) {
         // Get inbox messages according to conversation id
@@ -95,18 +96,22 @@ class MessageController {
         },
       );
 
-      List<double> results = [];
+      List<dynamic> results = [];
       if (response.statusCode == 200) {
         for (int i = 0; i < response.data.length; i++) {
           if (response.data[i]['probability'] == null) {
             continue;
           }
-          results.add(double.parse(
-            response.data[i]['probability'].toString().substring(0, 4),
-          ));
+          results.add(
+            {
+              'id': response.data[i]['id'],
+              'probability': double.parse(
+                  response.data[i]['probability'].toString().substring(0, 4)),
+            },
+          );
         }
 
-        return response.data;
+        return results;
       }
       return List.generate(
         messages.length,
