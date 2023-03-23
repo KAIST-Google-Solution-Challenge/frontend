@@ -12,8 +12,21 @@ class SettingModel extends ChangeNotifier {
   Brightness brightness = Brightness.light;
   Language language = Language.english;
 
-  changeAutoAnalysis() {
+  changeAutoAnalysis() async {
     autoAnalysis = !autoAnalysis;
+
+    print(
+      'is background service running? ${await backgroundController.service.isRunning()}',
+    );
+    if (autoAnalysis) {
+      await backgroundController.service.startService();
+    } else {
+      backgroundController.service.invoke('stopService');
+    }
+    print(
+      'is background service running? ${await backgroundController.service.isRunning()}',
+    );
+
     notifyListeners();
   }
 

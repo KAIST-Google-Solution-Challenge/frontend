@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:ui';
-
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
@@ -10,7 +8,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:phone_state/phone_state.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/call_controller.dart';
-import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/util/constant.dart';
 
@@ -18,7 +15,7 @@ class BackgroundController {
   PhoneStateStatus status = PhoneStateStatus.NOTHING;
   bool granted = false;
 
-  final service = FlutterBackgroundService();
+  late FlutterBackgroundService service;
   final telephony = Telephony.instance;
 
   static const notificationChannelId = 'the-voice';
@@ -30,6 +27,8 @@ class BackgroundController {
     if (permission) {
       _setCallStream();
       _setSmsStream();
+      service = FlutterBackgroundService();
+
       await _initBackService();
     }
   }
@@ -46,6 +45,78 @@ class BackgroundController {
       case PermissionStatus.granted:
         return true;
     }
+  }
+
+  Future<void> _initBackService() async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      notificationChannelId, // id
+      notificationTitle, // title
+      description: 'Detecting Incoming voice phishing', // description
+      importance: Importance.max, // importance must be at low or higher level
+    );
+
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    await service.configure(
+      androidConfiguration: AndroidConfiguration(
+        // this will be executed when app is in foreground or background in separated isolate
+        onStart: BackgroundController.onStart,
+
+        // auto start service
+        // autoStart: true,
+        isForegroundMode: true,
+
+        notificationChannelId: notificationChannelId,
+        initialNotificationTitle: notificationTitle,
+        initialNotificationContent: 'Waiting for Call and Message',
+        foregroundServiceNotificationId: notificationId,
+      ),
+      iosConfiguration: IosConfiguration(
+        // auto start service
+        // autoStart: true,
+
+        // this will be executed when app is in foreground in separated isolate
+        onForeground: BackgroundController.onStart,
+
+        // you have to enable background fetch capability on xcode project
+        onBackground: onIosBackground,
+      ),
+    );
+  }
+
+  @pragma('vm:entry-point')
+  Future<bool> onIosBackground(ServiceInstance service) async {
+    return true;
+  }
+
+  @pragma('vm:entry-point')
+  static void onStart(ServiceInstance service) async {
+    // Only available for flutter 3.0.0 and later
+    DartPluginRegistrant.ensureInitialized();
+
+    // For flutter prior to version 3.0.0
+    // We have to register the plugin manually
+
+    /// OPTIONAL when use custom notification
+    if (service is AndroidServiceInstance) {
+      service.on('setAsForeground').listen((event) {
+        service.setAsForegroundService();
+      });
+
+      service.on('setAsBackground').listen((event) {
+        service.setAsBackgroundService();
+      });
+    }
+
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
   }
 
   void _setCallStream() {
@@ -122,77 +193,5 @@ class BackgroundController {
         ),
       ),
     );
-  }
-
-  Future<void> _initBackService() async {
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      notificationChannelId, // id
-      notificationTitle, // title
-      description: 'Detecting Incoming voice phishing', // description
-      importance: Importance.max, // importance must be at low or higher level
-    );
-
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-    await service.configure(
-      androidConfiguration: AndroidConfiguration(
-        // this will be executed when app is in foreground or background in separated isolate
-        onStart: BackgroundController.onStart,
-
-        // auto start service
-        autoStart: true,
-        isForegroundMode: true,
-
-        notificationChannelId: notificationChannelId,
-        initialNotificationTitle: notificationTitle,
-        initialNotificationContent: 'Detecting Incoming voice phishing',
-        foregroundServiceNotificationId: notificationId,
-      ),
-      iosConfiguration: IosConfiguration(
-        // auto start service
-        autoStart: true,
-
-        // this will be executed when app is in foreground in separated isolate
-        onForeground: BackgroundController.onStart,
-
-        // you have to enable background fetch capability on xcode project
-        onBackground: onIosBackground,
-      ),
-    );
-  }
-
-  @pragma('vm:entry-point')
-  Future<bool> onIosBackground(ServiceInstance service) async {
-    return true;
-  }
-
-  @pragma('vm:entry-point')
-  static void onStart(ServiceInstance service) async {
-    // Only available for flutter 3.0.0 and later
-    DartPluginRegistrant.ensureInitialized();
-
-    // For flutter prior to version 3.0.0
-    // We have to register the plugin manually
-
-    /// OPTIONAL when use custom notification
-    if (service is AndroidServiceInstance) {
-      service.on('setAsForeground').listen((event) {
-        service.setAsForegroundService();
-      });
-
-      service.on('setAsBackground').listen((event) {
-        service.setAsBackgroundService();
-      });
-    }
-
-    service.on('stopService').listen((event) {
-      service.stopSelf();
-    });
   }
 }
