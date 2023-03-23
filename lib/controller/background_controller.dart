@@ -34,17 +34,27 @@ class BackgroundController {
   }
 
   Future<bool> requestPermission() async {
-    var status = await Permission.phone.request();
-
-    switch (status) {
-      case PermissionStatus.denied:
-      case PermissionStatus.restricted:
-      case PermissionStatus.limited:
-      case PermissionStatus.permanentlyDenied:
-        return false;
-      case PermissionStatus.granted:
-        return true;
+    var phoneStatus = await Permission.phone.status;
+    if (!phoneStatus.isGranted) {
+      await Permission.phone.request();
     }
+
+    var contactsStatus = await Permission.contacts.status;
+    if (!contactsStatus.isGranted) {
+      await Permission.contacts.request();
+    }
+
+    var smsStatus = await Permission.sms.status;
+    if (!smsStatus.isGranted) {
+      await Permission.sms.request();
+    }
+
+    var storageStatus = await Permission.storage.status;
+    if (!storageStatus.isGranted) {
+      await Permission.storage.request();
+    }
+
+    return true;
   }
 
   Future<void> _initBackService() async {
