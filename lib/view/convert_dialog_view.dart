@@ -98,16 +98,11 @@ class ConvertMessageDialogView extends StatelessWidget {
         title: Text(
           value.language == Language.english ? 'Analysis?' : '분석하시겠습니까?',
         ),
-        content: Row(
-          children: [
-            Expanded(
-              child: ListTile(
-                title: Text(title),
-                subtitle: Text(subtitle),
-                trailing: Text(trailing),
-              ),
-            ),
-          ],
+        content: ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(title),
+          subtitle: Text(subtitle),
+          trailing: Text(trailing),
         ),
         actions: [
           TextButton(
