@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:the_voice/controller/background_controller.dart';
 
 enum Language { english, korean }
 
 class SettingModel extends ChangeNotifier {
+  final BackgroundController backgroundController;
+
+  SettingModel({required this.backgroundController});
+
   bool autoAnalysis = false;
   Brightness brightness = Brightness.light;
   Language language = Language.english;

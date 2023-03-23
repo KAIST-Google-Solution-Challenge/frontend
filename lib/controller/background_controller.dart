@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
@@ -9,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:phone_state/phone_state.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/call_controller.dart';
+import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/util/constant.dart';
 
@@ -47,23 +49,26 @@ class BackgroundController {
   }
 
   void _setCallStream() {
-    PhoneState.phoneStateStream.listen((event) {
-      if (event != null) {
-        print('Call event occur: $event');
-        if (event == PhoneStateStatus.CALL_ENDED) {
-          Future.delayed(const Duration(seconds: 10), analyzeCall);
+    PhoneState.phoneStateStream.listen(
+      (event) {
+        if (event != null) {
+          print('Call event occur: $event');
+          if (event == PhoneStateStatus.CALL_ENDED) {
+            Future.delayed(const Duration(seconds: 10), analyzeCall);
+          }
+          status = event;
         }
-        status = event;
-      }
-    });
+      },
+    );
   }
 
   void _setSmsStream() {
     telephony.listenIncomingSms(
-        onNewMessage: (SmsMessage message) async {
-          messageHandler(message);
-        },
-        onBackgroundMessage: messageHandler);
+      onNewMessage: (SmsMessage message) async {
+        messageHandler(message);
+      },
+      onBackgroundMessage: messageHandler,
+    );
   }
 
   static void messageHandler(SmsMessage message) async {
@@ -73,10 +78,8 @@ class BackgroundController {
       final response = await MessageController.analyzeSingle(message.body!);
       if (response == -1) {
         return;
-      }
-
-      if (response > THREASHOLD) {
-        alertPhishing();
+      } else if (response > THREASHOLD) {
+        alertPhishing(message.address!, response);
       }
     }
   }
@@ -91,30 +94,30 @@ class BackgroundController {
       final result = await CallController.analyze(callLog.number!, datetime);
       print(result);
       if (result > THREASHOLD) {
-        alertPhishing();
+        alertPhishing(callLog.number!, result);
       }
     } catch (e) {
       print("Error: $e");
     }
   }
 
-  static void alertPhishing() {
+  static void alertPhishing(String number, double probability) {
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin.show(
       888,
       notificationTitle,
-      'Voice Phishing Detected!!!',
+      'Detected from $number: ${probability.toString().substring(0, 4)}%',
       const NotificationDetails(
         android: AndroidNotificationDetails(
           notificationTitle,
-          'Voice Phishing Detected!!!',
+          'default',
           importance: Importance.max,
           priority: Priority.high,
           icon: 'ic_bg_service_small',
           color: Colors.red,
           ongoing: true,
-          styleInformation: BigTextStyleInformation('보이스 피싱이 감지되었습니다!'),
+          styleInformation: BigTextStyleInformation('default'),
           showWhen: true,
         ),
       ),

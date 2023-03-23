@@ -58,13 +58,15 @@ class CallController {
   static Future<CallLogEntry> fetchLastCall() async {
     var now = DateTime.now();
     int from = now.subtract(const Duration(days: 1)).millisecondsSinceEpoch;
-    final lastCallLog =
-        await CallLog.query(dateFrom: from, type: CallType.incoming);
+    final callLog =
+        (await CallLog.query(dateFrom: from, type: CallType.incoming)).first;
 
-    if (lastCallLog.isEmpty) {
-      throw Exception('No calls found');
-    }
-    return lastCallLog.first;
+    final contacts = await ContactsService.getContacts(withThumbnails: false);
+    callLog.number!.replaceAll('+', '');
+    callLog.number!.replaceAll('-', '');
+    callLog.number = ContactController.getName(contacts, callLog.number!);
+
+    return callLog;
   }
 
   static Future<String> getFilePath(String number, String datetime) async {

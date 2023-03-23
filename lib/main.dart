@@ -12,21 +12,30 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final backgroundController = BackgroundController();
+  final BackgroundController backgroundController = BackgroundController();
   await backgroundController.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const TheVoice());
+
+  runApp(
+    TheVoice(
+      backgroundController: backgroundController,
+    ),
+  );
 }
 
 class TheVoice extends StatelessWidget {
-  const TheVoice({super.key});
+  final BackgroundController backgroundController;
+
+  const TheVoice({super.key, required this.backgroundController});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<SettingModel>(
-      create: (context) => SettingModel(),
+      create: (context) => SettingModel(
+        backgroundController: backgroundController,
+      ),
       builder: (context, child) => Consumer<SettingModel>(
         builder: (context, value, child) => MaterialApp(
           debugShowCheckedModeBanner: false,
