@@ -1,6 +1,8 @@
+import 'package:contacts_service/contacts_service.dart';
 import 'package:dio/dio.dart' as d;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:telephony/telephony.dart';
+import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/model/chat_model.dart';
 import 'package:the_voice/util/constant.dart';
 
@@ -8,44 +10,49 @@ class MessageController {
   static Future<List<ChatModel>> fetchChat() async {
     final telephony = Telephony.instance;
 
+    var contactsStatus = await Permission.contacts.status;
+    if (!contactsStatus.isGranted) {
+      await Permission.contacts.request();
+    }
+
     var smsStatus = await Permission.sms.status;
     if (!smsStatus.isGranted) {
       await Permission.sms.request();
     }
 
+    if (!contactsStatus.isGranted || !smsStatus.isGranted) {
+      return [];
+    }
+
     List<ChatModel> results = [];
-    if (smsStatus.isGranted) {
-      // Get All Conversations from device
-      List<SmsConversation> chats = await telephony.getConversations();
-      if (chats.length > 60) {
-        chats = chats.sublist(chats.length - 60);
-      }
 
-      for (var chat in chats) {
-        // Get inbox messages according to conversation id
-        List<SmsMessage> messages = await telephony.getInboxSms(
-          filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
-            chat.threadId.toString(),
-          ),
+    // Get All Conversations from device
+    List<SmsConversation> chats = await telephony.getConversations();
+
+    final contacts = await ContactsService.getContacts(withThumbnails: false);
+    for (var chat in chats) {
+      // Get inbox messages according to conversation id
+      List<SmsMessage> messages = await telephony.getInboxSms(
+        filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
+          chat.threadId.toString(),
+        ),
+      );
+
+      if (messages.isNotEmpty) {
+        ChatModel chatModel = ChatModel(
+          threadId: chat.threadId,
+          address: ContactController.getName(contacts, messages[0].address!),
+          lastMessage: messages[0].body,
+          lastMessageDate: messages[0].date,
         );
-
-        if (messages.isNotEmpty) {
-          ChatModel chatModel = ChatModel(
-              threadId: chat.threadId,
-              address: messages[0].address ?? 'undefined',
-              lastMessage: messages[0].body ?? 'undefined',
-              lastMessageDate: messages[0].date ?? 0);
-          results.add(chatModel);
-        }
+        results.add(chatModel);
       }
     }
-    if (results.isEmpty) {
-      return results;
-    }
+
     results.sort((a, b) => b.lastMessageDate!.compareTo(a.lastMessageDate!));
 
     print("(fetchChat) $results");
-    return results;
+    return results.length > 60 ? results.sublist(0, 60) : results;
   }
 
   static Future<List<MessageModel>> fetchMessages(int threadId) async {

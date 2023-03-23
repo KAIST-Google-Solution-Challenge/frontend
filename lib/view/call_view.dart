@@ -46,6 +46,10 @@ class _CallViewState extends State<CallView> {
                     // print("index: $index");
                     // print(snapshot.data![index]);
                     // print(snapshot.data![index].number!);
+
+                    int minute = snapshot.data![index].duration! ~/ 60;
+                    int second = snapshot.data![index].duration! % 60;
+
                     nextHeader = DateTime.fromMillisecondsSinceEpoch(
                       snapshot.data![index].timestamp!,
                     ).toIso8601String().substring(0, 10);
@@ -60,7 +64,7 @@ class _CallViewState extends State<CallView> {
                           .substring(9)
                           .toLowerCase(),
                       trailing:
-                          '${snapshot.data![index].duration! ~/ 60}:${snapshot.data![index].duration! % 60}',
+                          '${minute < 10 ? '0$minute' : minute}:${second < 10 ? '0$second' : second}',
                       datetime: DateTime.fromMillisecondsSinceEpoch(
                         snapshot.data![index].timestamp!,
                       ).toIso8601String(),
