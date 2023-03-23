@@ -144,7 +144,7 @@ class BackgroundController {
 
         // auto start service
         autoStart: true,
-        isForegroundMode: false,
+        isForegroundMode: true,
 
         notificationChannelId: notificationChannelId,
         initialNotificationTitle: notificationTitle,

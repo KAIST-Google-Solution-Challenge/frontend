@@ -24,12 +24,20 @@ class CallController {
     }
 
     // Fetch call logs from device
-    var callLogs = (await CallLog.get()).toList();
+    var callLogs = (await CallLog.get())
+        .where(
+          (call) =>
+              call.callType == CallType.incoming ||
+              call.callType == CallType.outgoing,
+        )
+        .toList()
+      ..sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
+
     if (callLogs.length > 60) {
       callLogs = callLogs.sublist(0, 60);
     }
-    final contacts = await ContactsService.getContacts(withThumbnails: false);
 
+    final contacts = await ContactsService.getContacts(withThumbnails: false);
     for (var callLogEntry in callLogs) {
       // number of call log is undefined
       if (callLogEntry.number == null) {
@@ -43,6 +51,7 @@ class CallController {
       callLogEntry.number =
           ContactController.getName(contacts, callLogEntry.number!);
     }
+
     return callLogs;
   }
 
