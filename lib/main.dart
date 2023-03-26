@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:the_voice/controller/background_controller.dart';
 import 'package:the_voice/controller/file_controller.dart';
 import 'package:the_voice/view/call_view.dart';
@@ -22,30 +21,42 @@ void main() async {
   await backgroundController.init();
 
   final FileController fileController = FileController();
+  late String fileString;
+  if (await fileController.fileExists()) {
+    fileString = await fileController.fileReadAsString();
+  } else {
+    await fileController.fileInit();
+    fileString = await fileController.fileReadAsString();
+  }
 
   runApp(
     TheVoice(
       backgroundController: backgroundController,
+      fileString: fileString,
     ),
   );
 }
 
 class TheVoice extends StatelessWidget {
   final BackgroundController backgroundController;
+  final String fileString;
 
-  const TheVoice({super.key, required this.backgroundController});
+  const TheVoice({
+    super.key,
+    required this.backgroundController,
+    required this.fileString,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<SettingModel>(
       create: (context) {
-        return SettingModel(
+        SettingModel settingModel = SettingModel(
           backgroundController: backgroundController,
-          emergencyContact: '',
-          autoAnalysis: false,
-          brightness: Brightness.light,
-          language: Language.english,
         );
+        settingModel.init(fileString);
+
+        return settingModel;
       },
       builder: (context, child) => Consumer<SettingModel>(
         builder: (context, value, child) => MaterialApp(

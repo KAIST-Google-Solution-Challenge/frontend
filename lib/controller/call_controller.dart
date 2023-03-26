@@ -85,8 +85,8 @@ class CallController {
         datetime.substring(17, 19);
     print("(getFilePath) initial time: $time");
 
-    Directory directory = Directory(Dir);
-    Directory oldDirectory = Directory(DirOld);
+    Directory directory = Directory(CALLDIR);
+    Directory oldDirectory = Directory(CALLDIROLD);
 
     for (var i = 0; i < 10; i++) {
       time = (int.parse(time) + 1).toString();

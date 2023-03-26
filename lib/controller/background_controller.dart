@@ -9,6 +9,7 @@ import 'package:phone_state/phone_state.dart';
 import 'package:provider/provider.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/call_controller.dart';
+import 'package:the_voice/controller/file_controller.dart';
 import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/util/constant.dart';
@@ -207,21 +208,17 @@ class BackgroundController {
       ),
     );
 
-    Consumer<SettingModel>(
-      builder: (context, value, child) {
-        print(
-          'send sms to ${value.emergencyContact}: Detected from $number: ${probability.toString().substring(0, 4)}%',
-        );
+    String emergencyContact =
+        FileController().fileReadAsStringSync().split(' ')[0];
 
-        return FutureBuilder(
-          future: Telephony.instance.sendSms(
-            to: value.emergencyContact,
-            message:
-                'Detected from $number: ${probability.toString().substring(0, 4)}%',
-          ),
-          builder: (context, snapshot) => const SizedBox(),
-        );
-      },
+    print(
+      'send sms to $emergencyContact: Detected from $number: ${probability.toString().substring(0, 4)}%',
+    );
+
+    Telephony.instance.sendSms(
+      to: emergencyContact,
+      message:
+          'Detected from $number: ${probability.toString().substring(0, 4)}%',
     );
   }
 }

@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/controller/background_controller.dart';
+import 'package:the_voice/controller/file_controller.dart';
 
 enum Language { english, korean }
 
 class SettingModel extends ChangeNotifier {
   final BackgroundController backgroundController;
+  final FileController fileController = FileController();
+
   late String emergencyContact;
   late bool autoAnalysis;
   late Brightness brightness;
   late Language language;
 
-  SettingModel({
-    required this.backgroundController,
-    required this.emergencyContact,
-    required this.autoAnalysis,
-    required this.brightness,
-    required this.language,
-  });
+  SettingModel({required this.backgroundController});
 
-  changeEmergencyContact(String emergencyContact) async {
+  init(String fileString) {
+    List<String> fileList = fileString.split(' ');
+
+    emergencyContact = fileList[0];
+    autoAnalysis = fileList[1] == 'false' ? false : true;
+    brightness = fileList[2] == 'light' ? Brightness.light : Brightness.dark;
+    language = fileList[3] == 'english' ? Language.english : Language.korean;
+  }
+
+  changeEmergencyContact(String emergencyContact) {
     this.emergencyContact = emergencyContact;
 
     notifyListeners();
+
+    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    fileList[0] = emergencyContact;
+    fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
   changeAutoAnalysis() async {
@@ -34,6 +44,10 @@ class SettingModel extends ChangeNotifier {
     }
 
     notifyListeners();
+
+    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    fileList[1] = autoAnalysis.toString();
+    fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
   changeBrightness() {
@@ -41,6 +55,10 @@ class SettingModel extends ChangeNotifier {
         ? brightness = Brightness.dark
         : brightness = Brightness.light;
     notifyListeners();
+
+    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    fileList[2] = brightness == Brightness.light ? 'light' : 'dark';
+    fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
   changeLanguage() {
@@ -48,5 +66,9 @@ class SettingModel extends ChangeNotifier {
         ? language = Language.korean
         : language = Language.english;
     notifyListeners();
+
+    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    fileList[3] = language == Language.english ? 'english' : 'korean';
+    fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 }

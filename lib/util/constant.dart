@@ -3,5 +3,6 @@ const String BASEURL = 'http://35.216.72.5:3000/';
 // const String BASEURL = 'http://10.0.2.2:3000'; // For Android emulator
 const double THREASHOLD = 80;
 
-const String Dir = '/storage/emulated/0/Recordings/Call';
-const String DirOld = '/storage/emulated/0/Call';
+const String CALLDIR = '/storage/emulated/0/Recordings/Call';
+const String CALLDIROLD = '/storage/emulated/0/Call';
+const String DOCUMENTSDIR = 'storage/emulated/0/Documents';
