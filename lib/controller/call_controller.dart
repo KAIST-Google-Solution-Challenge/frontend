@@ -3,6 +3,7 @@ import 'package:call_log/call_log.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:dio/dio.dart' as d;
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/util/constant.dart';
@@ -84,13 +85,15 @@ class CallController {
         datetime.substring(17, 19);
     print("(getFilePath) initial time: $time");
 
-    Directory directory = Directory(EngDir);
-    Directory oldDirectory = Directory(EngDirOld);
-    for (var i = 0; i < 1000; i++) {
+    Directory directory = Directory(Dir);
+    Directory oldDirectory = Directory(DirOld);
+
+    for (var i = 0; i < 10; i++) {
       time = (int.parse(time) + 1).toString();
       while (time.length < 6) {
         time = '0$time';
       }
+
       String fileKor =
           "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
       String fileEng =
@@ -99,6 +102,7 @@ class CallController {
           "${oldDirectory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
       String fileEngOld =
           "${oldDirectory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
+
       if (File(fileKor).existsSync()) {
         fileName = fileKor;
         break;
@@ -107,7 +111,7 @@ class CallController {
         fileName = fileEng;
         break;
       }
-      if (File(fileKor).existsSync()) {
+      if (File(fileKorOld).existsSync()) {
         fileName = fileKorOld;
         break;
       }
