@@ -29,6 +29,13 @@
             {
               "client_id": "28208195456-8ksnniuq3m2c9gvpgfqe4tkceuovn979.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "28208195456-7dqr7i68s2s7hjr8ltbk2ib70fcu0a55.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.theVoice"
+              }
             }
           ]
         }
