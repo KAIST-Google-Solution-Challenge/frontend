@@ -3,7 +3,6 @@ import 'package:call_log/call_log.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:dio/dio.dart' as d;
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/util/constant.dart';
@@ -89,7 +88,26 @@ class CallController {
     Directory oldDirectory = Directory(CALLDIROLD);
 
     for (var i = 0; i < 10; i++) {
-      time = (int.parse(time) + 1).toString();
+      var hour = int.parse(time.substring(0, 1));
+      var minute = int.parse(time.substring(2, 3));
+      var second = int.parse(time.substring(4, 5)) + 1;
+
+      if (second == 59) {
+        second = 60;
+        minute += 1;
+      }
+
+      if (minute == 60) {
+        minute = 0;
+        hour += 1;
+      }
+
+      if (hour == 24) {
+        hour = 0;
+        // TODO: 일월년 반올림
+      }
+
+      time = hour.toString() + minute.toString() + hour.toString();
       while (time.length < 6) {
         time = '0$time';
       }
