@@ -8,24 +8,25 @@ class SettingModel extends ChangeNotifier {
 
   SettingModel({required this.backgroundController});
 
+  String emergencyContact = '';
   bool autoAnalysis = false;
   Brightness brightness = Brightness.light;
   Language language = Language.english;
 
+  changeEmergencyContact(String emergencyContact) async {
+    this.emergencyContact = emergencyContact;
+
+    notifyListeners();
+  }
+
   changeAutoAnalysis() async {
     autoAnalysis = !autoAnalysis;
 
-    print(
-      'is background service running? ${await backgroundController.service.isRunning()}',
-    );
     if (autoAnalysis) {
       await backgroundController.service.startService();
     } else {
       backgroundController.service.invoke('stopService');
     }
-    print(
-      'is background service running? ${await backgroundController.service.isRunning()}',
-    );
 
     notifyListeners();
   }

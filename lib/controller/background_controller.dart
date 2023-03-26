@@ -6,9 +6,11 @@ import 'package:flutter_background_service_android/flutter_background_service_an
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:phone_state/phone_state.dart';
+import 'package:provider/provider.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/call_controller.dart';
 import 'package:the_voice/controller/message_controller.dart';
+import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/util/constant.dart';
 
 class BackgroundController {
@@ -185,6 +187,7 @@ class BackgroundController {
   static void alertPhishing(String number, double probability) {
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
+
     flutterLocalNotificationsPlugin.show(
       888,
       notificationTitle,
@@ -202,6 +205,23 @@ class BackgroundController {
           showWhen: true,
         ),
       ),
+    );
+
+    Consumer<SettingModel>(
+      builder: (context, value, child) {
+        print(
+          'send sms to ${value.emergencyContact}: Detected from $number: ${probability.toString().substring(0, 4)}%',
+        );
+
+        return FutureBuilder(
+          future: Telephony.instance.sendSms(
+            to: value.emergencyContact,
+            message:
+                'Detected from $number: ${probability.toString().substring(0, 4)}%',
+          ),
+          builder: (context, snapshot) => const SizedBox(),
+        );
+      },
     );
   }
 }

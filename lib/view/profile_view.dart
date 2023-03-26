@@ -6,6 +6,8 @@ import 'package:the_voice/model/setting_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 
+import 'package:the_voice/view/emergency_contact_dialog_view.dart';
+
 class ProfileView extends StatelessWidget {
   static String route = 'profile_view';
 
@@ -61,74 +63,95 @@ class ProfileView extends StatelessWidget {
               children: [
                 const SizedBox(width: 32),
                 Expanded(
-                  child: Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      borderRadius: const BorderRadius.all(Radius.circular(12)),
-                    ),
-                    child: Consumer<SettingModel>(
-                      builder: (context, value, child) => Column(
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.autorenew),
-                            title: Text(
-                              value.language == Language.english
-                                  ? 'Auto Analysis'
-                                  : '자동 분석',
-                              style: textTheme.labelLarge,
-                            ),
-                            trailing: Switch(
-                              value: value.autoAnalysis,
-                              onChanged: (_) => value.changeAutoAnalysis(),
+                  child: Consumer<SettingModel>(
+                    builder: (context, value, child) => Column(
+                      children: [
+                        ListTile(
+                          leading: Icon(Icons.add_call),
+                          title: Text(
+                            value.language == Language.english
+                                ? 'Emergency Contact'
+                                : '비상 연락처',
+                            style: textTheme.labelLarge,
+                          ),
+                          subtitle: Text(
+                            value.emergencyContact.isEmpty
+                                ? value.language == Language.english
+                                    ? 'Not Enrolled'
+                                    : '등록되지 않음'
+                                : value.emergencyContact,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
-                          ListTile(
-                            leading: const Icon(Icons.sunny),
-                            title: Text(
-                              value.language == Language.english
-                                  ? 'Dark Mode'
-                                  : '다크 모드',
-                              style: textTheme.labelLarge,
-                            ),
-                            trailing: Switch(
-                              value: value.brightness == Brightness.light
-                                  ? false
-                                  : true,
-                              onChanged: (_) => value.changeBrightness(),
+                          trailing: IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  EmergencyContactDialogView(),
                             ),
                           ),
-                          ListTile(
-                            leading: const Icon(Icons.language),
-                            title: Text(
-                              value.language == Language.english
-                                  ? 'Language'
-                                  : '언어',
-                              style: textTheme.labelLarge,
+                        ),
+                        Divider(),
+                        ListTile(
+                          leading: const Icon(Icons.autorenew),
+                          title: Text(
+                            value.language == Language.english
+                                ? 'Auto Analysis'
+                                : '자동 분석',
+                            style: textTheme.labelLarge,
+                          ),
+                          trailing: Switch(
+                            value: value.autoAnalysis,
+                            onChanged: (_) => value.changeAutoAnalysis(),
+                          ),
+                        ),
+                        Divider(),
+                        ListTile(
+                          leading: const Icon(Icons.sunny),
+                          title: Text(
+                            value.language == Language.english
+                                ? 'Dark Mode'
+                                : '다크 모드',
+                            style: textTheme.labelLarge,
+                          ),
+                          trailing: Switch(
+                            value: value.brightness == Brightness.light
+                                ? false
+                                : true,
+                            onChanged: (_) => value.changeBrightness(),
+                          ),
+                        ),
+                        Divider(),
+                        ListTile(
+                          leading: const Icon(Icons.language),
+                          title: Text(
+                            value.language == Language.english
+                                ? 'Language'
+                                : '언어',
+                            style: textTheme.labelLarge,
+                          ),
+                          subtitle: Text(
+                            value.language == Language.english
+                                ? value.language == Language.english
+                                    ? 'English'
+                                    : '영어'
+                                : value.language == Language.english
+                                    ? 'Korean'
+                                    : '한국어',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                             ),
-                            subtitle: Text(
-                              value.language == Language.english
-                                  ? value.language == Language.english
-                                      ? 'English'
-                                      : '영어'
-                                  : value.language == Language.english
-                                      ? 'Korean'
-                                      : '한국어',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            trailing: Switch(
-                              value: value.language == Language.english
-                                  ? false
-                                  : true,
-                              onChanged: (_) => value.changeLanguage(),
-                            ),
-                          )
-                        ],
-                      ),
+                          ),
+                          trailing: Switch(
+                            value: value.language == Language.english
+                                ? false
+                                : true,
+                            onChanged: (_) => value.changeLanguage(),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
