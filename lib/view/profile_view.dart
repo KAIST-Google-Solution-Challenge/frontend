@@ -33,7 +33,13 @@ class ProfileView extends StatelessWidget {
           children: [
             firebaseAuth.currentUser == null
                 ? const CircleAvatar(radius: 64)
-                : const CircleAvatar(radius: 64),
+                : Image(
+                    width: 100,
+                    height: 100,
+                    image: NetworkImage(
+                      firebaseAuth.currentUser!.photoURL!,
+                    ),
+                  ),
             const SizedBox(height: 16),
             Text(
               firebaseAuth.currentUser == null
