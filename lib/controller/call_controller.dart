@@ -69,48 +69,38 @@ class CallController {
     return callLog;
   }
 
+  // datetime ISO8601 2023-03-26T06:49:36+00:00
   static Future<String> getFilePath(String number, String datetime) async {
     String fileName = '';
 
     final contacts = await ContactsService.getContacts(withThumbnails: false);
     String name = ContactController.getName(contacts, number);
     print("name: $name");
-    String date = datetime.substring(2, 4) +
-        datetime.substring(5, 7) +
-        datetime.substring(8, 10);
-    print("date: $date");
-    String time = datetime.substring(11, 13) +
-        datetime.substring(14, 16) +
-        datetime.substring(17, 19);
-    print("(getFilePath) initial time: $time");
+    late String date;
+    late String time;
 
     Directory directory = Directory(CALLDIR);
     Directory oldDirectory = Directory(CALLDIROLD);
 
     for (var i = 0; i < 10; i++) {
-      var hour = int.parse(time.substring(0, 1));
-      var minute = int.parse(time.substring(2, 3));
-      var second = int.parse(time.substring(4, 5)) + 1;
+      // Need to be optimized by pararmetering Datetime, not ISO8601String.
+      datetime = DateTime(
+        2000 + int.parse(datetime.substring(2, 4)),
+        int.parse(datetime.substring(5, 7)),
+        int.parse(datetime.substring(8, 10)),
+        int.parse(datetime.substring(11, 13)),
+        int.parse(datetime.substring(14, 16)),
+        int.parse(datetime.substring(17, 19)),
+      ).add(Duration(seconds: i)).toIso8601String();
 
-      if (second == 59) {
-        second = 60;
-        minute += 1;
-      }
-
-      if (minute == 60) {
-        minute = 0;
-        hour += 1;
-      }
-
-      if (hour == 24) {
-        hour = 0;
-        // TODO: 일월년 반올림
-      }
-
-      time = hour.toString() + minute.toString() + hour.toString();
-      while (time.length < 6) {
-        time = '0$time';
-      }
+      date = datetime.substring(2, 4) +
+          datetime.substring(5, 7) +
+          datetime.substring(8, 10);
+      print("date: $date");
+      time = datetime.substring(11, 13) +
+          datetime.substring(14, 16) +
+          datetime.substring(17, 19);
+      print("time: $time");
 
       String fileKor =
           "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
