@@ -5,13 +5,18 @@ enum Language { english, korean }
 
 class SettingModel extends ChangeNotifier {
   final BackgroundController backgroundController;
+  late String emergencyContact;
+  late bool autoAnalysis;
+  late Brightness brightness;
+  late Language language;
 
-  SettingModel({required this.backgroundController});
-
-  String emergencyContact = '';
-  bool autoAnalysis = false;
-  Brightness brightness = Brightness.light;
-  Language language = Language.english;
+  SettingModel({
+    required this.backgroundController,
+    required this.emergencyContact,
+    required this.autoAnalysis,
+    required this.brightness,
+    required this.language,
+  });
 
   changeEmergencyContact(String emergencyContact) async {
     this.emergencyContact = emergencyContact;

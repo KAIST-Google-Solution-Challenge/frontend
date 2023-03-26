@@ -31,24 +31,28 @@ class _CaseViewState extends State<CaseView> {
   }
 
   Future<bool> future() async {
-    messages = await MessageController.fetchMessages(widget.threadId);
-    List<dynamic> requests = [];
+    try {
+      messages = await MessageController.fetchMessages(widget.threadId);
+      List<dynamic> requests = [];
 
-    for (int i = 0; i < messages.length; i++) {
-      if (messages[i].sender == Sender.user) {
-        continue;
+      for (int i = 0; i < messages.length; i++) {
+        if (messages[i].sender == Sender.user) {
+          continue;
+        }
+        requests.add(
+          {
+            'id': messages[i].smsMessage.id!,
+            'content': messages[i].smsMessage.body!
+          },
+        );
       }
-      requests.add(
-        {
-          'id': messages[i].smsMessage.id!,
-          'content': messages[i].smsMessage.body!
-        },
-      );
+
+      probabilities = await MessageController.analyze(requests);
+
+      return true;
+    } catch (error) {
+      return false;
     }
-
-    probabilities = await MessageController.analyze(requests);
-
-    return true;
   }
 
   @override
