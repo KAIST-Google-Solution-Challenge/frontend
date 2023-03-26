@@ -104,7 +104,8 @@ class ProfileView extends StatelessWidget {
                           ),
                           trailing: Switch(
                             value: value.autoAnalysis,
-                            onChanged: (_) => value.changeAutoAnalysis(),
+                            onChanged: (_) async =>
+                                await value.changeAutoAnalysis(),
                           ),
                         ),
                         Divider(),

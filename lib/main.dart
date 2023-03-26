@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/background_controller.dart';
 import 'package:the_voice/controller/file_controller.dart';
 import 'package:the_voice/view/call_view.dart';
@@ -17,16 +18,36 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  if (!(await Permission.phone.status).isGranted) {
+    await Permission.phone.request();
+  }
+
+  if (!(await Permission.contacts.status).isGranted) {
+    await Permission.contacts.request();
+  }
+
+  if (!(await Permission.sms.status).isGranted) {
+    await Permission.sms.request();
+  }
+
+  if (!(await Permission.storage.status).isGranted) {
+    await Permission.storage.request();
+  }
+
+  if (!(await Permission.manageExternalStorage.status).isGranted) {
+    await Permission.manageExternalStorage.request();
+  }
+
   final BackgroundController backgroundController = BackgroundController();
   await backgroundController.init();
 
   final FileController fileController = FileController();
   late String fileString;
   if (await fileController.fileExists()) {
-    fileString = await fileController.fileReadAsString();
+    fileString = fileController.fileReadAsStringSync();
   } else {
     await fileController.fileInit();
-    fileString = await fileController.fileReadAsString();
+    fileString = fileController.fileReadAsStringSync();
   }
 
   runApp(

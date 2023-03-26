@@ -15,7 +15,7 @@ class SettingModel extends ChangeNotifier {
 
   SettingModel({required this.backgroundController});
 
-  init(String fileString) {
+  void init(String fileString) {
     List<String> fileList = fileString.split(' ');
 
     emergencyContact = fileList[0];
@@ -24,7 +24,7 @@ class SettingModel extends ChangeNotifier {
     language = fileList[3] == 'english' ? Language.english : Language.korean;
   }
 
-  changeEmergencyContact(String emergencyContact) {
+  void changeEmergencyContact(String emergencyContact) {
     this.emergencyContact = emergencyContact;
 
     notifyListeners();
@@ -34,7 +34,7 @@ class SettingModel extends ChangeNotifier {
     fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
-  changeAutoAnalysis() async {
+  Future<void> changeAutoAnalysis() async {
     autoAnalysis = !autoAnalysis;
 
     if (autoAnalysis) {
@@ -50,7 +50,7 @@ class SettingModel extends ChangeNotifier {
     fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
-  changeBrightness() {
+  void changeBrightness() {
     brightness == Brightness.light
         ? brightness = Brightness.dark
         : brightness = Brightness.light;
@@ -61,7 +61,7 @@ class SettingModel extends ChangeNotifier {
     fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
-  changeLanguage() {
+  void changeLanguage() {
     language == Language.english
         ? language = Language.korean
         : language = Language.english;

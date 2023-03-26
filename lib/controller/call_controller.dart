@@ -3,26 +3,11 @@ import 'package:call_log/call_log.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:dio/dio.dart' as d;
-import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/util/constant.dart';
 
 class CallController {
   static Future<List<CallLogEntry>> fetchCalls() async {
-    var contactsStatus = await Permission.contacts.status;
-    if (!contactsStatus.isGranted) {
-      await Permission.contacts.request();
-    }
-
-    var phoneStatus = await Permission.phone.status;
-    if (!phoneStatus.isGranted) {
-      await Permission.phone.request();
-    }
-
-    if (!contactsStatus.isGranted || !phoneStatus.isGranted) {
-      return [];
-    }
-
     // Fetch call logs from device
     var callLogs = (await CallLog.get())
         .where(
@@ -82,7 +67,7 @@ class CallController {
     Directory directory = Directory(CALLDIR);
     Directory oldDirectory = Directory(CALLDIROLD);
 
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 100; i++) {
       // Need to be optimized by pararmetering Datetime, not ISO8601String.
       datetime = DateTime(
         2000 + int.parse(datetime.substring(2, 4)),
@@ -91,7 +76,7 @@ class CallController {
         int.parse(datetime.substring(11, 13)),
         int.parse(datetime.substring(14, 16)),
         int.parse(datetime.substring(17, 19)),
-      ).add(Duration(seconds: i)).toIso8601String();
+      ).add(const Duration(seconds: 1)).toIso8601String();
 
       date = datetime.substring(2, 4) +
           datetime.substring(5, 7) +
@@ -137,18 +122,6 @@ class CallController {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     final dio = d.Dio();
     dio.options.baseUrl = BASEURL;
-
-    var contactsStatus = await Permission.contacts.status;
-    if (!contactsStatus.isGranted) {
-      print('No contact permission granted');
-      await Permission.contacts.request();
-    }
-
-    var storageStatus = await Permission.storage.status;
-    if (!storageStatus.isGranted) {
-      print('No storage permission granted');
-      await Permission.storage.request();
-    }
 
     try {
       final String fileName = await getFilePath(number, datetime);

@@ -26,38 +26,11 @@ class BackgroundController {
   static const notificationTitle = 'The Voice';
 
   Future<void> init() async {
-    var permission = await requestPermission();
-    if (permission) {
-      _setCallStream();
-      _setSmsStream();
-      service = FlutterBackgroundService();
+    _setCallStream();
+    _setSmsStream();
+    service = FlutterBackgroundService();
 
-      await _initBackService();
-    }
-  }
-
-  Future<bool> requestPermission() async {
-    var phoneStatus = await Permission.phone.status;
-    if (!phoneStatus.isGranted) {
-      await Permission.phone.request();
-    }
-
-    var contactsStatus = await Permission.contacts.status;
-    if (!contactsStatus.isGranted) {
-      await Permission.contacts.request();
-    }
-
-    var smsStatus = await Permission.sms.status;
-    if (!smsStatus.isGranted) {
-      await Permission.sms.request();
-    }
-
-    var storageStatus = await Permission.storage.status;
-    if (!storageStatus.isGranted) {
-      await Permission.storage.request();
-    }
-
-    return true;
+    await _initBackService();
   }
 
   Future<void> _initBackService() async {
@@ -212,13 +185,13 @@ class BackgroundController {
         FileController().fileReadAsStringSync().split(' ')[0];
 
     print(
-      'send sms to $emergencyContact: Detected from $number: ${probability.toString().substring(0, 4)}%',
+      'Send SMS to $emergencyContact',
     );
 
     Telephony.instance.sendSms(
       to: emergencyContact,
       message:
-          'Detected from $number: ${probability.toString().substring(0, 4)}%',
+          '[The Voice] Phone Scam by $number is Detected (${probability.toString().substring(0, 4)}%)',
     );
   }
 }

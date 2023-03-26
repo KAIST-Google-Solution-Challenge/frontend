@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:the_voice/util/constant.dart';
 
 class FileController {
@@ -8,10 +7,6 @@ class FileController {
 
   Future<bool> fileExists() async {
     return await File(filepath).exists();
-  }
-
-  Future<String> fileReadAsString() async {
-    return await File(filepath).readAsString();
   }
 
   Future<void> fileInit() async {

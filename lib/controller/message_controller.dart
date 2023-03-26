@@ -1,6 +1,5 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:dio/dio.dart' as d;
-import 'package:permission_handler/permission_handler.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/model/chat_model.dart';
@@ -9,20 +8,6 @@ import 'package:the_voice/util/constant.dart';
 class MessageController {
   static Future<List<ChatModel>> fetchChat() async {
     final telephony = Telephony.instance;
-
-    var contactsStatus = await Permission.contacts.status;
-    if (!contactsStatus.isGranted) {
-      await Permission.contacts.request();
-    }
-
-    var smsStatus = await Permission.sms.status;
-    if (!smsStatus.isGranted) {
-      await Permission.sms.request();
-    }
-
-    if (!contactsStatus.isGranted || !smsStatus.isGranted) {
-      return [];
-    }
 
     List<ChatModel> results = [];
 
