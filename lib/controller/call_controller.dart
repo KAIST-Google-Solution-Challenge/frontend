@@ -70,8 +70,6 @@ class CallController {
   }
 
   static Future<String> getFilePath(String number, String datetime) async {
-    Directory directory = Directory(EngDir);
-
     String fileName = '';
 
     final contacts = await ContactsService.getContacts(withThumbnails: false);
@@ -86,6 +84,8 @@ class CallController {
         datetime.substring(17, 19);
     print("(getFilePath) initial time: $time");
 
+    Directory directory = Directory(EngDir);
+    Directory oldDirectory = Directory(EngDirOld);
     for (var i = 0; i < 1000; i++) {
       time = (int.parse(time) + 1).toString();
       while (time.length < 6) {
@@ -95,11 +95,23 @@ class CallController {
           "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
       String fileEng =
           "${directory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
+      String fileKorOld =
+          "${oldDirectory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
+      String fileEngOld =
+          "${oldDirectory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
       if (File(fileKor).existsSync()) {
         fileName = fileKor;
         break;
       }
       if (File(fileEng).existsSync()) {
+        fileName = fileEng;
+        break;
+      }
+      if (File(fileKor).existsSync()) {
+        fileName = fileKorOld;
+        break;
+      }
+      if (File(fileEngOld).existsSync()) {
         fileName = fileEng;
         break;
       }
