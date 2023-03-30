@@ -12,4 +12,4 @@ https://the-voice-0235.web.app/#home_view
 
 ## How to use?
 
-### [Document](https://jongeunpark.notion.site/test-2c0245341c8d498aa09d236b10a330b4)
+### [Document](https://abrasive-shift-c8c.notion.site/The-Voice-2ba7dc9ab10a48dfaa9eed7f4a63228b)
