@@ -9,3 +9,7 @@ Tools • Dart 3.0.0 (build 3.0.0-257.0.dev) • DevTools 2.21.1
 
 ## Release 0.2.1
 https://the-voice-0235.web.app/#home_view
+
+## How to use?
+
+### [Document](https://jongeunpark.notion.site/test-2c0245341c8d498aa09d236b10a330b4)
