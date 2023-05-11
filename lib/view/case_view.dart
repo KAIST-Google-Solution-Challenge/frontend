@@ -3,7 +3,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/model/chat_model.dart';
-import 'package:the_voice/model/custom_widget_model.dart';
+import 'package:the_voice/model/build_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/report_dialog_view.dart';
 
@@ -62,10 +62,10 @@ class _CaseViewState extends State<CaseView> {
 
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
-        appBar: CustomAppBar(
-          isBack: true,
-          isSurface: true,
-          data: widget.number,
+        appBar: BuildAppBar(
+          pushed: true,
+          colored: false,
+          title: widget.number,
         ),
         backgroundColor: value.brightness == Brightness.light
             ? const Color(0xFFF4F4F4)

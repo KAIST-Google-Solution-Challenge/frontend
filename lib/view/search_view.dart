@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/search_controller.dart';
-import 'package:the_voice/model/custom_widget_model.dart';
+import 'package:the_voice/model/build_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 
 class SearchView extends StatefulWidget {
-  final String number;
-
-  const SearchView({super.key, required this.number});
+  final String text;
+  const SearchView({super.key, required this.text});
 
   @override
   State<SearchView> createState() => _SearchViewState();
@@ -23,15 +22,15 @@ class _SearchViewState extends State<SearchView> {
     TextTheme textTheme = Theme.of(context).textTheme;
 
     return FutureBuilder(
-      future: searchController.search(widget.number),
+      future: searchController.search(widget.text),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data!.isEmpty) {
             return Scaffold(
-              appBar: CustomAppBar(
-                isBack: true,
-                isSurface: true,
-                data: widget.number,
+              appBar: BuildAppBar(
+                pushed: true,
+                colored: false,
+                title: widget.text,
               ),
               body: Center(
                 child: Text(
@@ -45,10 +44,10 @@ class _SearchViewState extends State<SearchView> {
           } else {
             return Consumer<SettingModel>(
               builder: (context, value, child) => Scaffold(
-                appBar: CustomAppBar(
-                  isBack: true,
-                  isSurface: true,
-                  data: widget.number,
+                appBar: BuildAppBar(
+                  pushed: true,
+                  colored: false,
+                  title: widget.text,
                 ),
                 body: ListView(
                   children: List.generate(
@@ -64,10 +63,10 @@ class _SearchViewState extends State<SearchView> {
           }
         } else {
           return Scaffold(
-            appBar: CustomAppBar(
-              isBack: true,
-              isSurface: true,
-              data: widget.number,
+            appBar: BuildAppBar(
+              pushed: true,
+              colored: false,
+              title: widget.text,
             ),
             body: Center(
               child: LoadingAnimationWidget.staggeredDotsWave(

@@ -3,7 +3,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/call_controller.dart';
 import 'package:the_voice/model/chart_model.dart';
-import 'package:the_voice/model/custom_widget_model.dart';
+import 'package:the_voice/model/build_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/report_dialog_view.dart';
 
@@ -39,10 +39,10 @@ class _AnalysisViewState extends State<AnalysisView> {
           colorScheme.surfaceTint,
           1,
         ),
-        appBar: CustomAppBar(
-          isBack: true,
-          isSurface: false,
-          data: widget.number,
+        appBar: BuildAppBar(
+          pushed: true,
+          colored: true,
+          title: widget.number,
         ),
         floatingActionButton: FloatingActionButton.large(
           onPressed: () => showDialog(

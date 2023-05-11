@@ -1,32 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/authentication_controller.dart';
-import 'package:the_voice/model/custom_widget_model.dart';
+import 'package:the_voice/model/build_model.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
-
 import 'package:the_voice/view/emergency_contact_dialog_view.dart';
 
 class ProfileView extends StatelessWidget {
-  static String route = 'profile_view';
-
   const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    AuthenticationController authenticationController =
-        AuthenticationController();
+    AuthenticationController ac = AuthenticationController();
     FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
 
     return Consumer<SettingModel>(
       builder: (context, value, child) => Scaffold(
-        appBar: CustomAppBar(
-          isBack: true,
-          isSurface: true,
-          data: value.language == Language.english ? 'Profile' : '프로필',
+        appBar: BuildAppBar(
+          pushed: true,
+          colored: false,
+          title: value.language == Language.english ? 'Profile' : '프로필',
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +53,7 @@ class ProfileView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             OutlinedButton(
-              onPressed: () => authenticationController.signInWithGoogle(),
+              onPressed: () => ac.signInWithGoogle(),
               child: Text(
                 value.language == Language.english
                     ? 'Connect with Google'

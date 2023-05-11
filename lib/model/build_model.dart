@@ -1,126 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/model/chart_model.dart';
+import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/convert_dialog_view.dart';
-import 'package:the_voice/view/call_view.dart';
-import 'package:the_voice/view/home_view.dart';
-import 'package:the_voice/view/message_view.dart';
 import 'package:the_voice/view/profile_view.dart';
 import 'package:the_voice/view/search_view.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final bool isBack;
-  final bool isSurface;
-  final String data;
+class BuildAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final bool pushed; // is pushed by navigator?
+  final bool colored; // is appbar colored?
+  final String title;
 
-  const CustomAppBar({
+  const BuildAppBar({
     super.key,
-    required this.isBack,
-    required this.isSurface,
-    required this.data,
+    required this.pushed,
+    required this.colored,
+    required this.title,
   });
 
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    Color surface1 = ElevationOverlay.applySurfaceTint(
+      colorScheme.background,
+      colorScheme.surfaceTint,
+      1,
+    );
 
-    if (isBack) {
+    if (pushed) {
       return AppBar(
-        backgroundColor: isSurface
-            ? colorScheme.surface
-            : ElevationOverlay.applySurfaceTint(
-                colorScheme.background,
-                colorScheme.surfaceTint,
-                1,
-              ),
+        backgroundColor: colored ? surface1 : colorScheme.surface,
+        title: Text(title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: Text(data),
       );
     } else {
       return AppBar(
-        backgroundColor: isSurface
-            ? colorScheme.surface
-            : ElevationOverlay.applySurfaceTint(
-                colorScheme.background,
-                colorScheme.surfaceTint,
-                1,
-              ),
-        title: Row(
-          children: [
-            const SizedBox(width: 8),
-            Text(data),
-          ],
-        ),
+        backgroundColor: colored ? surface1 : colorScheme.surface,
+        title: Text(title),
         actions: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, ProfileView.route),
-                icon: const Icon(Icons.account_circle),
-              ),
-              const SizedBox(width: 8),
-            ],
+          IconButton(
+            onPressed: () => Navigator.push(context, _buildProfileViewRoute()),
+            icon: const Icon(Icons.account_circle),
           ),
         ],
       );
     }
   }
 
+  Route _buildProfileViewRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const ProfileView(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        final curveTween = CurveTween(curve: Curves.ease);
+        final tween = Tween(begin: begin, end: end).chain(curveTween);
+        final offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+    );
+  }
+
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class CustomNavigationBar extends StatelessWidget {
-  final int selectedIndex;
-
-  const CustomNavigationBar({
-    super.key,
-    required this.selectedIndex,
-  });
+class BuildSearch extends StatefulWidget {
+  final SettingModel sm;
+  const BuildSearch({super.key, required this.sm});
 
   @override
-  Widget build(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: selectedIndex,
-      onDestinationSelected: (value) => Navigator.pushReplacementNamed(
-        context,
-        [CallView.route, HomeView.route, MessageView.route][value],
-      ),
-      destinations: [
-        NavigationDestination(
-          icon: Icon(selectedIndex == 0 ? Icons.call : Icons.call_outlined),
-          label: 'Call',
-        ),
-        NavigationDestination(
-          icon: Icon(selectedIndex == 1 ? Icons.home : Icons.home_outlined),
-          label: 'Home',
-        ),
-        NavigationDestination(
-          icon:
-              Icon(selectedIndex == 2 ? Icons.message : Icons.message_outlined),
-          label: 'Message',
-        ),
-      ],
-    );
-  }
+  State<BuildSearch> createState() => _BuildSearchState();
 }
 
-class CustomSearch extends StatefulWidget {
-  final String hintText;
-
-  const CustomSearch({
-    super.key,
-    required this.hintText,
-  });
-
-  @override
-  State<CustomSearch> createState() => _CustomSearchState();
-}
-
-class _CustomSearchState extends State<CustomSearch> {
+class _BuildSearchState extends State<BuildSearch> {
   String text = '';
 
   @override
@@ -160,7 +117,9 @@ class _CustomSearchState extends State<CustomSearch> {
                         decoration: InputDecoration(
                           isCollapsed: true,
                           border: InputBorder.none,
-                          hintText: widget.hintText,
+                          hintText: widget.sm.language == Language.english
+                              ? 'Search phone number'
+                              : '전화번호 검색',
                           hintStyle: textTheme.bodyLarge?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -173,7 +132,7 @@ class _CustomSearchState extends State<CustomSearch> {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SearchView(number: text),
+                        builder: (context) => SearchView(text: text),
                       ),
                     ),
                   ),
