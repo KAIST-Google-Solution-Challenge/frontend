@@ -51,9 +51,8 @@ class BuildAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Route _buildProfileViewRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          const ProfileView(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      pageBuilder: (_, __, ___) => const ProfileView(),
+      transitionsBuilder: (_, animation, __, child) {
         const begin = Offset(0.0, 1.0);
         const end = Offset.zero;
         final curveTween = CurveTween(curve: Curves.ease);

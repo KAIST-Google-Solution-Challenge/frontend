@@ -14,7 +14,7 @@ class _MessageViewState extends State<MessageView> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: MessageController.fetchChat(),
-      builder: (context, snapshot) {
+      builder: (_, snapshot) {
         if (snapshot.hasData) {
           return ListView(
             children: List<Widget>.generate(snapshot.data!.length, (index) {

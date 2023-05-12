@@ -27,19 +27,12 @@ class TheVoice extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _initializeController(bc, fc),
-      builder: (context, snapshot) {
+      builder: (_, snapshot) {
         if (snapshot.data ?? false) {
           return ChangeNotifierProvider<SettingModel>(
-            create: (context) {
-              SettingModel settingModel = SettingModel(
-                backgroundController: bc,
-              );
-              settingModel.init(fc.fileReadAsStringSync());
-
-              return settingModel;
-            },
-            builder: (context, child) => Consumer<SettingModel>(
-              builder: (context, value, child) => MaterialApp(
+            create: (_) => _createSettingModel(bc, fc),
+            builder: (_, child) => Consumer<SettingModel>(
+              builder: (_, value, __) => MaterialApp(
                 debugShowCheckedModeBanner: false,
                 home: Home(sm: value),
                 theme: ThemeData(
@@ -87,6 +80,18 @@ class TheVoice extends StatelessWidget {
   }
 }
 
+SettingModel _createSettingModel(
+  BackgroundController backgroundController,
+  FileController fileController,
+) {
+  SettingModel settingModel = SettingModel(
+    backgroundController: backgroundController,
+  );
+  settingModel.init(fileController.fileReadAsStringSync());
+
+  return settingModel;
+}
+
 Future<void> _requestPermission() async {
   if (!(await Permission.phone.status).isGranted) {
     await Permission.phone.request();
@@ -106,13 +111,13 @@ Future<void> _requestPermission() async {
 }
 
 Future<bool> _initializeController(
-  BackgroundController bc,
-  FileController fc,
+  BackgroundController backgroundController,
+  FileController fileController,
 ) async {
-  await bc.init();
+  await backgroundController.init();
 
-  if (!await fc.fileExists()) {
-    await fc.fileInit();
+  if (!await fileController.fileExists()) {
+    await fileController.fileInit();
   }
 
   return true;

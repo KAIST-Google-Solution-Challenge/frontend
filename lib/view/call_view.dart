@@ -17,7 +17,7 @@ class _CallViewState extends State<CallView> {
 
     return FutureBuilder(
       future: CallController.fetchCalls(),
-      builder: (context, snapshot) {
+      builder: (_, snapshot) {
         if (snapshot.hasData) {
           return ListView(
             children: List<Widget>.generate(
