@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/controller/call_controller.dart';
-import 'package:the_voice/model/build_model.dart';
+import 'package:the_voice/view/call_convert_dialog_view.dart';
 
 class CallView extends StatefulWidget {
   const CallView({super.key});
@@ -30,7 +30,7 @@ class _CallViewState extends State<CallView> {
                   snapshot.data![index].timestamp!,
                 ).toIso8601String().substring(0, 10);
 
-                CustomCallListTile customCallListTile = CustomCallListTile(
+                BuildListTile customCallListTile = BuildListTile(
                   leading: const CircleAvatar(radius: 32),
                   isHeader: currHeader != nextHeader,
                   header: nextHeader,
@@ -56,6 +56,64 @@ class _CallViewState extends State<CallView> {
           return const Center(child: CircularProgressIndicator());
         }
       },
+    );
+  }
+}
+
+class BuildListTile extends StatelessWidget {
+  final bool isHeader;
+  final Widget leading;
+  final String header;
+  final String title;
+  final String subtitle;
+  final String trailing;
+  final String datetime;
+
+  const BuildListTile({
+    super.key,
+    required this.isHeader,
+    required this.leading,
+    required this.header,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+    required this.datetime,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+
+    void onTap() {
+      showDialog(
+        context: context,
+        builder: (context) => CallConvertDialogView(
+          leading: leading,
+          title: title,
+          subtitle: subtitle,
+          trailing: trailing,
+          datetime: datetime,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        isHeader
+            ? Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(header, style: textTheme.labelMedium),
+              )
+            : const SizedBox(),
+        ListTile(
+          leading: leading,
+          title: Text(title),
+          subtitle: Text(subtitle),
+          trailing: Text(trailing),
+          onTap: onTap,
+        ),
+      ],
     );
   }
 }

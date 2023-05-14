@@ -41,7 +41,6 @@ dependencies:
     call_log: ^4.0.0
     telephony: ^0.2.0
     contacts_service: ^0.6.3
-    loading_animation_widget: ^1.2.0+4
     url_launcher: ^6.1.10
     flutter_background_service: ^2.4.6
     flutter_background_service_android: ^3.0.3

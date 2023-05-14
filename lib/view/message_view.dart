@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/controller/message_controller.dart';
-import 'package:the_voice/model/build_model.dart';
+import 'package:the_voice/view/message_convert_dialog_view.dart';
 
 class MessageView extends StatefulWidget {
   const MessageView({super.key});
@@ -20,7 +20,7 @@ class _MessageViewState extends State<MessageView> {
             children: List<Widget>.generate(snapshot.data!.length, (index) {
               String lastMessage = snapshot.data![index].lastMessage!;
 
-              return CustomMessageListTile(
+              return BuildListTile(
                 threadId: snapshot.data![index].threadId!,
                 leading: const CircleAvatar(radius: 32),
                 title: snapshot.data![index].address!,
@@ -37,6 +37,47 @@ class _MessageViewState extends State<MessageView> {
           return const Center(child: CircularProgressIndicator());
         }
       },
+    );
+  }
+}
+
+class BuildListTile extends StatelessWidget {
+  final int threadId;
+  final Widget leading;
+  final String title;
+  final String subtitle;
+  final String trailing;
+
+  const BuildListTile({
+    super.key,
+    required this.threadId,
+    required this.leading,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    void onTap() {
+      showDialog(
+        context: context,
+        builder: (context) => MessageConvertDialogView(
+          threadId: threadId,
+          leading: leading,
+          title: title,
+          subtitle: subtitle,
+          trailing: trailing,
+        ),
+      );
+    }
+
+    return ListTile(
+      leading: leading,
+      title: Text(title),
+      subtitle: Text(subtitle),
+      trailing: Text(trailing),
+      onTap: onTap,
     );
   }
 }
