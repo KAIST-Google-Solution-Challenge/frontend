@@ -38,7 +38,7 @@ class BuildAppBar extends StatelessWidget implements PreferredSizeWidget {
         actions: [
           IconButton(
             onPressed: () => Navigator.push(context, _buildProfileViewRoute()),
-            icon: const Icon(Icons.account_circle),
+            icon: const Icon(Icons.person),
           ),
         ],
       );

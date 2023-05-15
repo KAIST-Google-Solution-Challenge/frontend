@@ -3,14 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/call_analysis_view.dart';
 
-class CallConvertDialogView extends StatelessWidget {
+class CallAnalysisDialogView extends StatelessWidget {
   final Widget leading;
   final String title;
   final String subtitle;
   final String trailing;
   final String datetime;
 
-  const CallConvertDialogView({
+  const CallAnalysisDialogView({
     super.key,
     required this.leading,
     required this.title,
@@ -29,7 +29,7 @@ class CallConvertDialogView extends StatelessWidget {
         final bool lang = value.language == Language.english;
 
         return AlertDialog(
-          icon: const Icon(Icons.sync),
+          icon: const Icon(Icons.assessment),
           title: Text(lang ? 'Analysis?' : '분석하시겠습니까?'),
           content: ListTile(
             title: Text(title),

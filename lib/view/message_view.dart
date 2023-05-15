@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/controller/message_controller.dart';
-import 'package:the_voice/view/message_convert_dialog_view.dart';
+import 'package:the_voice/view/message_analysis_dialog_view.dart';
 
 class MessageView extends StatefulWidget {
   const MessageView({super.key});
@@ -62,7 +62,7 @@ class BuildListTile extends StatelessWidget {
     void onTap() {
       showDialog(
         context: context,
-        builder: (context) => MessageConvertDialogView(
+        builder: (context) => MessageAnalysisDialogView(
           threadId: threadId,
           leading: leading,
           title: title,

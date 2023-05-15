@@ -141,13 +141,17 @@ class ProfileView extends StatelessWidget {
       ),
       const Divider(),
       ListTile(
-        leading: const Icon(Icons.sunny),
+        leading: Icon(
+          value.brightness == Brightness.light
+              ? Icons.wb_sunny_outlined
+              : Icons.brightness_3,
+        ),
         title: Text(
           lang ? 'Dark Mode' : '다크 모드',
           style: textTheme.labelLarge,
         ),
         trailing: Switch(
-          value: value.brightness == Brightness.dark,
+          value: value.brightness != Brightness.light,
           onChanged: (_) => value.changeBrightness(),
         ),
       ),
@@ -165,7 +169,7 @@ class ProfileView extends StatelessWidget {
           ),
         ),
         trailing: Switch(
-          value: value.language == Language.korean,
+          value: value.language != Language.english,
           onChanged: (_) => value.changeLanguage(),
         ),
       )

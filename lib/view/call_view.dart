@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:the_voice/controller/call_controller.dart';
-import 'package:the_voice/view/call_convert_dialog_view.dart';
+import 'package:the_voice/view/call_analysis_dialog_view.dart';
 
 class CallView extends StatefulWidget {
   const CallView({super.key});
@@ -87,7 +87,7 @@ class BuildListTile extends StatelessWidget {
     void onTap() {
       showDialog(
         context: context,
-        builder: (context) => CallConvertDialogView(
+        builder: (context) => CallAnalysisDialogView(
           leading: leading,
           title: title,
           subtitle: subtitle,

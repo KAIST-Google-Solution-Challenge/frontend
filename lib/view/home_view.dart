@@ -52,7 +52,7 @@ class _BuildSearchState extends State<BuildSearch> {
         child: Material(
           elevation: 3,
           color: colorScheme.surface,
-          shadowColor: colorScheme.shadow,
+          shadowColor: Colors.transparent,
           surfaceTintColor: colorScheme.surfaceTint,
           borderRadius: BorderRadius.circular(28),
           child: InkWell(

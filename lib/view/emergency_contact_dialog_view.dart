@@ -16,7 +16,7 @@ class EmergencyContactDialogView extends StatelessWidget {
         final bool lang = value.language == Language.english;
 
         return AlertDialog(
-          icon: const Icon(Icons.report),
+          icon: const Icon(Icons.add_call),
           title: Text(lang ? 'Emergency Contact' : '비상 연락처'),
           content: TextField(
             onChanged: (value) => emergencyContact = value,
