@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_voice/model/build_model.dart';
+import 'package:the_voice/util/build.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/call_view.dart';
 import 'package:the_voice/view/home_view.dart';

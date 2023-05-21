@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/call_controller.dart';
-import 'package:the_voice/model/build_model.dart';
+import 'package:the_voice/util/build.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/util/constant.dart';
 
