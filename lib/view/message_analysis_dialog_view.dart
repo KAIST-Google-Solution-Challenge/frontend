@@ -23,39 +23,33 @@ class MessageAnalysisDialogView extends StatelessWidget {
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
+    SettingModel sm = context.watch<SettingModel>();
+    bool lang = sm.language == Language.english;
 
-    return Consumer<SettingModel>(
-      builder: (_, value, __) {
-        final bool lang = value.language == Language.english;
-
-        return AlertDialog(
-          icon: const Icon(Icons.assessment),
-          title: Text(lang ? 'Analysis?' : '분석하시겠습니까?'),
-          content: ListTile(
-            title: Text(title),
-            subtitle: Text(subtitle),
-            trailing: Text(trailing),
+    return AlertDialog(
+      icon: const Icon(Icons.assessment),
+      title: Text(lang ? 'Analysis?' : '분석하시겠습니까?'),
+      content: ListTile(
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: Text(trailing),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            lang ? 'Cancel' : '취소',
+            style: tt.labelLarge?.copyWith(color: cs.onSurfaceVariant),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                lang ? 'Cancel' : '취소',
-                style: tt.labelLarge?.copyWith(
-                  color: cs.onSurfaceVariant,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(context, _buildRoute(title, threadId));
-              },
-              child: Text(lang ? 'Analysis' : '분석'),
-            ),
-          ],
-        );
-      },
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(context, _buildRoute(title, threadId));
+          },
+          child: Text(lang ? 'Analysis' : '분석'),
+        ),
+      ],
     );
   }
 

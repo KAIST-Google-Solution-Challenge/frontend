@@ -21,43 +21,41 @@ class _SearchViewState extends State<SearchView> {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
 
-    return Scaffold(
-      appBar: BuildAppBar(pushed: true, title: widget.text),
-      body: _buildBody(cs, tt),
-    );
-  }
-
-  Widget _buildBody(ColorScheme colorScheme, TextTheme textTheme) {
-    return FutureBuilder(
-      future: searchService.search(widget.text),
-      builder: (_, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data!.isEmpty) {
-            return Center(
-              child: Text(
-                'NO DATA',
-                style: textTheme.headlineLarge?.copyWith(
-                  color: colorScheme.onSurface,
+    Widget buildBody() {
+      return FutureBuilder(
+        future: searchService.search(widget.text),
+        builder: (_, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data!.isEmpty) {
+              return Center(
+                child: Text(
+                  'NO DATA',
+                  style: tt.headlineLarge?.copyWith(color: cs.onSurface),
                 ),
-              ),
-            );
-          } else {
-            return Consumer<SettingModel>(
-              builder: (_, value, __) => ListView(
-                children: List.generate(
-                  snapshot.data!.length,
-                  (index) => BuildHistory(
-                    probability: snapshot.data![index]['probability'],
-                    date: snapshot.data![index]['timestamp'],
+              );
+            } else {
+              return Consumer<SettingModel>(
+                builder: (_, value, __) => ListView(
+                  children: List.generate(
+                    snapshot.data!.length,
+                    (index) => BuildHistory(
+                      probability: snapshot.data![index]['probability'],
+                      date: snapshot.data![index]['timestamp'],
+                    ),
                   ),
                 ),
-              ),
-            );
+              );
+            }
+          } else {
+            return const Center(child: CircularProgressIndicator());
           }
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
+        },
+      );
+    }
+
+    return Scaffold(
+      appBar: BuildAppBar(pushed: true, title: widget.text),
+      body: buildBody(),
     );
   }
 }

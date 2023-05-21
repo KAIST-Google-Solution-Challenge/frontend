@@ -31,490 +31,407 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
+    SettingModel sm = context.watch<SettingModel>();
+    bool lang = sm.language == Language.english;
+    bool brightness = sm.brightness == Brightness.light;
 
-    return Consumer<SettingModel>(
-      builder: (_, value, __) => FutureBuilder(
-        future: CallController.analyze(widget.number, widget.datetime),
-        builder: (_, snapshot) {
-          // Debug
-          // snapshot = const AsyncSnapshot.withData(ConnectionState.done, 97.0);
-
-          if (snapshot.hasData) {
-            if (snapshot.data! >= 0.0) {
-              return Scaffold(
-                backgroundColor: _getBackgroundColor(cs, snapshot.data!),
-                appBar: _buildAppBar(widget.number, cs, snapshot.data!),
-                body: _buildBody(value, cs, tt, snapshot.data!),
-              );
-            } else {
-              return _buildError(value, cs, tt, snapshot.data!);
-            }
-          } else {
-            return _buildLoading();
-          }
-        },
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(
-    String title,
-    ColorScheme colorScheme,
-    double probability,
-  ) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      title: Text(
-        title,
-        style: TextStyle(
-          color: _getOnSurfaceColor(colorScheme, probability),
-        ),
-      ),
-      leading: IconButton(
-        onPressed: () => Navigator.pop(context),
-        icon: const Icon(Icons.arrow_back),
-        color: _getOnSurfaceColor(colorScheme, probability),
-      ),
-      systemOverlayStyle: _getSystemUiOverlayStyle(
-        Theme.of(context).brightness,
-        probability,
-      ),
-    );
-  }
-
-  Widget _buildBody(
-    SettingModel settingModel,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    double probability,
-  ) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 48,
-          vertical: 64,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _getTitle(probability, colorScheme, textTheme),
-                const SizedBox(height: 8),
-                _getProbability(probability, colorScheme, textTheme),
-                const SizedBox(height: 32),
-                const Divider(endIndent: 128),
-                const SizedBox(height: 32),
-                _getBody(probability, colorScheme, textTheme),
-                const SizedBox(height: 8),
-                _getLabel(
-                  ['2023', 'Google', 'Solution', 'Challenge'],
-                  probability,
-                  colorScheme,
-                  textTheme,
-                ),
-              ],
-            ),
-            _buildBar(colorScheme, textTheme),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBar(ColorScheme colorScheme, TextTheme textTheme) {
-    TonalPalette toTonalPallete(Color color) {
-      final hct = Hct.fromInt(color.value);
-      return TonalPalette.of(hct.hue, hct.chroma);
+    SystemUiOverlayStyle getSystemUiOverlayStyle(double probability) {
+      if (brightness) {
+        if (THRESHOLD2 < probability && probability <= THRESHOLD3) {
+          return SystemUiOverlayStyle.dark;
+        } else {
+          return SystemUiOverlayStyle.light;
+        }
+      } else {
+        if (THRESHOLD2 < probability && probability <= THRESHOLD3) {
+          return SystemUiOverlayStyle.light;
+        } else {
+          return SystemUiOverlayStyle.dark;
+        }
+      }
     }
 
-    return Row(
-      children: [
-        const Expanded(child: SizedBox()),
-        Expanded(
-          flex: 5,
-          child: SizedBox(
-            height: 24,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    color: colorScheme.primary,
-                    child: Center(
-                      child: Text(
-                        '1',
-                        style: textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onPrimary,
+    Widget getTitle(double probability) {
+      if (probability > THRESHOLD4) {
+        return Text(
+          lang ? 'Very Dangerous' : '매우 위험해요',
+          style: tt.displaySmall?.copyWith(color: cs.onTertiary),
+        );
+      } else if (probability > THRESHOLD3) {
+        return Text(
+          lang ? 'Dangerous' : '위험해요',
+          style: tt.displaySmall?.copyWith(color: cs.onTertiary),
+        );
+      } else if (probability > THRESHOLD2) {
+        return Text(
+          lang ? 'Normal' : '보통이에요',
+          style: tt.displaySmall?.copyWith(color: cs.onSurfaceVariant),
+        );
+      } else if (probability > THRESHOLD1) {
+        return Text(
+          lang ? 'Safe' : '안전해요',
+          style: tt.displaySmall?.copyWith(color: cs.onPrimary),
+        );
+      } else {
+        return Text(
+          lang ? 'Very Safe' : '매우 안전해요',
+          style: tt.displaySmall?.copyWith(color: cs.onPrimary),
+        );
+      }
+    }
+
+    Widget getProbability(double probability) {
+      if (probability > THRESHOLD4) {
+        return Text(
+          '${probability.toInt()}%',
+          style: tt.displayLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: cs.onTertiary,
+          ),
+        );
+      } else if (probability > THRESHOLD3) {
+        return Text(
+          '$probability%',
+          style: tt.displayLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: cs.onTertiary,
+          ),
+        );
+      } else if (probability > THRESHOLD2) {
+        return Text(
+          '$probability%',
+          style: tt.displayLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: cs.onSurfaceVariant,
+          ),
+        );
+      } else if (probability > THRESHOLD1) {
+        return Text(
+          '$probability%',
+          style: tt.displayLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: cs.onPrimary,
+          ),
+        );
+      } else {
+        return Text(
+          '$probability%',
+          style: tt.displayLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: cs.onPrimary,
+          ),
+        );
+      }
+    }
+
+    Widget getBody(double probability) {
+      if (probability > THRESHOLD4) {
+        return Text(
+          lang
+              ? 'AI Detected Below Tokens\nAs Very Dangerous'
+              : 'AI가 아래 토큰들을\n매우 위험하다고 판단했어요!',
+          style: tt.titleLarge?.copyWith(color: cs.onTertiary),
+        );
+      } else if (probability > THRESHOLD3) {
+        return Text(
+          lang
+              ? 'AI Detected Below Tokens\nAs Dangerous'
+              : 'AI가 아래 토큰들을\n위험하다고 판단했어요!',
+          style: tt.titleLarge?.copyWith(color: cs.onTertiary),
+        );
+      } else if (probability > THRESHOLD2) {
+        return Text(
+          lang
+              ? 'AI Detected Below Tokens\nAs Normal'
+              : 'AI가 아래 토큰들을\n기준으로 판단했어요!',
+          style: tt.titleLarge?.copyWith(color: cs.onSurfaceVariant),
+        );
+      } else if (probability > THRESHOLD1) {
+        return Text(
+          lang
+              ? 'AI Detected Below Tokens\nAs Safe'
+              : 'AI가 아래 토큰들을\n안전하다고 판단했어요!',
+          style: tt.titleLarge?.copyWith(color: cs.onPrimary),
+        );
+      } else {
+        return Text(
+          lang
+              ? 'AI Detected Below Tokens\nAs Very Safe'
+              : 'AI가 아래 토큰들을\n매우 안전하다고 판단했어요!',
+          style: tt.titleLarge?.copyWith(color: cs.onPrimary),
+        );
+      }
+    }
+
+    Widget getLabel(List<String> tokens, double probability) {
+      if (probability > THRESHOLD4) {
+        return Text(
+          tokens.join(' '),
+          style: tt.bodyLarge?.copyWith(color: cs.onTertiary),
+        );
+      } else if (probability > THRESHOLD3) {
+        return Text(
+          tokens.join(' '),
+          style: tt.bodyLarge?.copyWith(color: cs.onTertiary),
+        );
+      } else if (probability > THRESHOLD2) {
+        return Text(
+          tokens.join(' '),
+          style: tt.bodyLarge?.copyWith(color: cs.onSurfaceVariant),
+        );
+      } else if (probability > THRESHOLD1) {
+        return Text(
+          tokens.join(' '),
+          style: tt.bodyLarge?.copyWith(color: cs.onPrimary),
+        );
+      } else {
+        return Text(
+          tokens.join(' '),
+          style: tt.bodyLarge?.copyWith(color: cs.onPrimary),
+        );
+      }
+    }
+
+    Color getBackgroundColor(double probability) {
+      TonalPalette toTonalPallete(Color color) {
+        final hct = Hct.fromInt(color.value);
+        return TonalPalette.of(hct.hue, hct.chroma);
+      }
+
+      if (probability > THRESHOLD4) {
+        return cs.tertiary;
+      } else if (probability > THRESHOLD3) {
+        return Color(toTonalPallete(cs.tertiary).get(60));
+      } else if (probability > THRESHOLD2) {
+        return cs.surfaceVariant;
+      } else if (probability > THRESHOLD1) {
+        return Color(toTonalPallete(cs.primary).get(60));
+      } else {
+        return cs.primary;
+      }
+    }
+
+    Color getOnSurfaceColor(double probability) {
+      if (probability > THRESHOLD3) {
+        return cs.onTertiary;
+      } else if (probability > THRESHOLD2) {
+        return cs.onSurfaceVariant;
+      } else {
+        return cs.onPrimary;
+      }
+    }
+
+    PreferredSizeWidget buildAppBar(double probability) {
+      return AppBar(
+        backgroundColor: Colors.transparent,
+        title: Text(
+          widget.number,
+          style: TextStyle(color: getOnSurfaceColor(probability)),
+        ),
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back),
+          color: getOnSurfaceColor(probability),
+        ),
+        systemOverlayStyle: getSystemUiOverlayStyle(probability),
+      );
+    }
+
+    Widget buildBar() {
+      TonalPalette toTonalPallete(Color color) {
+        final hct = Hct.fromInt(color.value);
+        return TonalPalette.of(hct.hue, hct.chroma);
+      }
+
+      return Row(
+        children: [
+          const Expanded(child: SizedBox()),
+          Expanded(
+            flex: 5,
+            child: SizedBox(
+              height: 24,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      color: cs.primary,
+                      child: Center(
+                        child: Text(
+                          '1',
+                          style: tt.labelLarge?.copyWith(color: cs.onPrimary),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: Color(toTonalPallete(colorScheme.primary).get(60)),
-                    child: Center(
-                      child: Text(
-                        '2',
-                        style: textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onPrimary,
+                  Expanded(
+                    child: Container(
+                      color: Color(toTonalPallete(cs.primary).get(60)),
+                      child: Center(
+                        child: Text(
+                          '2',
+                          style: tt.labelLarge?.copyWith(color: cs.onPrimary),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: colorScheme.surfaceVariant,
-                    child: Center(
-                      child: Text(
-                        '3',
-                        style: textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+                  Expanded(
+                    child: Container(
+                      color: cs.surfaceVariant,
+                      child: Center(
+                        child: Text(
+                          '3',
+                          style: tt.labelLarge
+                              ?.copyWith(color: cs.onSurfaceVariant),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: Color(toTonalPallete(colorScheme.tertiary).get(60)),
-                    child: Center(
-                      child: Text(
-                        '4',
-                        style: textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onTertiary,
+                  Expanded(
+                    child: Container(
+                      color: Color(toTonalPallete(cs.tertiary).get(60)),
+                      child: Center(
+                        child: Text(
+                          '4',
+                          style: tt.labelLarge?.copyWith(color: cs.onTertiary),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: colorScheme.tertiary,
-                    child: Center(
-                      child: Text(
-                        '5',
-                        style: textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onTertiary,
+                  Expanded(
+                    child: Container(
+                      color: cs.tertiary,
+                      child: Center(
+                        child: Text(
+                          '5',
+                          style: tt.labelLarge?.copyWith(color: cs.onTertiary),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-        const Expanded(child: SizedBox()),
-      ],
-    );
-  }
+          const Expanded(child: SizedBox()),
+        ],
+      );
+    }
 
-  Widget _buildError(
-    SettingModel settingModel,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    double probability,
-  ) {
-    return Scaffold(
-      appBar: BuildAppBar(pushed: true, title: widget.number),
-      body: Center(
-        child: Builder(
-          builder: (_) {
-            if (probability == ERROR_NOFILE) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+    Widget buildBody(double probability) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 64),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'ERROR',
-                    style: textTheme.headlineLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
+                  getTitle(probability),
+                  const SizedBox(height: 8),
+                  getProbability(probability),
+                  const SizedBox(height: 32),
+                  const Divider(endIndent: 128),
+                  const SizedBox(height: 32),
+                  getBody(probability),
+                  const SizedBox(height: 8),
+                  getLabel(
+                    ['2023', 'Google', 'Solution', 'Challenge'],
+                    probability,
                   ),
-                  Text(
-                    'NO FILE',
-                    style: textTheme.displayLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                  )
                 ],
-              );
-            } else if (probability == ERROR_SERVER) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'ERROR',
-                    style: textTheme.headlineLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  Text(
-                    'SERVER',
-                    style: textTheme.displayLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                  )
-                ],
-              );
-            } else {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'ERROR',
-                    style: textTheme.headlineLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  Text(
-                    (-probability.toInt()).toString(),
-                    style: textTheme.displayLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                  )
-                ],
-              );
-            }
-          },
+              ),
+              buildBar(),
+            ],
+          ),
         ),
-      ),
+      );
+    }
+
+    Widget buildError(double probability) {
+      return Scaffold(
+        appBar: BuildAppBar(pushed: true, title: widget.number),
+        body: Center(
+          child: Builder(
+            builder: (_) {
+              if (probability == ERROR_NOFILE) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'ERROR',
+                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
+                    ),
+                    Text(
+                      'NO FILE',
+                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
+                    )
+                  ],
+                );
+              } else if (probability == ERROR_SERVER) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'ERROR',
+                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
+                    ),
+                    Text(
+                      'SERVER',
+                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
+                    )
+                  ],
+                );
+              } else {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'ERROR',
+                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
+                    ),
+                    Text(
+                      (-probability.toInt()).toString(),
+                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
+                    )
+                  ],
+                );
+              }
+            },
+          ),
+        ),
+      );
+    }
+
+    Widget buildLoading() {
+      return Scaffold(
+        appBar: BuildAppBar(pushed: true, title: widget.number),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return FutureBuilder(
+      future: CallController.analyze(widget.number, widget.datetime),
+      builder: (_, snapshot) {
+        // Debug
+        // snapshot = const AsyncSnapshot.withData(ConnectionState.done, 3);
+
+        if (snapshot.hasData) {
+          double probability = snapshot.data!;
+          if (probability >= 0.0) {
+            return Scaffold(
+              backgroundColor: getBackgroundColor(probability),
+              appBar: buildAppBar(probability),
+              body: buildBody(probability),
+            );
+          } else {
+            return buildError(probability);
+          }
+        } else {
+          return buildLoading();
+        }
+      },
     );
-  }
-
-  Widget _buildLoading() {
-    return Scaffold(
-      appBar: BuildAppBar(pushed: true, title: widget.number),
-      body: const Center(child: CircularProgressIndicator()),
-    );
-  }
-
-  Color _getBackgroundColor(ColorScheme colorScheme, double probability) {
-    TonalPalette toTonalPallete(Color color) {
-      final hct = Hct.fromInt(color.value);
-      return TonalPalette.of(hct.hue, hct.chroma);
-    }
-
-    if (probability > THRESHOLD4) {
-      return colorScheme.tertiary;
-    } else if (probability > THRESHOLD3) {
-      return Color(toTonalPallete(colorScheme.tertiary).get(60));
-    } else if (probability > THRESHOLD2) {
-      return colorScheme.surfaceVariant;
-    } else if (probability > THRESHOLD1) {
-      return Color(toTonalPallete(colorScheme.primary).get(60));
-    } else {
-      return colorScheme.primary;
-    }
-  }
-
-  Color _getOnSurfaceColor(ColorScheme colorScheme, double probability) {
-    if (probability > THRESHOLD3) {
-      return colorScheme.onTertiary;
-    } else if (probability > THRESHOLD2) {
-      return colorScheme.onSurfaceVariant;
-    } else {
-      return colorScheme.onPrimary;
-    }
-  }
-
-  SystemUiOverlayStyle _getSystemUiOverlayStyle(
-    Brightness brightness,
-    double probability,
-  ) {
-    if (brightness == Brightness.light) {
-      if (THRESHOLD2 < probability && probability <= THRESHOLD3) {
-        return SystemUiOverlayStyle.dark;
-      } else {
-        return SystemUiOverlayStyle.light;
-      }
-    } else {
-      if (THRESHOLD2 < probability && probability <= THRESHOLD3) {
-        return SystemUiOverlayStyle.light;
-      } else {
-        return SystemUiOverlayStyle.dark;
-      }
-    }
-  }
-
-  Widget _getTitle(
-    double probability,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
-    if (probability > THRESHOLD4) {
-      return Text(
-        '매우 위험해요',
-        style: textTheme.displaySmall?.copyWith(
-          color: colorScheme.onTertiary,
-        ),
-      );
-    } else if (probability > THRESHOLD3) {
-      return Text(
-        '위험해요',
-        style: textTheme.displaySmall?.copyWith(
-          color: colorScheme.onTertiary,
-        ),
-      );
-    } else if (probability > THRESHOLD2) {
-      return Text(
-        '보통이에요',
-        style: textTheme.displaySmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      );
-    } else if (probability > THRESHOLD1) {
-      return Text(
-        '안전해요',
-        style: textTheme.displaySmall?.copyWith(
-          color: colorScheme.onPrimary,
-        ),
-      );
-    } else {
-      return Text(
-        '매우 안전해요',
-        style: textTheme.displaySmall?.copyWith(
-          color: colorScheme.onPrimary,
-        ),
-      );
-    }
-  }
-
-  Widget _getProbability(
-    double probability,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
-    if (probability > THRESHOLD4) {
-      return Text(
-        '${probability.toInt()}%',
-        style: textTheme.displayLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: colorScheme.onTertiary,
-        ),
-      );
-    } else if (probability > THRESHOLD3) {
-      return Text(
-        '$probability%',
-        style: textTheme.displayLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: colorScheme.onTertiary,
-        ),
-      );
-    } else if (probability > THRESHOLD2) {
-      return Text(
-        '$probability%',
-        style: textTheme.displayLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: colorScheme.onSurfaceVariant,
-        ),
-      );
-    } else if (probability > THRESHOLD1) {
-      return Text(
-        '$probability%',
-        style: textTheme.displayLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: colorScheme.onPrimary,
-        ),
-      );
-    } else {
-      return Text(
-        '$probability%',
-        style: textTheme.displayLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: colorScheme.onPrimary,
-        ),
-      );
-    }
-  }
-
-  Widget _getBody(
-    double probability,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
-    if (probability > THRESHOLD4) {
-      return Text(
-        'AI가 아래 문자들을\n위험하다고 판단했어요!',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onTertiary,
-        ),
-      );
-    } else if (probability > THRESHOLD3) {
-      return Text(
-        'AI가 아래 문자들을\n위험하다고 판단했어요!',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onTertiary,
-        ),
-      );
-    } else if (probability > THRESHOLD2) {
-      return Text(
-        'AI가 아래 토큰들을\n기준으로 판단했어요!',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      );
-    } else if (probability > THRESHOLD1) {
-      return Text(
-        'AI가 아래 토큰들을\n안전하다고 판단했어요!',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onPrimary,
-        ),
-      );
-    } else {
-      return Text(
-        'AI가 아래 토큰들을\n안전하다고 판단했어요!',
-        style: textTheme.titleLarge?.copyWith(
-          color: colorScheme.onPrimary,
-        ),
-      );
-    }
-  }
-
-  Widget _getLabel(
-    List<String> tokens,
-    double probability,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
-    if (probability > THRESHOLD4) {
-      return Text(
-        tokens.join(' '),
-        style: textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onTertiary,
-        ),
-      );
-    } else if (probability > THRESHOLD3) {
-      return Text(
-        tokens.join(' '),
-        style: textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onTertiary,
-        ),
-      );
-    } else if (probability > THRESHOLD2) {
-      return Text(
-        tokens.join(' '),
-        style: textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      );
-    } else if (probability > THRESHOLD1) {
-      return Text(
-        tokens.join(' '),
-        style: textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onPrimary,
-        ),
-      );
-    } else {
-      return Text(
-        tokens.join(' '),
-        style: textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onPrimary,
-        ),
-      );
-    }
   }
 }

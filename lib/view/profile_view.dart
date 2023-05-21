@@ -13,166 +13,139 @@ class ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AuthenticationController ac = AuthenticationController();
-    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    FirebaseAuth fa = FirebaseAuth.instance;
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
+    SettingModel sm = context.watch<SettingModel>();
+    bool lang = sm.language == Language.english;
+    bool brightness = sm.brightness == Brightness.light;
+    bool user = fa.currentUser == null;
 
-    return Consumer<SettingModel>(
-      builder: (_, value, __) => Scaffold(
-        appBar: _buildAppBar(value),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ..._buildInfo(firebaseAuth, cs, tt, ac, value),
-            const SizedBox(height: 64),
-            Row(
-              children: [
-                const SizedBox(width: 32),
-                Expanded(
-                  child: Column(
-                    children: _buildSetting(context, cs, tt, value),
-                  ),
+    PreferredSizeWidget buildAppBar() {
+      return BuildAppBar(pushed: true, title: lang ? 'Profile' : '프로필');
+    }
+
+    Widget buildInfo() {
+      return Column(
+        children: [
+          user
+              ? const CircleAvatar(radius: 64)
+              : Image(
+                  width: 100,
+                  height: 100,
+                  image: NetworkImage(fa.currentUser!.photoURL!),
                 ),
-                const SizedBox(width: 32),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
-  }
+          const SizedBox(height: 16),
+          Text(
+            user ? 'Guest' : fa.currentUser!.displayName!,
+            style: tt.headlineSmall,
+          ),
+          Text(
+            user
+                ? 'guest${Random().nextInt(9999) + 1}@the-voice.app'
+                : fa.currentUser!.email!,
+            style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton(
+            onPressed: () => ac.signInWithGoogle(),
+            child: Text(
+              lang ? 'Connect with Google' : '구글 연동',
+            ),
+          ),
+        ],
+      );
+    }
 
-  PreferredSizeWidget _buildAppBar(SettingModel sm) {
-    return BuildAppBar(pushed: true, title: _getTitle(sm));
-  }
-
-  String _getTitle(SettingModel sm) {
-    return sm.language == Language.english ? 'Profile' : '프로필';
-  }
-
-  List<Widget> _buildInfo(
-    FirebaseAuth firebaseAuth,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    AuthenticationController authenticationController,
-    SettingModel settingModel,
-  ) {
-    return [
-      firebaseAuth.currentUser == null
-          ? const CircleAvatar(radius: 64)
-          : Image(
-              width: 100,
-              height: 100,
-              image: NetworkImage(
-                firebaseAuth.currentUser!.photoURL!,
+    Widget buildSetting() {
+      return Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.add_call),
+            title: Text(
+              lang ? 'Emergency Contact' : '비상 연락처',
+              style: tt.labelLarge,
+            ),
+            subtitle: Text(
+              sm.emergencyContact.isEmpty
+                  ? lang
+                      ? 'Not Enrolled'
+                      : '등록되지 않음'
+                  : sm.emergencyContact,
+              style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (_) => const EmergencyContactDialogView(),
               ),
             ),
-      const SizedBox(height: 16),
-      Text(
-        firebaseAuth.currentUser == null
-            ? 'Guest'
-            : firebaseAuth.currentUser!.displayName!,
-        style: textTheme.headlineSmall,
-      ),
-      Text(
-        firebaseAuth.currentUser == null
-            ? 'guest${Random().nextInt(9999) + 1}@the-voice.app'
-            : firebaseAuth.currentUser!.email!,
-        style: textTheme.bodySmall?.copyWith(
-          color: colorScheme.onSurfaceVariant,
-        ),
-      ),
-      const SizedBox(height: 16),
-      OutlinedButton(
-        onPressed: () => authenticationController.signInWithGoogle(),
-        child: Text(
-          settingModel.language == Language.english
-              ? 'Connect with Google'
-              : '구글 연동',
-        ),
-      ),
-    ];
-  }
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.autorenew),
+            title: Text(
+              lang ? 'Auto Analysis' : '자동 분석',
+              style: tt.labelLarge,
+            ),
+            trailing: Switch(
+              value: sm.autoAnalysis,
+              onChanged: (_) async => await sm.changeAutoAnalysis(),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            leading: Icon(brightness ? Icons.brightness_7 : Icons.brightness_2),
+            title: Text(
+              brightness
+                  ? (lang ? 'Light Mode' : '라이트 모드')
+                  : (lang ? 'Dark Mode' : '다크 모드'),
+              style: tt.labelLarge,
+            ),
+            trailing: Switch(
+              value: !brightness,
+              onChanged: (_) => sm.changeBrightness(),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: Text(
+              lang ? 'Language' : '언어',
+              style: tt.labelLarge,
+            ),
+            subtitle: Text(
+              lang ? 'English' : '한국어',
+              style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+            ),
+            trailing: Switch(
+              value: !lang,
+              onChanged: (_) => sm.changeLanguage(),
+            ),
+          )
+        ],
+      );
+    }
 
-  List<Widget> _buildSetting(
-    BuildContext context,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    SettingModel value,
-  ) {
-    final bool lang = value.language == Language.english;
-
-    return [
-      ListTile(
-        leading: const Icon(Icons.add_call),
-        title: Text(
-          lang ? 'Emergency Contact' : '비상 연락처',
-          style: textTheme.labelLarge,
-        ),
-        subtitle: Text(
-          value.emergencyContact.isEmpty
-              ? lang
-                  ? 'Not Enrolled'
-                  : '등록되지 않음'
-              : value.emergencyContact,
-          style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () => showDialog(
-            context: context,
-            builder: (_) => const EmergencyContactDialogView(),
-          ),
-        ),
+    return Scaffold(
+      appBar: buildAppBar(),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          buildInfo(),
+          const SizedBox(height: 64),
+          Row(
+            children: [
+              const SizedBox(width: 32),
+              Expanded(
+                child: buildSetting(),
+              ),
+              const SizedBox(width: 32),
+            ],
+          )
+        ],
       ),
-      const Divider(),
-      ListTile(
-        leading: const Icon(Icons.autorenew),
-        title: Text(
-          lang ? 'Auto Analysis' : '자동 분석',
-          style: textTheme.labelLarge,
-        ),
-        trailing: Switch(
-          value: value.autoAnalysis,
-          onChanged: (_) async => await value.changeAutoAnalysis(),
-        ),
-      ),
-      const Divider(),
-      ListTile(
-        leading: Icon(
-          value.brightness == Brightness.light
-              ? Icons.wb_sunny_outlined
-              : Icons.brightness_3,
-        ),
-        title: Text(
-          lang ? 'Dark Mode' : '다크 모드',
-          style: textTheme.labelLarge,
-        ),
-        trailing: Switch(
-          value: value.brightness != Brightness.light,
-          onChanged: (_) => value.changeBrightness(),
-        ),
-      ),
-      const Divider(),
-      ListTile(
-        leading: const Icon(Icons.language),
-        title: Text(
-          lang ? 'Language' : '언어',
-          style: textTheme.labelLarge,
-        ),
-        subtitle: Text(
-          lang ? 'English' : '한국어',
-          style: textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        trailing: Switch(
-          value: value.language != Language.english,
-          onChanged: (_) => value.changeLanguage(),
-        ),
-      )
-    ];
+    );
   }
 }
