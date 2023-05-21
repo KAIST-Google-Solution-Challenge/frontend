@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/profile_view.dart';
 
 class BuildAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -13,10 +15,14 @@ class BuildAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme tt = Theme.of(context).textTheme;
+    SettingModel sm = context.watch<SettingModel>();
+    bool largeFont = sm.largeFont;
+
     if (pushed) {
       return AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(title),
+        title: largeFont ? Text(title, style: tt.headlineLarge) : Text(title),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
@@ -25,7 +31,7 @@ class BuildAppBar extends StatelessWidget implements PreferredSizeWidget {
     } else {
       return AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(title),
+        title: largeFont ? Text(title, style: tt.headlineLarge) : Text(title),
         actions: [
           IconButton(
             onPressed: () => Navigator.push(context, _buildProfileViewRoute()),

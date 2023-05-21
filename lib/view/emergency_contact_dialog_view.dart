@@ -10,12 +10,15 @@ class EmergencyContactDialogView extends StatelessWidget {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
     SettingModel sm = context.watch<SettingModel>();
+    bool largeFont = sm.largeFont;
     bool lang = sm.language == Language.english;
     String emergencyContact = '';
 
     return AlertDialog(
       icon: const Icon(Icons.add_call),
-      title: Text(lang ? 'Emergency Contact' : '비상 연락처'),
+      title: largeFont
+          ? Text(lang ? 'Emergency Contact' : '비상 연락처', style: tt.headlineLarge)
+          : Text(lang ? 'Emergency Contact' : '비상 연락처'),
       content: TextField(
         onChanged: (value) => emergencyContact = value,
       ),
@@ -24,9 +27,9 @@ class EmergencyContactDialogView extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
           child: Text(
             lang ? 'Cancel' : '취소',
-            style: tt.labelLarge?.copyWith(
-              color: cs.onSurfaceVariant,
-            ),
+            style: largeFont
+                ? tt.titleLarge?.copyWith(color: cs.onSurfaceVariant)
+                : tt.labelLarge?.copyWith(color: cs.onSurfaceVariant),
           ),
         ),
         TextButton(
@@ -34,7 +37,9 @@ class EmergencyContactDialogView extends StatelessWidget {
             sm.changeEmergencyContact(emergencyContact);
             Navigator.pop(context);
           },
-          child: Text(lang ? 'Enroll' : '등록'),
+          child: largeFont
+              ? Text(lang ? 'Enroll' : '등록', style: tt.titleLarge)
+              : Text(lang ? 'Enroll' : '등록'),
         ),
       ],
     );

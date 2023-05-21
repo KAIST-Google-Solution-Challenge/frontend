@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:the_voice/controller/call_controller.dart';
+import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/call_analysis_dialog_view.dart';
 
 class CallView extends StatefulWidget {
@@ -82,7 +84,9 @@ class BuildListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    TextTheme tt = Theme.of(context).textTheme;
+    SettingModel sm = context.watch<SettingModel>();
+    bool largeFont = sm.largeFont;
 
     void onTap() {
       showDialog(
@@ -103,14 +107,19 @@ class BuildListTile extends StatelessWidget {
         isHeader
             ? Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(header, style: textTheme.labelMedium),
+                child: Text(
+                  header,
+                  style: largeFont ? tt.bodyLarge : tt.labelMedium,
+                ),
               )
             : const SizedBox(),
         ListTile(
           leading: leading,
-          title: Text(title),
-          subtitle: Text(subtitle),
-          trailing: Text(trailing),
+          title: largeFont ? Text(title, style: tt.titleLarge) : Text(title),
+          subtitle:
+              largeFont ? Text(subtitle, style: tt.bodyLarge) : Text(subtitle),
+          trailing:
+              largeFont ? Text(trailing, style: tt.labelLarge) : Text(trailing),
           onTap: onTap,
         ),
       ],

@@ -21,7 +21,7 @@ class HomeView extends StatelessWidget {
           style: tt.headlineLarge?.copyWith(color: cs.onSurface),
         ),
         const SizedBox(height: 32),
-        BuildSearch(sm: sm),
+        const BuildSearch(),
         const Expanded(flex: 4, child: SizedBox()),
       ],
     );
@@ -29,8 +29,7 @@ class HomeView extends StatelessWidget {
 }
 
 class BuildSearch extends StatefulWidget {
-  final SettingModel sm;
-  const BuildSearch({super.key, required this.sm});
+  const BuildSearch({super.key});
 
   @override
   State<BuildSearch> createState() => _BuildSearchState();
@@ -41,8 +40,10 @@ class _BuildSearchState extends State<BuildSearch> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme cs = Theme.of(context).colorScheme;
+    TextTheme tt = Theme.of(context).textTheme;
+    SettingModel sm = context.watch<SettingModel>();
+    bool largeFont = sm.largeFont;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -51,9 +52,9 @@ class _BuildSearchState extends State<BuildSearch> {
         height: 56,
         child: Material(
           elevation: 3,
-          color: colorScheme.surface,
+          color: cs.surface,
           shadowColor: Colors.transparent,
-          surfaceTintColor: colorScheme.surfaceTint,
+          surfaceTintColor: cs.surfaceTint,
           borderRadius: BorderRadius.circular(28),
           child: InkWell(
             onTap: () {},
@@ -70,18 +71,22 @@ class _BuildSearchState extends State<BuildSearch> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
                         onChanged: (value) => text = value,
-                        cursorColor: colorScheme.primary,
-                        style: textTheme.bodyLarge,
+                        cursorColor: cs.primary,
+                        style: tt.bodyLarge,
                         textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
                           isCollapsed: true,
                           border: InputBorder.none,
-                          hintText: widget.sm.language == Language.english
+                          hintText: sm.language == Language.english
                               ? 'Search phone number'
                               : '전화번호 검색',
-                          hintStyle: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                          hintStyle: largeFont
+                              ? tt.titleLarge?.copyWith(
+                                  color: cs.onSurfaceVariant,
+                                )
+                              : tt.bodyLarge?.copyWith(
+                                  color: cs.onSurfaceVariant,
+                                ),
                         ),
                       ),
                     ),

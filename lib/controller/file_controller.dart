@@ -11,7 +11,7 @@ class FileController {
 
   Future<void> fileInit() async {
     await File(filepath).create(recursive: true);
-    await File(filepath).writeAsString(' false light english');
+    await File(filepath).writeAsString(' false false light english');
   }
 
   String fileReadAsStringSync() {
