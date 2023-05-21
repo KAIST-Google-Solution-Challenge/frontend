@@ -17,8 +17,9 @@ class ProfileView extends StatelessWidget {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
     SettingModel sm = context.watch<SettingModel>();
-    bool lang = sm.language == Language.english;
+    bool largeFont = sm.largeFont;
     bool brightness = sm.brightness == Brightness.light;
+    bool lang = sm.language == Language.english;
     bool user = fa.currentUser == null;
 
     PreferredSizeWidget buildAppBar() {
@@ -38,33 +39,44 @@ class ProfileView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             user ? 'Guest' : fa.currentUser!.displayName!,
-            style: tt.headlineSmall,
+            style: largeFont ? tt.headlineLarge : tt.headlineSmall,
           ),
           Text(
             user
                 ? 'guest${Random().nextInt(9999) + 1}@the-voice.app'
                 : fa.currentUser!.email!,
-            style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+            style: largeFont
+                ? tt.bodyLarge?.copyWith(color: cs.onSurfaceVariant)
+                : tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
           ),
           const SizedBox(height: 16),
           OutlinedButton(
             onPressed: () => ac.signInWithGoogle(),
-            child: Text(
-              lang ? 'Connect with Google' : '구글 연동',
-            ),
+            child: largeFont
+                ? Text(
+                    lang ? 'Connect with Google' : '구글 연동',
+                    style: tt.bodyLarge,
+                  )
+                : Text(
+                    lang ? 'Connect with Google' : '구글 연동',
+                  ),
           ),
         ],
       );
     }
 
     Widget buildSetting() {
+      TextStyle? titleStyle = largeFont ? tt.titleLarge : tt.labelLarge;
+      TextStyle? subtitleStyle = largeFont
+          ? tt.bodyLarge?.copyWith(color: cs.onSurfaceVariant)
+          : tt.bodySmall?.copyWith(color: cs.onSurfaceVariant);
       return Column(
         children: [
           ListTile(
             leading: const Icon(Icons.add_call),
             title: Text(
               lang ? 'Emergency Contact' : '비상 연락처',
-              style: tt.labelLarge,
+              style: titleStyle,
             ),
             subtitle: Text(
               sm.emergencyContact.isEmpty
@@ -72,7 +84,7 @@ class ProfileView extends StatelessWidget {
                       ? 'Not Enrolled'
                       : '등록되지 않음'
                   : sm.emergencyContact,
-              style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+              style: subtitleStyle,
             ),
             trailing: IconButton(
               icon: const Icon(Icons.add),
@@ -87,11 +99,23 @@ class ProfileView extends StatelessWidget {
             leading: const Icon(Icons.autorenew),
             title: Text(
               lang ? 'Auto Analysis' : '자동 분석',
-              style: tt.labelLarge,
+              style: titleStyle,
             ),
             trailing: Switch(
               value: sm.autoAnalysis,
               onChanged: (_) async => await sm.changeAutoAnalysis(),
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.format_size),
+            title: Text(
+              lang ? 'Large Font' : '큰글 모드',
+              style: titleStyle,
+            ),
+            trailing: Switch(
+              value: sm.largeFont,
+              onChanged: (_) async => sm.changeLargeFont(),
             ),
           ),
           const Divider(),
@@ -101,7 +125,7 @@ class ProfileView extends StatelessWidget {
               brightness
                   ? (lang ? 'Light Mode' : '라이트 모드')
                   : (lang ? 'Dark Mode' : '다크 모드'),
-              style: tt.labelLarge,
+              style: titleStyle,
             ),
             trailing: Switch(
               value: !brightness,
@@ -113,11 +137,11 @@ class ProfileView extends StatelessWidget {
             leading: const Icon(Icons.language),
             title: Text(
               lang ? 'Language' : '언어',
-              style: tt.labelLarge,
+              style: titleStyle,
             ),
             subtitle: Text(
               lang ? 'English' : '한국어',
-              style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+              style: subtitleStyle,
             ),
             trailing: Switch(
               value: !lang,

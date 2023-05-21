@@ -10,6 +10,7 @@ class SettingModel extends ChangeNotifier {
 
   late String emergencyContact;
   late bool autoAnalysis;
+  late bool largeFont;
   late Brightness brightness;
   late Language language;
 
@@ -20,8 +21,9 @@ class SettingModel extends ChangeNotifier {
 
     emergencyContact = fileList[0];
     autoAnalysis = fileList[1] == 'false' ? false : true;
-    brightness = fileList[2] == 'light' ? Brightness.light : Brightness.dark;
-    language = fileList[3] == 'english' ? Language.english : Language.korean;
+    largeFont = fileList[2] == 'false' ? false : true;
+    brightness = fileList[3] == 'light' ? Brightness.light : Brightness.dark;
+    language = fileList[4] == 'english' ? Language.english : Language.korean;
   }
 
   void changeEmergencyContact(String emergencyContact) {
@@ -50,6 +52,15 @@ class SettingModel extends ChangeNotifier {
     fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
+  void changeLargeFont() {
+    largeFont = !largeFont;
+    notifyListeners();
+
+    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    fileList[2] = largeFont.toString();
+    fileController.fileWriteAsStringSync(fileList.join(' '));
+  }
+
   void changeBrightness() {
     brightness == Brightness.light
         ? brightness = Brightness.dark
@@ -57,7 +68,7 @@ class SettingModel extends ChangeNotifier {
     notifyListeners();
 
     List<String> fileList = fileController.fileReadAsStringSync().split(' ');
-    fileList[2] = brightness == Brightness.light ? 'light' : 'dark';
+    fileList[3] = brightness == Brightness.light ? 'light' : 'dark';
     fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
@@ -68,7 +79,7 @@ class SettingModel extends ChangeNotifier {
     notifyListeners();
 
     List<String> fileList = fileController.fileReadAsStringSync().split(' ');
-    fileList[3] = language == Language.english ? 'english' : 'korean';
+    fileList[4] = language == Language.english ? 'english' : 'korean';
     fileController.fileWriteAsStringSync(fileList.join(' '));
   }
 }

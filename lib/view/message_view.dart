@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:the_voice/controller/message_controller.dart';
+import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/message_analysis_dialog_view.dart';
 
 class MessageView extends StatefulWidget {
@@ -59,6 +61,10 @@ class BuildListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme tt = Theme.of(context).textTheme;
+    SettingModel sm = context.watch<SettingModel>();
+    bool largeFont = sm.largeFont;
+
     void onTap() {
       showDialog(
         context: context,
@@ -74,9 +80,11 @@ class BuildListTile extends StatelessWidget {
 
     return ListTile(
       leading: leading,
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: Text(trailing),
+      title: largeFont ? Text(title, style: tt.titleLarge) : Text(title),
+      subtitle:
+          largeFont ? Text(subtitle, style: tt.bodyLarge) : Text(subtitle),
+      trailing:
+          largeFont ? Text(trailing, style: tt.labelLarge) : Text(trailing),
       onTap: onTap,
     );
   }

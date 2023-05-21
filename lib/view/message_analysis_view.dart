@@ -61,8 +61,9 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
     SettingModel sm = context.watch<SettingModel>();
-    bool lang = sm.language == Language.english;
+    bool largeFont = sm.largeFont;
     bool brightness = sm.brightness == Brightness.light;
+    bool lang = sm.language == Language.english;
 
     SystemUiOverlayStyle getSystemUiOverlayStyle(double probability) {
       if (brightness) {
@@ -81,113 +82,101 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
     }
 
     Widget getTitle(double probability) {
+      TextStyle? onTertiary = largeFont
+          ? tt.displayMedium?.copyWith(color: cs.onTertiary)
+          : tt.displaySmall?.copyWith(color: cs.onTertiary);
+      TextStyle? onSurfaceVariant = largeFont
+          ? tt.displayMedium?.copyWith(color: cs.onSurfaceVariant)
+          : tt.displaySmall?.copyWith(color: cs.onSurfaceVariant);
+      TextStyle? onPrimary = largeFont
+          ? tt.displayMedium?.copyWith(color: cs.onPrimary)
+          : tt.displaySmall?.copyWith(color: cs.onPrimary);
+
       if (probability > THRESHOLD4) {
-        return Text(
-          lang ? 'Very Dangerous' : '매우 위험해요',
-          style: tt.displaySmall?.copyWith(color: cs.onTertiary),
-        );
+        return Text(lang ? 'Very Dangerous' : '매우 위험해요', style: onTertiary);
       } else if (probability > THRESHOLD3) {
-        return Text(
-          lang ? 'Dangerous' : '위험해요',
-          style: tt.displaySmall?.copyWith(color: cs.onTertiary),
-        );
+        return Text(lang ? 'Dangerous' : '위험해요', style: onTertiary);
       } else if (probability > THRESHOLD2) {
-        return Text(
-          lang ? 'Normal' : '보통이에요',
-          style: tt.displaySmall?.copyWith(color: cs.onSurfaceVariant),
-        );
+        return Text(lang ? 'Normal' : '보통이에요', style: onSurfaceVariant);
       } else if (probability > THRESHOLD1) {
-        return Text(
-          lang ? 'Safe' : '안전해요',
-          style: tt.displaySmall?.copyWith(color: cs.onPrimary),
-        );
+        return Text(lang ? 'Safe' : '안전해요', style: onPrimary);
       } else {
-        return Text(
-          lang ? 'Very Safe' : '매우 안전해요',
-          style: tt.displaySmall?.copyWith(color: cs.onPrimary),
-        );
+        return Text(lang ? 'Very Safe' : '매우 안전해요', style: onPrimary);
       }
     }
 
     Widget getProbability(double probability) {
+      TextStyle? onTertiary = tt.displayLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: cs.onTertiary,
+      );
+      TextStyle? onSurfaceVariant = tt.displayLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: cs.onSurfaceVariant,
+      );
+      TextStyle? onPrimary = tt.displayLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: cs.onPrimary,
+      );
+
       if (probability > THRESHOLD4) {
-        return Text(
-          '${probability.toInt()}%',
-          style: tt.displayLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: cs.onTertiary,
-          ),
-        );
+        return Text('${probability.toInt()}%', style: onTertiary);
       } else if (probability > THRESHOLD3) {
-        return Text(
-          '${probability.toInt()}%',
-          style: tt.displayLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: cs.onTertiary,
-          ),
-        );
+        return Text('${probability.toInt()}%', style: onTertiary);
       } else if (probability > THRESHOLD2) {
-        return Text(
-          '${probability.toInt()}%',
-          style: tt.displayLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: cs.onSurfaceVariant,
-          ),
-        );
+        return Text('${probability.toInt()}%', style: onSurfaceVariant);
       } else if (probability > THRESHOLD1) {
-        return Text(
-          '${probability.toInt()}%',
-          style: tt.displayLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: cs.onPrimary,
-          ),
-        );
+        return Text('${probability.toInt()}%', style: onPrimary);
       } else {
-        return Text(
-          '${probability.toInt()}%',
-          style: tt.displayLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: cs.onPrimary,
-          ),
-        );
+        return Text('${probability.toInt()}%', style: onPrimary);
       }
     }
 
     Widget getBody(double probability) {
+      TextStyle? onTertiary = largeFont
+          ? tt.headlineMedium?.copyWith(color: cs.onTertiary)
+          : tt.titleLarge?.copyWith(color: cs.onTertiary);
+      TextStyle? onSurfaceVariant = largeFont
+          ? tt.headlineMedium?.copyWith(color: cs.onSurfaceVariant)
+          : tt.titleLarge?.copyWith(color: cs.onSurfaceVariant);
+      TextStyle? onPrimary = largeFont
+          ? tt.headlineMedium?.copyWith(color: cs.onPrimary)
+          : tt.titleLarge?.copyWith(color: cs.onPrimary);
+
       if (probability > THRESHOLD4) {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nas Very Dangerous'
+              ? 'AI Detected\nBelow Tokens Very Dangerous!'
               : 'AI가 아래 토큰들을\n매우 위험하다고 판단했어요!',
-          style: tt.titleLarge?.copyWith(color: cs.onTertiary),
+          style: onTertiary,
         );
       } else if (probability > THRESHOLD3) {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nas Dangerous'
+              ? 'AI Detected\nBelow Tokens Dangerous!'
               : 'AI가 아래 토큰들을\n위험하다고 판단했어요!',
-          style: tt.titleLarge?.copyWith(color: cs.onTertiary),
+          style: onTertiary,
         );
       } else if (probability > THRESHOLD2) {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nas Normal'
+              ? 'AI Detected\nBelow Tokens Normal!'
               : 'AI가 아래 토큰들을\n기준으로 판단했어요!',
-          style: tt.titleLarge?.copyWith(color: cs.onSurfaceVariant),
+          style: onSurfaceVariant,
         );
       } else if (probability > THRESHOLD1) {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nas Safe'
+              ? 'AI Detected\nBelow Tokens Safe!'
               : 'AI가 아래 토큰들을\n안전하다고 판단했어요!',
-          style: tt.titleLarge?.copyWith(color: cs.onPrimary),
+          style: onPrimary,
         );
       } else {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nas Very Safe'
+              ? 'AI Detected\nBelow Tokens Very Safe!'
               : 'AI가 아래 토큰들을\n매우 안전하다고 판단했어요!',
-          style: tt.titleLarge?.copyWith(color: cs.onPrimary),
+          style: onPrimary,
         );
       }
     }
@@ -226,7 +215,13 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
         backgroundColor: Colors.transparent,
         title: Text(
           widget.number,
-          style: TextStyle(color: getOnSurfaceColor(probability)),
+          style: largeFont
+              ? tt.headlineLarge?.copyWith(
+                  color: getOnSurfaceColor(probability),
+                )
+              : tt.titleLarge?.copyWith(
+                  color: getOnSurfaceColor(probability),
+                ),
         ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -262,14 +257,21 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
                         ),
                       ),
                       child: Text(
-                        process(messages[i].smsMessage.body!),
-                        style: tt.bodyLarge?.copyWith(color: cs.onSurface),
+                        process(
+                          messages[i].smsMessage.body!,
+                          largeFont ? 12 : 16,
+                        ),
+                        style: largeFont
+                            ? tt.titleLarge?.copyWith(color: cs.onSurface)
+                            : tt.bodyLarge?.copyWith(color: cs.onSurface),
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${probabilities[index]['probability'].toInt()}%',
-                      style: tt.labelLarge?.copyWith(color: onSurfaceColor),
+                      style: largeFont
+                          ? tt.titleLarge?.copyWith(color: onSurfaceColor)
+                          : tt.labelLarge?.copyWith(color: onSurfaceColor),
                     ),
                   ],
                 ),
@@ -410,7 +412,7 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
   }
 }
 
-String process(String data) {
+String process(String data, int num) {
   List<String> lines = [];
 
   int cnt = 0;
@@ -420,7 +422,7 @@ String process(String data) {
       cnt += 1;
       line += data[i];
       lines.add(line);
-    } else if (cnt == 16 || data[i] == '\n') {
+    } else if (cnt == num || data[i] == '\n') {
       lines.add(line);
       cnt = 1;
       line = data[i];
