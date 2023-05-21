@@ -118,14 +118,14 @@ class CallController {
     return fileName;
   }
 
-  static Future<double> analyze(String number, String datetime) async {
+  static Future<dynamic> analyze(String number, String datetime) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     final dio = d.Dio();
     dio.options.baseUrl = BASEURL;
 
     try {
       final String fileName = await getFilePath(number, datetime);
-      if (fileName == '') return ERROR_NOFILE;
+      if (fileName == '') return {'probability': ERROR_NOFILE};
 
       var formData = d.FormData.fromMap(
         {
@@ -146,22 +146,33 @@ class CallController {
       );
 
       if (response.statusCode == 200) {
+        print('response.data: ${response.data}');
+
+        print("parsed['probability'], ${response.data['probability']}");
+        print("parsed['tokens']: ${response.data['tokens']}");
+
         print("(analyze) success!");
         final Map<String, dynamic> document = {
           'number': number,
-          'probability': response.data.toString().substring(0, 4),
+          'probability':
+              response.data['probability'].toString().substring(0, 4),
           'timestamp':
               Timestamp.now().toDate().toIso8601String().substring(0, 10),
         };
 
         firebaseFirestore.collection('phishing_probability').add(document);
 
-        return double.parse(response.data.toString());
+        return {
+          'tokens': response.data['tokens'],
+          'probability': double.parse(
+            response.data['probability'].toString(),
+          ),
+        };
       } else {
-        throw Exception('Request failed');
+        return {'probability': -response.statusCode!.toDouble()};
       }
     } catch (e) {
-      return ERROR_SERVER;
+      return {'probability': ERROR_SERVER};
     }
   }
 }
