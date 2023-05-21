@@ -117,6 +117,9 @@ Future<bool> _initializeController(
 
   if (!await fileController.fileExists()) {
     await fileController.fileInit();
+  } else if (fileController.fileReadAsStringSync().split(' ').length != 5) {
+    await fileController.fileDelete();
+    await fileController.fileInit();
   }
 
   return true;

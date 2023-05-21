@@ -9,6 +9,10 @@ class FileController {
     return await File(filepath).exists();
   }
 
+  Future<void> fileDelete() async {
+    await File(filepath).delete();
+  }
+
   Future<void> fileInit() async {
     await File(filepath).create(recursive: true);
     await File(filepath).writeAsString(' false false light english');
