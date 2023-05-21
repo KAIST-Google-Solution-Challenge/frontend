@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/view/search_view.dart';
 
 class HomeView extends StatelessWidget {
-  final SettingModel sm;
-  const HomeView({super.key, required this.sm});
+  const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme cs = Theme.of(context).colorScheme;
+    TextTheme tt = Theme.of(context).textTheme;
+    SettingModel sm = context.watch<SettingModel>();
+    bool lang = sm.language == Language.english;
 
     return Column(
       children: [
         const Expanded(flex: 1, child: SizedBox()),
         Text(
-          sm.language == Language.english ? 'The Voice' : '그놈 목소리',
-          style: textTheme.headlineLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
+          lang ? 'The Voice' : '그놈 목소리',
+          style: tt.headlineLarge?.copyWith(color: cs.onSurface),
         ),
         const SizedBox(height: 32),
         BuildSearch(sm: sm),

@@ -25,6 +25,26 @@ class TheVoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MaterialApp buildLoading() {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+        theme: ThemeData(
+          useMaterial3: true,
+          colorSchemeSeed: Colors.blue,
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+            ),
+          ),
+        ),
+      );
+    }
+
     return FutureBuilder(
       future: _initializeController(bc, fc),
       builder: (_, snapshot) {
@@ -32,20 +52,19 @@ class TheVoice extends StatelessWidget {
           return ChangeNotifierProvider<SettingModel>(
             create: (_) => _createSettingModel(bc, fc),
             builder: (_, child) => Consumer<SettingModel>(
-              builder: (_, value, __) => MaterialApp(
+              builder: (_, sm, __) => MaterialApp(
                 debugShowCheckedModeBanner: false,
-                home: Home(sm: value),
+                home: const Home(),
                 theme: ThemeData(
                   useMaterial3: true,
                   colorSchemeSeed: Colors.blue,
-                  brightness: value.brightness,
+                  brightness: sm.brightness,
                   appBarTheme: AppBarTheme(
                     systemOverlayStyle: SystemUiOverlayStyle(
                       statusBarColor: Colors.transparent,
-                      statusBarIconBrightness:
-                          value.brightness == Brightness.light
-                              ? Brightness.dark
-                              : Brightness.light,
+                      statusBarIconBrightness: sm.brightness == Brightness.light
+                          ? Brightness.dark
+                          : Brightness.light,
                     ),
                   ),
                 ),
@@ -53,29 +72,9 @@ class TheVoice extends StatelessWidget {
             ),
           );
         } else {
-          return _buildLoading(context);
+          return buildLoading();
         }
       },
-    );
-  }
-
-  MaterialApp _buildLoading(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
-        appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-          ),
-        ),
-      ),
     );
   }
 }
