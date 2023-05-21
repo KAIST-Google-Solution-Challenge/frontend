@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/authentication_controller.dart';
-import 'package:the_voice/model/build_model.dart';
+import 'package:the_voice/util/build.dart';
 import 'package:the_voice/model/setting_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
