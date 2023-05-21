@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/message_controller.dart';
-import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/model/chat_model.dart';
 import 'package:the_voice/model/build_model.dart';
 import 'package:the_voice/model/setting_model.dart';
-import 'package:the_voice/view/report_dialog_view.dart';
+import 'package:the_voice/util/constant.dart';
 
 class MessageAnalysisView extends StatefulWidget {
   final String number;
@@ -61,76 +62,132 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
     TextTheme tt = Theme.of(context).textTheme;
 
     return Consumer<SettingModel>(
-      builder: (context, value, child) => Scaffold(
-        appBar: BuildAppBar(pushed: true, colored: false, title: widget.number),
-        backgroundColor: value.brightness == Brightness.light
-            ? const Color(0xFFF4F4F4)
-            : const Color(0xFF030303),
-        floatingActionButton: FloatingActionButton.large(
-          onPressed: () => showDialog(
-            context: context,
-            builder: (context) => const ReportDialogView(),
-          ),
-          child: const Icon(Icons.report_outlined),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        body: _buildBody(cs, tt),
+      builder: (_, value, __) => FutureBuilder(
+        future: future(),
+        builder: (_, snapshot) {
+          if (snapshot.hasData) {
+            if (probabilities.isNotEmpty &&
+                probabilities[0]['probability'] >= 0.0) {
+              return Scaffold(
+                backgroundColor: _getBackgroundColor(
+                  cs,
+                  probabilities[0]['probability'],
+                ),
+                appBar: _buildAppBar(
+                  widget.number,
+                  cs,
+                  probabilities[0]['probability'],
+                ),
+                body: _buildBody(
+                  value,
+                  cs,
+                  tt,
+                  probabilities[0]['probability'],
+                ),
+              );
+            } else {
+              return _buildError(
+                  value, cs, tt, probabilities[0]['probability']);
+            }
+          } else {
+            return _buildLoading();
+          }
+        },
       ),
     );
   }
 
-  Widget _buildBody(ColorScheme colorScheme, TextTheme textTheme) {
-    return FutureBuilder(
-      future: future(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (probabilities.isEmpty || probabilities[0]['probability'] >= 0.0) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: ListView(
-                    children: List<Widget>.generate(
-                          messages.length,
-                          (index) {
-                            if (messages[index].sender == Sender.opponent) {
-                              for (int i = 0; i < probabilities.length; i++) {
-                                if (messages[index].smsMessage.id! ==
-                                    probabilities[i]['id']) {
-                                  return CustomChatAnalysis(
-                                    isLeft: true,
-                                    isAnalyzed: true,
-                                    data: messages[index].smsMessage.body!,
-                                    probability: probabilities[i]
-                                        ['probability'],
-                                  );
-                                }
-                              }
+  PreferredSizeWidget _buildAppBar(
+    String title,
+    ColorScheme colorScheme,
+    double probability,
+  ) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      title: Text(
+        title,
+        style: TextStyle(
+          color: _getOnSurfaceColor(colorScheme, probability),
+        ),
+      ),
+      leading: IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: const Icon(Icons.arrow_back),
+        color: _getOnSurfaceColor(colorScheme, probability),
+      ),
+      systemOverlayStyle: _getSystemUiOverlayStyle(
+        Theme.of(context).brightness,
+        probability,
+      ),
+    );
+  }
 
-                              return CustomChatAnalysis(
-                                isLeft: true,
-                                isAnalyzed: false,
-                                data: messages[index].smsMessage.body!,
-                                probability: 0.0,
-                              );
-                            } else {
-                              return CustomChatAnalysis(
-                                isLeft: false,
-                                isAnalyzed: false,
-                                data: messages[index].smsMessage.body!,
-                                probability: 0.0,
-                              );
-                            }
-                          },
-                        ) +
-                        <Widget>[const SizedBox(height: 16)],
+  Widget _buildBody(
+    SettingModel settingModel,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    double probability,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 48,
+          vertical: 64,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _getTitle(probability, colorScheme, textTheme),
+            const SizedBox(height: 8),
+            _getProbability(probability, colorScheme, textTheme),
+            const SizedBox(height: 32),
+            const Divider(endIndent: 128),
+            const SizedBox(height: 32),
+            _getBody(probability, colorScheme, textTheme),
+            const SizedBox(height: 8),
+            _getLabel(
+              ['2023', 'Google', 'Solution', 'Challenge'],
+              probability,
+              colorScheme,
+              textTheme,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildError(
+    SettingModel settingModel,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    double probability,
+  ) {
+    return Scaffold(
+      appBar: BuildAppBar(pushed: true, title: widget.number),
+      body: Center(
+        child: Builder(
+          builder: (_) {
+            if (probability == ERROR_NOFILE) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'ERROR',
+                    style: textTheme.headlineLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                   ),
-                ),
-              ],
-            );
-          } else if (probabilities[0]['probability'] == -2.0) {
-            return Center(
-              child: Column(
+                  Text(
+                    'NO FILE',
+                    style: textTheme.displayLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                  )
+                ],
+              );
+            } else if (probability == ERROR_SERVER) {
+              return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -146,11 +203,9 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
                     ),
                   )
                 ],
-              ),
-            );
-          } else {
-            return Center(
-              child: Column(
+              );
+            } else {
+              return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -160,153 +215,273 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
                     ),
                   ),
                   Text(
-                    (-probabilities[0]['probability'].toInt()).toString(),
+                    (-probability.toInt()).toString(),
                     style: textTheme.displayLarge?.copyWith(
                       color: colorScheme.onSurface,
                     ),
                   )
                 ],
-              ),
-            );
-          }
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
+              );
+            }
+          },
+        ),
+      ),
     );
+  }
+
+  Widget _buildLoading() {
+    return Scaffold(
+      appBar: BuildAppBar(pushed: true, title: widget.number),
+      body: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Color _getBackgroundColor(ColorScheme colorScheme, double probability) {
+    TonalPalette toTonalPallete(Color color) {
+      final hct = Hct.fromInt(color.value);
+      return TonalPalette.of(hct.hue, hct.chroma);
+    }
+
+    if (probability > THRESHOLD4) {
+      return colorScheme.tertiary;
+    } else if (probability > THRESHOLD3) {
+      return Color(toTonalPallete(colorScheme.tertiary).get(60));
+    } else if (probability > THRESHOLD2) {
+      return colorScheme.surfaceVariant;
+    } else if (probability > THRESHOLD1) {
+      return Color(toTonalPallete(colorScheme.primary).get(60));
+    } else {
+      return colorScheme.primary;
+    }
+  }
+
+  Color _getOnSurfaceColor(ColorScheme colorScheme, double probability) {
+    if (probability > THRESHOLD3) {
+      return colorScheme.onTertiary;
+    } else if (probability > THRESHOLD2) {
+      return colorScheme.onSurfaceVariant;
+    } else {
+      return colorScheme.onPrimary;
+    }
+  }
+
+  SystemUiOverlayStyle _getSystemUiOverlayStyle(
+    Brightness brightness,
+    double probability,
+  ) {
+    if (brightness == Brightness.light) {
+      if (THRESHOLD2 < probability && probability <= THRESHOLD3) {
+        return SystemUiOverlayStyle.dark;
+      } else {
+        return SystemUiOverlayStyle.light;
+      }
+    } else {
+      if (THRESHOLD2 < probability && probability <= THRESHOLD3) {
+        return SystemUiOverlayStyle.light;
+      } else {
+        return SystemUiOverlayStyle.dark;
+      }
+    }
+  }
+
+  Widget _getTitle(
+    double probability,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    if (probability > THRESHOLD4) {
+      return Text(
+        '매우 위험해요',
+        style: textTheme.displaySmall?.copyWith(
+          color: colorScheme.onTertiary,
+        ),
+      );
+    } else if (probability > THRESHOLD3) {
+      return Text(
+        '위험해요',
+        style: textTheme.displaySmall?.copyWith(
+          color: colorScheme.onTertiary,
+        ),
+      );
+    } else if (probability > THRESHOLD2) {
+      return Text(
+        '보통이에요',
+        style: textTheme.displaySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      );
+    } else if (probability > THRESHOLD1) {
+      return Text(
+        '안전해요',
+        style: textTheme.displaySmall?.copyWith(
+          color: colorScheme.onPrimary,
+        ),
+      );
+    } else {
+      return Text(
+        '매우 안전해요',
+        style: textTheme.displaySmall?.copyWith(
+          color: colorScheme.onPrimary,
+        ),
+      );
+    }
+  }
+
+  Widget _getProbability(
+    double probability,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    if (probability > THRESHOLD4) {
+      return Text(
+        '${probability.toInt()}%',
+        style: textTheme.displayLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onTertiary,
+        ),
+      );
+    } else if (probability > THRESHOLD3) {
+      return Text(
+        '$probability%',
+        style: textTheme.displayLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onTertiary,
+        ),
+      );
+    } else if (probability > THRESHOLD2) {
+      return Text(
+        '$probability%',
+        style: textTheme.displayLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onSurfaceVariant,
+        ),
+      );
+    } else if (probability > THRESHOLD1) {
+      return Text(
+        '$probability%',
+        style: textTheme.displayLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onPrimary,
+        ),
+      );
+    } else {
+      return Text(
+        '$probability%',
+        style: textTheme.displayLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onPrimary,
+        ),
+      );
+    }
+  }
+
+  Widget _getBody(
+    double probability,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    if (probability > THRESHOLD4) {
+      return Text(
+        'AI가 아래 문자들을\n위험하다고 판단했어요!',
+        style: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onTertiary,
+        ),
+      );
+    } else if (probability > THRESHOLD3) {
+      return Text(
+        'AI가 아래 문자들을\n위험하다고 판단했어요!',
+        style: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onTertiary,
+        ),
+      );
+    } else if (probability > THRESHOLD2) {
+      return Text(
+        'AI가 아래 토큰들을\n기준으로 판단했어요!',
+        style: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      );
+    } else if (probability > THRESHOLD1) {
+      return Text(
+        'AI가 아래 토큰들을\n안전하다고 판단했어요!',
+        style: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onPrimary,
+        ),
+      );
+    } else {
+      return Text(
+        'AI가 아래 토큰들을\n안전하다고 판단했어요!',
+        style: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onPrimary,
+        ),
+      );
+    }
+  }
+
+  Widget _getLabel(
+    List<String> tokens,
+    double probability,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    if (probability > THRESHOLD4) {
+      return Text(
+        tokens.join(' '),
+        style: textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onTertiary,
+        ),
+      );
+    } else if (probability > THRESHOLD3) {
+      return Text(
+        tokens.join(' '),
+        style: textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onTertiary,
+        ),
+      );
+    } else if (probability > THRESHOLD2) {
+      return Text(
+        tokens.join(' '),
+        style: textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      );
+    } else if (probability > THRESHOLD1) {
+      return Text(
+        tokens.join(' '),
+        style: textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onPrimary,
+        ),
+      );
+    } else {
+      return Text(
+        tokens.join(' '),
+        style: textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onPrimary,
+        ),
+      );
+    }
   }
 }
 
-class CustomChatAnalysis extends StatelessWidget {
-  final bool isLeft;
-  final bool isAnalyzed;
-  final String data;
-  final double probability;
+String process(String data) {
+  List<String> lines = [];
 
-  const CustomChatAnalysis({
-    super.key,
-    required this.isLeft,
-    required this.isAnalyzed,
-    required this.data,
-    required this.probability,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    TextTheme textTheme = Theme.of(context).textTheme;
-
-    if (isLeft) {
-      return Column(
-        children: [
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              const SizedBox(width: 16),
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                      bottomRight: Radius.circular(16),
-                    ),
-                    color: colorScheme.surface),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(process(data)),
-                ),
-              ),
-              isAnalyzed
-                  ? Row(
-                      children: [
-                        const SizedBox(width: 4),
-                        DoughnutChart(
-                            isChat: true, radius: 10, probability: probability),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$probability%',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    )
-                  : const SizedBox()
-            ],
-          )
-        ],
-      );
+  int cnt = 0;
+  String line = "";
+  for (int i = 0; i < data.length; i += 1) {
+    if (i == data.length - 1) {
+      cnt += 1;
+      line += data[i];
+      lines.add(line);
+    } else if (cnt == 20 || data[i] == '\n') {
+      lines.add(line);
+      cnt = 1;
+      line = data[i];
     } else {
-      return Column(
-        children: [
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              isAnalyzed
-                  ? Row(
-                      children: [
-                        Text(
-                          '$probability%',
-                          style: textTheme.bodyMedium,
-                        ),
-                        const SizedBox(width: 4),
-                        DoughnutChart(
-                            isChat: true, radius: 10, probability: probability),
-                        const SizedBox(width: 4),
-                      ],
-                    )
-                  : const SizedBox(),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
-                  color: colorScheme.primary.withAlpha(13),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    process(data),
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-            ],
-          )
-        ],
-      );
+      cnt += 1;
+      line += data[i];
     }
   }
 
-  String process(String data) {
-    List<String> lines = [];
-
-    int cnt = 0;
-    String line = "";
-    for (int i = 0; i < data.length; i += 1) {
-      if (i == data.length - 1) {
-        cnt += 1;
-        line += data[i];
-        lines.add(line);
-      } else if (cnt == 20 || data[i] == '\n') {
-        lines.add(line);
-        cnt = 1;
-        line = data[i];
-      } else {
-        cnt += 1;
-        line += data[i];
-      }
-    }
-
-    return lines.join('\n');
-  }
+  return lines.join('\n');
 }

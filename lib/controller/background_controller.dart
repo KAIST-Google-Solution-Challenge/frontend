@@ -4,14 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:phone_state/phone_state.dart';
-import 'package:provider/provider.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/call_controller.dart';
 import 'package:the_voice/controller/file_controller.dart';
 import 'package:the_voice/controller/message_controller.dart';
-import 'package:the_voice/model/setting_model.dart';
 import 'package:the_voice/util/constant.dart';
 
 class BackgroundController {

@@ -43,7 +43,7 @@ class ProfileView extends StatelessWidget {
   }
 
   PreferredSizeWidget _buildAppBar(SettingModel sm) {
-    return BuildAppBar(pushed: true, colored: false, title: _getTitle(sm));
+    return BuildAppBar(pushed: true, title: _getTitle(sm));
   }
 
   String _getTitle(SettingModel sm) {

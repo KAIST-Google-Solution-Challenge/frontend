@@ -99,7 +99,8 @@ class MessageController {
             {
               'id': response.data[i]['id'],
               'probability': double.parse(
-                  response.data[i]['probability'].toString().substring(0, 4)),
+                response.data[i]['probability'].toString(),
+              ),
             },
           );
         }

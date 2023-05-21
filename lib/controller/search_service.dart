@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 
-class SearchController {
+class SearchService {
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   late Dio dio;
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_voice/controller/search_controller.dart';
 import 'package:the_voice/model/build_model.dart';
 import 'package:the_voice/model/chart_model.dart';
 import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/controller/search_service.dart';
 
 class SearchView extends StatefulWidget {
   final String text;
@@ -14,7 +14,7 @@ class SearchView extends StatefulWidget {
 }
 
 class _SearchViewState extends State<SearchView> {
-  SearchController searchController = SearchController();
+  SearchService searchService = SearchService();
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +22,14 @@ class _SearchViewState extends State<SearchView> {
     TextTheme tt = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: BuildAppBar(pushed: true, colored: false, title: widget.text),
+      appBar: BuildAppBar(pushed: true, title: widget.text),
       body: _buildBody(cs, tt),
     );
   }
 
   Widget _buildBody(ColorScheme colorScheme, TextTheme textTheme) {
     return FutureBuilder(
-      future: searchController.search(widget.text),
+      future: searchService.search(widget.text),
       builder: (_, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data!.isEmpty) {

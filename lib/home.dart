@@ -26,7 +26,7 @@ class _HomeState extends State<Home> {
   }
 
   PreferredSizeWidget _buildAppBar(SettingModel sm) {
-    return BuildAppBar(pushed: false, colored: false, title: _getTitle(sm));
+    return BuildAppBar(pushed: false, title: _getTitle(sm));
   }
 
   String _getTitle(SettingModel sm) {

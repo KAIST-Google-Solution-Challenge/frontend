@@ -6,3 +6,11 @@ const double THREASHOLD = 80;
 const String CALLDIR = '/storage/emulated/0/Recordings/Call';
 const String CALLDIROLD = '/storage/emulated/0/Call';
 const String DOCUMENTSDIR = 'storage/emulated/0/Documents';
+
+const double THRESHOLD4 = 95.0;
+const double THRESHOLD3 = 85.0;
+const double THRESHOLD2 = 15.0;
+const double THRESHOLD1 = 5.0;
+
+const double ERROR_NOFILE = -1.0;
+const double ERROR_SERVER = -2.0;

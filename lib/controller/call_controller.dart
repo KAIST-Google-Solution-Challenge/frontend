@@ -125,7 +125,7 @@ class CallController {
 
     try {
       final String fileName = await getFilePath(number, datetime);
-      if (fileName == '') return -1.0;
+      if (fileName == '') return ERROR_NOFILE;
 
       var formData = d.FormData.fromMap(
         {
@@ -156,14 +156,12 @@ class CallController {
 
         firebaseFirestore.collection('phishing_probability').add(document);
 
-        return double.parse(
-          response.data.toString().substring(0, 4),
-        );
+        return double.parse(response.data.toString());
       } else {
         throw Exception('Request failed');
       }
     } catch (e) {
-      return -2.0;
+      return ERROR_SERVER;
     }
   }
 }
