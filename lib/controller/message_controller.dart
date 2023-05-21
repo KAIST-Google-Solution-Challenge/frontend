@@ -106,17 +106,19 @@ class MessageController {
         }
 
         return results;
+      } else {
+        return List.generate(
+          messages.length,
+          (index) => {
+            'id': messages[index]['id'],
+            'probability': -response.statusCode!.toDouble(),
+          },
+        );
       }
-      return List.generate(
-        messages.length,
-        (index) => {
-          'id': messages[index]['id'],
-          'probability': -response.statusCode!.toDouble(),
-        },
-      );
     } catch (e) {
-      print(e);
-      return [];
+      return [
+        {'probability': ERROR_EMPTY}
+      ];
     }
   }
 

@@ -152,7 +152,8 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
       }
     }
 
-    Widget getLabel(List<String> tokens, double probability) {
+    Widget getLabel(List tokens, double probability) {
+      // List<String>
       TextStyle? onTertiary = largeFont
           ? tt.titleLarge?.copyWith(color: cs.onTertiary)
           : tt.bodyLarge?.copyWith(color: cs.onTertiary);
@@ -307,7 +308,8 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
       );
     }
 
-    Widget buildBody(double probability) {
+    Widget buildBody(double probability, List tokens) {
+      // List<String>
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 64),
@@ -326,10 +328,7 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
                   const SizedBox(height: 32),
                   getBody(probability),
                   const SizedBox(height: 8),
-                  getLabel(
-                    ['2023', 'Google', 'Solution', 'Challenge'],
-                    probability,
-                  ),
+                  getLabel(tokens, probability),
                 ],
               ),
               buildBar(),
@@ -408,13 +407,21 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
         // snapshot = const AsyncSnapshot.withData(ConnectionState.done, 3);
 
         if (snapshot.hasData) {
-          double probability = snapshot.data!;
+          double probability = snapshot.data['probability'];
+          print(snapshot.data['tokens']);
+
+          List parsed = snapshot.data['tokens'];
+          print(parsed);
+          print(parsed[0]);
 
           if (probability >= 0) {
             return Scaffold(
               backgroundColor: getBackgroundColor(probability),
               appBar: buildAppBar(probability),
-              body: buildBody(probability),
+              body: buildBody(
+                probability,
+                parsed,
+              ),
             );
           } else {
             return buildError(probability);

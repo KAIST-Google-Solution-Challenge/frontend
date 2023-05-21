@@ -240,8 +240,8 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
             if (probabilities[index]['id'] == messages[i].smsMessage.id!) {
               return Padding(
                 padding: EdgeInsets.only(
-                  top: index == 0 ? 0 : 16,
-                  bottom: index == probabilities.length - 1 ? 0 : 16,
+                  top: index == 0 ? 0 : 8,
+                  bottom: index == probabilities.length - 1 ? 0 : 8,
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
