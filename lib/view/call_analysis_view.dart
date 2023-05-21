@@ -128,35 +128,35 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
       if (probability > THRESHOLD4) {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nAs Very Dangerous'
+              ? 'AI Detected Below Tokens\nas Very Dangerous'
               : 'AI가 아래 토큰들을\n매우 위험하다고 판단했어요!',
           style: tt.titleLarge?.copyWith(color: cs.onTertiary),
         );
       } else if (probability > THRESHOLD3) {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nAs Dangerous'
+              ? 'AI Detected Below Tokens\nas Dangerous'
               : 'AI가 아래 토큰들을\n위험하다고 판단했어요!',
           style: tt.titleLarge?.copyWith(color: cs.onTertiary),
         );
       } else if (probability > THRESHOLD2) {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nAs Normal'
+              ? 'AI Detected Below Tokens\nas Normal'
               : 'AI가 아래 토큰들을\n기준으로 판단했어요!',
           style: tt.titleLarge?.copyWith(color: cs.onSurfaceVariant),
         );
       } else if (probability > THRESHOLD1) {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nAs Safe'
+              ? 'AI Detected Below Tokens\nas Safe'
               : 'AI가 아래 토큰들을\n안전하다고 판단했어요!',
           style: tt.titleLarge?.copyWith(color: cs.onPrimary),
         );
       } else {
         return Text(
           lang
-              ? 'AI Detected Below Tokens\nAs Very Safe'
+              ? 'AI Detected Below Tokens\nas Very Safe'
               : 'AI가 아래 토큰들을\n매우 안전하다고 판단했어요!',
           style: tt.titleLarge?.copyWith(color: cs.onPrimary),
         );
@@ -349,13 +349,13 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
       );
     }
 
-    Widget buildError(double probability) {
+    Widget buildError(double errorCode) {
       return Scaffold(
         appBar: BuildAppBar(pushed: true, title: widget.number),
         body: Center(
           child: Builder(
             builder: (_) {
-              if (probability == ERROR_NOFILE) {
+              if (errorCode == ERROR_NOFILE) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -369,7 +369,7 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
                     )
                   ],
                 );
-              } else if (probability == ERROR_SERVER) {
+              } else if (errorCode == ERROR_SERVER) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -392,7 +392,7 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
                       style: tt.headlineLarge?.copyWith(color: cs.onSurface),
                     ),
                     Text(
-                      (-probability.toInt()).toString(),
+                      (-errorCode.toInt()).toString(),
                       style: tt.displayLarge?.copyWith(color: cs.onSurface),
                     )
                   ],
@@ -419,7 +419,8 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
 
         if (snapshot.hasData) {
           double probability = snapshot.data!;
-          if (probability >= 0.0) {
+
+          if (probability >= 0) {
             return Scaffold(
               backgroundColor: getBackgroundColor(probability),
               appBar: buildAppBar(probability),
