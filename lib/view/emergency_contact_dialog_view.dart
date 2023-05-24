@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 
 class EmergencyContactDialogView extends StatelessWidget {
   const EmergencyContactDialogView({super.key});
@@ -9,7 +9,7 @@ class EmergencyContactDialogView extends StatelessWidget {
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
-    SettingModel sm = context.watch<SettingModel>();
+    SettingProvider sm = context.watch<SettingProvider>();
     bool largeFont = sm.largeFont;
     bool lang = sm.language == Language.english;
     String emergencyContact = '';

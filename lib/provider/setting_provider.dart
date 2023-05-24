@@ -4,20 +4,15 @@ import 'package:the_voice/controller/file_controller.dart';
 
 enum Language { english, korean }
 
-class SettingModel extends ChangeNotifier {
-  final BackgroundController backgroundController;
-  final FileController fileController = FileController();
-
+class SettingProvider extends ChangeNotifier {
   late String emergencyContact;
   late bool autoAnalysis;
   late bool largeFont;
   late Brightness brightness;
   late Language language;
 
-  SettingModel({required this.backgroundController});
-
-  void init(String fileString) {
-    List<String> fileList = fileString.split(' ');
+  void init() {
+    List<String> fileList = FileController.fileReadAsStringSync().split(' ');
 
     emergencyContact = fileList[0];
     autoAnalysis = fileList[1] == 'false' ? false : true;
@@ -31,34 +26,34 @@ class SettingModel extends ChangeNotifier {
 
     notifyListeners();
 
-    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    List<String> fileList = FileController.fileReadAsStringSync().split(' ');
     fileList[0] = emergencyContact;
-    fileController.fileWriteAsStringSync(fileList.join(' '));
+    FileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
   Future<void> changeAutoAnalysis() async {
     autoAnalysis = !autoAnalysis;
 
     if (autoAnalysis) {
-      await backgroundController.service.startService();
+      BackgroundController.service.startService();
     } else {
-      backgroundController.service.invoke('stopService');
+      BackgroundController.service.invoke('stopService');
     }
 
     notifyListeners();
 
-    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    List<String> fileList = FileController.fileReadAsStringSync().split(' ');
     fileList[1] = autoAnalysis.toString();
-    fileController.fileWriteAsStringSync(fileList.join(' '));
+    FileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
   void changeLargeFont() {
     largeFont = !largeFont;
     notifyListeners();
 
-    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    List<String> fileList = FileController.fileReadAsStringSync().split(' ');
     fileList[2] = largeFont.toString();
-    fileController.fileWriteAsStringSync(fileList.join(' '));
+    FileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
   void changeBrightness() {
@@ -67,9 +62,9 @@ class SettingModel extends ChangeNotifier {
         : brightness = Brightness.light;
     notifyListeners();
 
-    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    List<String> fileList = FileController.fileReadAsStringSync().split(' ');
     fileList[3] = brightness == Brightness.light ? 'light' : 'dark';
-    fileController.fileWriteAsStringSync(fileList.join(' '));
+    FileController.fileWriteAsStringSync(fileList.join(' '));
   }
 
   void changeLanguage() {
@@ -78,8 +73,8 @@ class SettingModel extends ChangeNotifier {
         : language = Language.english;
     notifyListeners();
 
-    List<String> fileList = fileController.fileReadAsStringSync().split(' ');
+    List<String> fileList = FileController.fileReadAsStringSync().split(' ');
     fileList[4] = language == Language.english ? 'english' : 'korean';
-    fileController.fileWriteAsStringSync(fileList.join(' '));
+    FileController.fileWriteAsStringSync(fileList.join(' '));
   }
 }

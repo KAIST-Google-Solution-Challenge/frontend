@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/util/build.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:the_voice/view/call_view.dart';
 import 'package:the_voice/view/home_view.dart';
 import 'package:the_voice/view/message_view.dart';
@@ -18,7 +18,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    SettingModel sm = context.watch<SettingModel>();
+    SettingProvider sm = context.watch<SettingProvider>();
 
     String getTitle() {
       switch (_selectedIndex) {

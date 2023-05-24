@@ -15,8 +15,9 @@ class SearchService {
             if (document['number'] == number) {
               documents.add(
                 {
-                  'probability': double.parse(document['probability']),
-                  'timestamp': document['timestamp'],
+                  'probability': double.parse(document['probability']).toInt(),
+                  'timestamp':
+                      document['timestamp'].toString().substring(0, 10),
                 },
               );
             }

@@ -1,150 +1,136 @@
-import 'package:contacts_service/contacts_service.dart';
-import 'package:dio/dio.dart' as d;
+import 'package:dio/dio.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/contact_controller.dart';
-import 'package:the_voice/model/chat_model.dart';
 import 'package:the_voice/util/constant.dart';
 
 class MessageController {
-  static Future<List<ChatModel>> fetchChat() async {
-    final telephony = Telephony.instance;
+  static int _loadedIndex = 0;
+  static bool _isLoading = false;
 
-    List<ChatModel> results = [];
+  static List<SmsConversation> _smsConversations = [];
 
-    // Get All Conversations from device
-    List<SmsConversation> chats = await telephony.getConversations();
+  // ignore: prefer_final_fields
+  static Map<int, List<SmsMessage>> _messages = {};
+  static Map<int, List<SmsMessage>> get messages {
+    return _messages;
+  }
 
-    final contacts = await ContactsService.getContacts(withThumbnails: false);
-    for (var chat in chats) {
-      // Get inbox messages according to conversation id
-      List<SmsMessage> messages = await telephony.getInboxSms(
+  // ignore: prefer_final_fields
+  static List<SmsConversation> _conversations = [];
+  static List<SmsConversation> get conversations {
+    if (_conversations.isEmpty) loadConversations();
+    return _conversations;
+  }
+
+  static Future<void> fetchMessages() async {
+    Telephony telephony = Telephony.instance;
+
+    _smsConversations = await telephony.getConversations();
+
+    for (SmsConversation smsConversation in _smsConversations) {
+      _messages[smsConversation.threadId!] =
+          (await Telephony.instance.getInboxSms(
         filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
-          chat.threadId.toString(),
+          smsConversation.threadId.toString(),
         ),
-      );
+      ))
+            ..forEach((e) => e.name = ContactController.getName(e.address!))
+            ..sort((a, b) => (b.date!).compareTo(a.date!));
+    }
 
-      if (messages.isNotEmpty) {
-        ChatModel chatModel = ChatModel(
-          threadId: chat.threadId,
-          address: ContactController.getName(contacts, messages[0].address!),
-          lastMessage: messages[0].body,
-          lastMessageDate: messages[0].date,
+    _smsConversations = _smsConversations
+        .where((element) => _messages[element.threadId]!.isNotEmpty)
+        .toList();
+
+    _smsConversations.sort(
+      (a, b) => (_messages[b.threadId]![0].date!)
+          .compareTo(_messages[a.threadId]![0].date!),
+    );
+  }
+
+  static void loadConversations() {
+    if (!_isLoading) {
+      _isLoading = true;
+
+      if (_loadedIndex + 10 < _smsConversations.length) {
+        _conversations.addAll(
+          _smsConversations.sublist(_loadedIndex, _loadedIndex + 10),
         );
-        results.add(chatModel);
+        _loadedIndex += 10;
+      } else {
+        _conversations.addAll(
+          _smsConversations.sublist(_loadedIndex, _smsConversations.length),
+        );
+        _loadedIndex = _smsConversations.length;
       }
+
+      _isLoading = false;
     }
-
-    results.sort((a, b) => b.lastMessageDate!.compareTo(a.lastMessageDate!));
-
-    print("(fetchChat) $results");
-    return results.length > 60 ? results.sublist(0, 60) : results;
   }
 
-  static Future<List<MessageModel>> fetchMessages(int threadId) async {
-    final telephony = Telephony.instance;
+  static Future<List<dynamic>> analyzeMessages(
+    List<SmsMessage> messages,
+  ) async {
+    Dio dio = Dio();
+    dio.options.baseUrl = BASEURL;
 
-    List<SmsMessage> receivedMessages = await telephony.getInboxSms(
-      filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
-        threadId.toString(),
-      ),
-    );
-    List<SmsMessage> sentMessages = await telephony.getSentSms(
-      filter: SmsFilter.where(SmsColumn.THREAD_ID).equals(
-        threadId.toString(),
-      ),
-    );
-
-    List<MessageModel> receivedMessageModel = List.generate(
-      receivedMessages.length,
-      (index) => MessageModel(
-        smsMessage: receivedMessages[index],
-        sender: Sender.opponent,
-      ),
-    );
-    List<MessageModel> sentMessageModel = List.generate(
-      sentMessages.length,
-      (index) => MessageModel(
-        smsMessage: sentMessages[index],
-        sender: Sender.user,
-      ),
-    );
-
-    List<MessageModel> messages = receivedMessageModel + sentMessageModel;
-    messages.sort((a, b) => a.smsMessage.date!.compareTo(b.smsMessage.date!));
-    if (messages.length > 10) {
-      messages = messages.sublist(messages.length - 10);
-    }
-    return messages;
-  }
-
-  static Future<List<dynamic>> analyze(List<dynamic> messages) async {
     try {
-      final dio = d.Dio();
-      dio.options.baseUrl = BASEURL;
-
       final response = await dio.post(
         '/model/messages',
         data: {
-          'messages': messages,
+          'messages': List.generate(
+            messages.length,
+            (i) => {'id': messages[i].id!, 'content': messages[i].body!},
+          ),
         },
       );
 
-      List<dynamic> results = [];
       if (response.statusCode == 200) {
-        for (int i = 0; i < response.data.length; i++) {
-          if (response.data[i]['probability'] == null) {
-            continue;
-          }
-          results.add(
-            {
-              'id': response.data[i]['id'],
-              'probability': double.parse(
-                response.data[i]['probability'].toString(),
-              ),
-            },
-          );
-        }
-
-        return results;
-      } else {
         return List.generate(
-          messages.length,
-          (index) => {
-            'id': messages[index]['id'],
-            'probability': -response.statusCode!.toDouble(),
+          response.data.length,
+          (i) => {
+            'statusCode': response.statusCode,
+            'id': response.data[i]['id'],
+            'probability': response.data[i]['probability'],
           },
         );
+      } else {
+        return [
+          {'statusCode': ERROR_SERVER},
+        ];
       }
     } catch (e) {
       return [
-        {'probability': ERROR_EMPTY}
+        {'statusCode': ERROR_CLIENT},
       ];
     }
   }
 
-  static Future<dynamic> analyzeSingle(String message) async {
-    try {
-      final dio = d.Dio();
-      dio.options.baseUrl = BASEURL;
+  static Future<dynamic> analyzeMessage(SmsMessage message) async {
+    Dio dio = Dio();
+    dio.options.baseUrl = BASEURL;
 
+    try {
       final response = await dio.post(
         '/model/messages',
         data: {
           'messages': [
-            {'id': 1, 'content': message}
+            {'id': message.id, 'content': message.body}
           ],
         },
       );
 
       if (response.statusCode == 200) {
-        print(response.data);
-        return response.data[0]['probability'];
+        return {
+          'statusCode': response.statusCode,
+          'id': response.data[0]['id'],
+          'probability': response.data[0]['probability']
+        };
       } else {
-        return -1;
+        return {'statusCode': ERROR_SERVER};
       }
     } catch (e) {
-      print(e);
-      return -1;
+      return {'statusCode': ERROR_CLIENT};
     }
   }
 }

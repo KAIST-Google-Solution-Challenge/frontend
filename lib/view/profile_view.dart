@@ -2,21 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/authentication_controller.dart';
 import 'package:the_voice/util/build.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 import 'package:the_voice/view/emergency_contact_dialog_view.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     AuthenticationController ac = AuthenticationController();
     FirebaseAuth fa = FirebaseAuth.instance;
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
-    SettingModel sm = context.watch<SettingModel>();
+    SettingProvider sm = context.watch<SettingProvider>();
     bool largeFont = sm.largeFont;
     bool brightness = sm.brightness == Brightness.light;
     bool lang = sm.language == Language.english;
@@ -51,7 +56,11 @@ class ProfileView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           OutlinedButton(
-            onPressed: () => ac.signInWithGoogle(),
+            onPressed: () {
+              setState(() {
+                ac.signInWithGoogle();
+              });
+            },
             child: largeFont
                 ? Text(
                     lang ? 'Connect with Google' : '구글 연동',

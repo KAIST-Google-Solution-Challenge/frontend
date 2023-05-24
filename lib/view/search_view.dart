@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/util/build.dart';
-import 'package:the_voice/model/chart_model.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/util/chart.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:the_voice/controller/search_service.dart';
 
 class SearchView extends StatefulWidget {
@@ -34,7 +34,7 @@ class _SearchViewState extends State<SearchView> {
                 ),
               );
             } else {
-              return Consumer<SettingModel>(
+              return Consumer<SettingProvider>(
                 builder: (_, value, __) => ListView(
                   children: List.generate(
                     snapshot.data!.length,

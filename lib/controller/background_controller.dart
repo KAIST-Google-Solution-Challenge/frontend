@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
@@ -12,86 +13,79 @@ import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/util/constant.dart';
 
 class BackgroundController {
-  PhoneStateStatus status = PhoneStateStatus.NOTHING;
-  bool granted = false;
+  static PhoneStateStatus status = PhoneStateStatus.NOTHING;
+  static bool granted = false;
 
-  late FlutterBackgroundService service;
-  final telephony = Telephony.instance;
+  static FlutterBackgroundService service = FlutterBackgroundService();
+  static FlutterLocalNotificationsPlugin notification =
+      FlutterLocalNotificationsPlugin();
+  static Telephony telephony = Telephony.instance;
 
-  static const notificationChannelId = 'the-voice';
-  static const notificationId = 888;
-  static const notificationTitle = 'The Voice';
+  static int id = 888;
+  static String channelId = 'the-voice';
+  static String channelName = 'The Voice';
 
-  Future<void> init() async {
-    _setCallStream();
-    _setSmsStream();
-    service = FlutterBackgroundService();
+  static void _setCallStream() {
+    PhoneState.phoneStateStream.listen(
+      (event) {
+        if (event != null) {
+          if (event == PhoneStateStatus.CALL_ENDED) {
+            // Future.delayed(const Duration(seconds: 10), analyzeCall);
+            analyzeCall();
+          }
+          status = event;
+        }
+      },
+    );
+  }
 
+  static void _setSmsStream() {
+    telephony.listenIncomingSms(
+      onNewMessage: (SmsMessage message) async {
+        analyzeMessage(message);
+      },
+      onBackgroundMessage: analyzeMessage,
+    );
+  }
+
+  static Future<void> init() async {
     await _initBackService();
   }
 
-  Future<void> _initBackService() async {
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      notificationChannelId, // id
-      notificationTitle, // title
-      description: 'Detecting Incoming voice phishing', // description
-      importance: Importance.max, // importance must be at low or higher level
-    );
-
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
-    await flutterLocalNotificationsPlugin
+  static Future<void> _initBackService() async {
+    await notification
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
+        ?.createNotificationChannel(
+          AndroidNotificationChannel(channelId, channelName),
+        );
 
     await service.configure(
       androidConfiguration: AndroidConfiguration(
-        // this will be executed when app is in foreground or background in separated isolate
-        onStart: BackgroundController.onStart,
-
-        // auto start service
-        // autoStart: true,
+        onStart: onStart,
+        autoStart: false,
+        autoStartOnBoot: false,
         isForegroundMode: true,
-
-        notificationChannelId: notificationChannelId,
-        initialNotificationTitle: notificationTitle,
-        initialNotificationContent: 'Waiting for Call and Message',
-        foregroundServiceNotificationId: notificationId,
+        foregroundServiceNotificationId: id,
+        notificationChannelId: channelId,
+        initialNotificationTitle: 'The Voice',
+        initialNotificationContent: 'Auto Analysis',
       ),
-      iosConfiguration: IosConfiguration(
-        // auto start service
-        // autoStart: true,
-
-        // this will be executed when app is in foreground in separated isolate
-        onForeground: BackgroundController.onStart,
-
-        // you have to enable background fetch capability on xcode project
-        onBackground: onIosBackground,
-      ),
+      iosConfiguration: IosConfiguration(),
     );
-  }
-
-  @pragma('vm:entry-point')
-  Future<bool> onIosBackground(ServiceInstance service) async {
-    return true;
   }
 
   @pragma('vm:entry-point')
   static void onStart(ServiceInstance service) async {
-    // Only available for flutter 3.0.0 and later
     DartPluginRegistrant.ensureInitialized();
 
-    // For flutter prior to version 3.0.0
-    // We have to register the plugin manually
+    _setCallStream();
+    _setSmsStream();
 
-    /// OPTIONAL when use custom notification
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
       });
-
       service.on('setAsBackground').listen((event) {
         service.setAsBackgroundService();
       });
@@ -102,93 +96,46 @@ class BackgroundController {
     });
   }
 
-  void _setCallStream() {
-    PhoneState.phoneStateStream.listen(
-      (event) {
-        if (event != null) {
-          print('Call event occur: $event');
-          if (event == PhoneStateStatus.CALL_ENDED) {
-            Future.delayed(const Duration(seconds: 10), analyzeCall);
-          }
-          status = event;
-        }
-      },
-    );
-  }
-
-  void _setSmsStream() {
-    telephony.listenIncomingSms(
-      onNewMessage: (SmsMessage message) async {
-        messageHandler(message);
-      },
-      onBackgroundMessage: messageHandler,
-    );
-  }
-
-  static void messageHandler(SmsMessage message) async {
-    //Handle background message
-    print('Message incoming: ${message.body}');
-    if (message.body!.length > 20) {
-      final response = await MessageController.analyzeSingle(message.body!);
-      if (response == -1) {
-        return;
-      } else if (response > THREASHOLD) {
-        alertPhishing(message.address!, response);
+  static void analyzeCall() async {
+    CallLogEntry lastCall = await CallController.fetchLastCall();
+    dynamic response = await CallController.analyzeCall(lastCall);
+    if (response['statusCode'] == 200) {
+      if (response['probability'] > THRESHOLD3) {
+        alertPhishing(lastCall.number!, response['probability']);
       }
     }
   }
 
-  void analyzeCall() async {
-    try {
-      final callLog = await CallController.fetchLastCall();
-      print('Incoming call from: ${callLog.number}');
-      final datetime = DateTime.fromMillisecondsSinceEpoch(callLog.timestamp!)
-          .toIso8601String();
-      print('Incoming call datetime: $datetime');
-      final result = await CallController.analyze(callLog.number!, datetime);
-      print(result);
-      if (result > THREASHOLD) {
-        alertPhishing(callLog.number!, result);
+  static void analyzeMessage(SmsMessage message) async {
+    if (message.body!.length > 16) {
+      dynamic response = await MessageController.analyzeMessage(message);
+      if (response['statusCode'] == 200) {
+        if (response['probability'] > THRESHOLD3) {
+          alertPhishing(message.address!, response['probability']);
+        }
       }
-    } catch (e) {
-      print("Error: $e");
     }
   }
 
   static void alertPhishing(String number, double probability) {
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
-    flutterLocalNotificationsPlugin.show(
-      888,
-      notificationTitle,
-      'Detected from $number: ${probability.toString().substring(0, 4)}%',
-      const NotificationDetails(
+    notification.show(
+      id,
+      'The Voice',
+      'Phone Scam by $number is Detected (${probability.toInt()}%)',
+      NotificationDetails(
         android: AndroidNotificationDetails(
-          notificationTitle,
-          'default',
-          importance: Importance.max,
-          priority: Priority.high,
+          channelId,
+          channelName,
           icon: 'ic_bg_service_small',
           color: Colors.red,
-          ongoing: true,
-          styleInformation: BigTextStyleInformation('default'),
-          showWhen: true,
         ),
       ),
     );
 
-    String emergencyContact =
-        FileController().fileReadAsStringSync().split(' ')[0];
-
-    print(
-      'Send SMS to $emergencyContact',
-    );
-
-    Telephony.instance.sendSms(
-      to: emergencyContact,
+    telephony.sendSms(
+      to: FileController.fileReadAsStringSync().split(' ')[0],
       message:
-          '[The Voice] Phone Scam by $number is Detected (${probability.toString().substring(0, 4)}%)',
+          '[The Voice] Phone Scam by $number is Detected (${probability.toInt()}%)',
     );
   }
 }

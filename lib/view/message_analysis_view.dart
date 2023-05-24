@@ -2,68 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
+import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/message_controller.dart';
-import 'package:the_voice/model/chat_model.dart';
 import 'package:the_voice/util/build.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:the_voice/util/constant.dart';
 
 class MessageAnalysisView extends StatefulWidget {
-  final String number;
   final int threadId;
 
-  const MessageAnalysisView({
-    super.key,
-    required this.number,
-    required this.threadId,
-  });
+  const MessageAnalysisView({super.key, required this.threadId});
 
   @override
   State<MessageAnalysisView> createState() => _MessageAnalysisViewState();
 }
 
 class _MessageAnalysisViewState extends State<MessageAnalysisView> {
-  late List<MessageModel> messages;
-  late List<dynamic> probabilities;
-
   @override
   void initState() {
     super.initState();
-  }
-
-  Future<bool> future() async {
-    try {
-      messages = await MessageController.fetchMessages(widget.threadId);
-      List<dynamic> requests = [];
-
-      for (int i = 0; i < messages.length; i++) {
-        if (messages[i].sender == Sender.user) {
-          continue;
-        }
-        requests.add(
-          {
-            'id': messages[i].smsMessage.id!,
-            'content': messages[i].smsMessage.body!
-          },
-        );
-      }
-
-      probabilities = await MessageController.analyze(requests);
-
-      return true;
-    } catch (error) {
-      return false;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
-    SettingModel sm = context.watch<SettingModel>();
+    SettingProvider sm = context.watch<SettingProvider>();
     bool largeFont = sm.largeFont;
     bool brightness = sm.brightness == Brightness.light;
     bool lang = sm.language == Language.english;
+
+    SmsMessage lastMessage = MessageController.messages[widget.threadId]![0];
+
+    String title =
+        lastMessage.name! != '' ? lastMessage.name! : lastMessage.address!;
+
+    List<SmsMessage> requests = MessageController.messages[widget.threadId]!;
+    List<dynamic>? responses;
 
     SystemUiOverlayStyle getSystemUiOverlayStyle(double probability) {
       if (brightness) {
@@ -146,38 +121,50 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
       if (probability > THRESHOLD4) {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Very Dangerous!'
-              : 'AI가 아래 토큰들을\n매우 위험하다고 판단했어요!',
+              ? 'AI Detected Below\nMessages Very Dangerous!'
+              : 'AI가 아래 메시지들을\n매우 위험하다고 판단했어요!',
           style: onTertiary,
         );
       } else if (probability > THRESHOLD3) {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Dangerous!'
-              : 'AI가 아래 토큰들을\n위험하다고 판단했어요!',
+              ? 'AI Detected Below\nMessages Dangerous!'
+              : 'AI가 아래 메시지들을\n위험하다고 판단했어요!',
           style: onTertiary,
         );
       } else if (probability > THRESHOLD2) {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Normal!'
-              : 'AI가 아래 토큰들을\n기준으로 판단했어요!',
+              ? 'AI Detected Below\nMessages Normal!'
+              : 'AI가 아래 메시지들을\n기준으로 판단했어요!',
           style: onSurfaceVariant,
         );
       } else if (probability > THRESHOLD1) {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Safe!'
-              : 'AI가 아래 토큰들을\n안전하다고 판단했어요!',
+              ? 'AI Detected Below\nMessages Safe!'
+              : 'AI가 아래 메시지들을\n안전하다고 판단했어요!',
           style: onPrimary,
         );
       } else {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Very Safe!'
-              : 'AI가 아래 토큰들을\n매우 안전하다고 판단했어요!',
+              ? 'AI Detected Below\nMessages Very Safe!'
+              : 'AI가 아래 메시지들을\n매우 안전하다고 판단했어요!',
           style: onPrimary,
         );
+      }
+    }
+
+    String getError(int statusCode) {
+      if (statusCode == ERROR_EMPTY) {
+        return 'EMPTY';
+      } else if (statusCode == ERROR_SERVER) {
+        return 'SERVER';
+      } else if (statusCode == ERROR_CLIENT) {
+        return 'CLIENT';
+      } else {
+        return 'UNKNOWN';
       }
     }
 
@@ -214,7 +201,7 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
       return AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
-          widget.number,
+          title,
           style: largeFont
               ? tt.headlineLarge?.copyWith(
                   color: getOnSurfaceColor(probability),
@@ -234,14 +221,14 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
 
     List<Widget> getMessages(Color onSurfaceColor) {
       return List.generate(
-        probabilities.length,
+        responses!.length,
         (index) {
-          for (int i = 0; i < messages.length; i++) {
-            if (probabilities[index]['id'] == messages[i].smsMessage.id!) {
+          for (int i = 0; i < requests.length; i++) {
+            if (responses![index]['id'] == requests[i].id!) {
               return Padding(
                 padding: EdgeInsets.only(
                   top: index == 0 ? 0 : 8,
-                  bottom: index == probabilities.length - 1 ? 0 : 8,
+                  bottom: index == responses!.length - 1 ? 0 : 8,
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -258,7 +245,7 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
                       ),
                       child: Text(
                         process(
-                          messages[i].smsMessage.body!,
+                          requests[i].body!,
                           largeFont ? 12 : 16,
                         ),
                         style: largeFont
@@ -268,7 +255,7 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${probabilities[index]['probability'].toInt()}%',
+                      '${responses![index]['probability'].toInt()}%',
                       style: largeFont
                           ? tt.titleLarge?.copyWith(color: onSurfaceColor)
                           : tt.labelLarge?.copyWith(color: onSurfaceColor),
@@ -308,70 +295,22 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
       );
     }
 
-    Widget buildError(double errorCode) {
+    Widget buildError(int statusCode) {
       return Scaffold(
-        appBar: BuildAppBar(pushed: true, title: widget.number),
+        appBar: BuildAppBar(pushed: true, title: title),
         body: Center(
-          child: Builder(
-            builder: (_) {
-              if (errorCode == ERROR_NOFILE) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'ERROR',
-                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
-                    ),
-                    Text(
-                      'NO FILE',
-                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
-                    )
-                  ],
-                );
-              } else if (errorCode == ERROR_SERVER) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'ERROR',
-                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
-                    ),
-                    Text(
-                      'SERVER',
-                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
-                    )
-                  ],
-                );
-              } else if (errorCode == ERROR_EMPTY) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'ERROR',
-                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
-                    ),
-                    Text(
-                      'EMPTY',
-                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
-                    )
-                  ],
-                );
-              } else {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'ERROR',
-                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
-                    ),
-                    Text(
-                      (-errorCode.toInt()).toString(),
-                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
-                    )
-                  ],
-                );
-              }
-            },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'ERROR',
+                style: tt.headlineLarge?.copyWith(color: cs.onSurface),
+              ),
+              Text(
+                getError(statusCode),
+                style: tt.displayLarge?.copyWith(color: cs.onSurface),
+              ),
+            ],
           ),
         ),
       );
@@ -379,27 +318,35 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
 
     Widget buildLoading() {
       return Scaffold(
-        appBar: BuildAppBar(pushed: true, title: widget.number),
+        appBar: BuildAppBar(pushed: true, title: title),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return FutureBuilder(
-      future: future(),
+      future: MessageController.analyzeMessages(requests.sublist(0, 16)),
       builder: (_, snapshot) {
-        if (snapshot.hasData) {
-          if (probabilities.isNotEmpty) {
-            double probability = probabilities[0]['probability'];
+        responses = snapshot.data;
 
-            if (probability >= 0) {
-              double probability = probabilities[0]['probability'];
+        if (snapshot.hasData) {
+          if (responses!.isNotEmpty) {
+            int statusCode = responses![0]['statusCode'];
+
+            if (statusCode == 200) {
+              double probability = avg(
+                List.generate(
+                  responses!.length,
+                  (i) => responses![i]['probability'],
+                ),
+              );
+
               return Scaffold(
                 backgroundColor: getBackgroundColor(probability),
                 appBar: buildAppBar(probability),
                 body: buildBody(probability),
               );
             } else {
-              return buildError(probability);
+              return buildError(responses![0]['statusCode']);
             }
           } else {
             return buildError(ERROR_EMPTY);
@@ -433,4 +380,14 @@ String process(String data, int num) {
   }
 
   return lines.join('\n');
+}
+
+double avg(List iter) {
+  double sum = 0;
+
+  for (double e in iter) {
+    sum += e;
+  }
+
+  return sum / iter.length;
 }

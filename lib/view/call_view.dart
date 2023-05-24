@@ -1,7 +1,8 @@
+import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/call_controller.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:the_voice/view/call_analysis_dialog_view.dart';
 
 class CallView extends StatefulWidget {
@@ -17,87 +18,74 @@ class _CallViewState extends State<CallView> {
     String currHeader = '';
     String nextHeader = '';
 
-    return FutureBuilder(
-      future: CallController.fetchCalls(),
-      builder: (_, snapshot) {
-        if (snapshot.hasData) {
-          return ListView(
-            children: List<Widget>.generate(
-              snapshot.data!.length,
-              (index) {
-                int minute = snapshot.data![index].duration! ~/ 60;
-                int second = snapshot.data![index].duration! % 60;
-
-                nextHeader = DateTime.fromMillisecondsSinceEpoch(
-                  snapshot.data![index].timestamp!,
-                ).toIso8601String().substring(0, 10);
-
-                BuildListTile customCallListTile = BuildListTile(
-                  leading: const CircleAvatar(radius: 32),
-                  isHeader: currHeader != nextHeader,
-                  header: nextHeader,
-                  title: snapshot.data![index].number!,
-                  subtitle: snapshot.data![index].callType
-                      .toString()
-                      .substring(9)
-                      .toLowerCase(),
-                  trailing:
-                      '${minute < 10 ? '0$minute' : minute}:${second < 10 ? '0$second' : second}',
-                  datetime: DateTime.fromMillisecondsSinceEpoch(
-                    snapshot.data![index].timestamp!,
-                  ).toIso8601String(),
-                );
-
-                currHeader = nextHeader;
-
-                return customCallListTile;
-              },
-            ),
-          );
-        } else {
-          return const Center(child: CircularProgressIndicator());
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if (scrollNotification.metrics.pixels ==
+            scrollNotification.metrics.maxScrollExtent) {
+          setState(() {
+            CallController.loadCalls();
+          });
         }
+
+        return true;
       },
+      child: ListView(
+        children: List<Widget>.generate(
+          CallController.calls.length,
+          (index) {
+            nextHeader = DateTime.fromMillisecondsSinceEpoch(
+              CallController.calls[index].timestamp!,
+            ).toIso8601String().substring(0, 10);
+
+            BuildListTile buildListTile = BuildListTile(
+              isHeader: currHeader != nextHeader,
+              header: nextHeader,
+              callLogEntry: CallController.calls[index],
+            );
+
+            currHeader = nextHeader;
+
+            return buildListTile;
+          },
+        ),
+      ),
     );
   }
 }
 
 class BuildListTile extends StatelessWidget {
   final bool isHeader;
-  final Widget leading;
   final String header;
-  final String title;
-  final String subtitle;
-  final String trailing;
-  final String datetime;
+  final CallLogEntry callLogEntry;
 
   const BuildListTile({
     super.key,
     required this.isHeader,
-    required this.leading,
     required this.header,
-    required this.title,
-    required this.subtitle,
-    required this.trailing,
-    required this.datetime,
+    required this.callLogEntry,
   });
 
   @override
   Widget build(BuildContext context) {
     TextTheme tt = Theme.of(context).textTheme;
-    SettingModel sm = context.watch<SettingModel>();
+    SettingProvider sm = context.watch<SettingProvider>();
     bool largeFont = sm.largeFont;
+
+    int minute = callLogEntry.duration! ~/ 60;
+    int second = callLogEntry.duration! % 60;
+
+    String title =
+        callLogEntry.name! != '' ? callLogEntry.name! : callLogEntry.number!;
+    String subtitle =
+        callLogEntry.callType.toString().substring(9).toLowerCase();
+    String trailing =
+        '${minute < 10 ? '0$minute' : minute}:${second < 10 ? '0$second' : second}';
 
     void onTap() {
       showDialog(
         context: context,
-        builder: (context) => CallAnalysisDialogView(
-          leading: leading,
-          title: title,
-          subtitle: subtitle,
-          trailing: trailing,
-          datetime: datetime,
-        ),
+        builder: (context) =>
+            CallAnalysisDialogView(callLogEntry: callLogEntry),
       );
     }
 
@@ -114,7 +102,7 @@ class BuildListTile extends StatelessWidget {
               )
             : const SizedBox(),
         ListTile(
-          leading: leading,
+          leading: const CircleAvatar(radius: 32),
           title: largeFont ? Text(title, style: tt.titleLarge) : Text(title),
           subtitle:
               largeFont ? Text(subtitle, style: tt.bodyLarge) : Text(subtitle),

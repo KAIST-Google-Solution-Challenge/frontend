@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:the_voice/controller/background_controller.dart';
+import 'package:the_voice/controller/call_controller.dart';
+import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/controller/file_controller.dart';
+import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/home.dart';
 import 'package:provider/provider.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -14,14 +17,11 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await _requestPermission();
 
-  runApp(TheVoice());
+  runApp(const TheVoice());
 }
 
 class TheVoice extends StatelessWidget {
-  final BackgroundController bc = BackgroundController();
-  final FileController fc = FileController();
-
-  TheVoice({super.key});
+  const TheVoice({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +46,12 @@ class TheVoice extends StatelessWidget {
     }
 
     return FutureBuilder(
-      future: _initializeController(bc, fc),
+      future: _initializeController(),
       builder: (_, snapshot) {
-        if (snapshot.data ?? false) {
-          return ChangeNotifierProvider<SettingModel>(
-            create: (_) => _createSettingModel(bc, fc),
-            builder: (_, child) => Consumer<SettingModel>(
+        if (snapshot.hasData) {
+          return ChangeNotifierProvider<SettingProvider>(
+            create: (_) => _createSettingModel(),
+            builder: (_, child) => Consumer<SettingProvider>(
               builder: (_, sm, __) => MaterialApp(
                 debugShowCheckedModeBanner: false,
                 home: const Home(),
@@ -79,16 +79,11 @@ class TheVoice extends StatelessWidget {
   }
 }
 
-SettingModel _createSettingModel(
-  BackgroundController backgroundController,
-  FileController fileController,
-) {
-  SettingModel settingModel = SettingModel(
-    backgroundController: backgroundController,
-  );
-  settingModel.init(fileController.fileReadAsStringSync());
+SettingProvider _createSettingModel() {
+  SettingProvider settingProvider = SettingProvider();
+  settingProvider.init();
 
-  return settingModel;
+  return settingProvider;
 }
 
 Future<void> _requestPermission() async {
@@ -104,23 +99,20 @@ Future<void> _requestPermission() async {
   if (!(await Permission.storage.status).isGranted) {
     await Permission.storage.request();
   }
+  if (!(await Permission.notification.status).isGranted) {
+    await Permission.notification.request();
+  }
   if (!(await Permission.manageExternalStorage.status).isGranted) {
     await Permission.manageExternalStorage.request();
   }
 }
 
-Future<bool> _initializeController(
-  BackgroundController backgroundController,
-  FileController fileController,
-) async {
-  await backgroundController.init();
-
-  if (!await fileController.fileExists()) {
-    await fileController.fileInit();
-  } else if (fileController.fileReadAsStringSync().split(' ').length != 5) {
-    await fileController.fileDelete();
-    await fileController.fileInit();
-  }
+Future<bool> _initializeController() async {
+  await BackgroundController.init();
+  await FileController.init();
+  await ContactController.fetchContacts();
+  await CallController.fetchCalls();
+  await MessageController.fetchMessages();
 
   return true;
 }
