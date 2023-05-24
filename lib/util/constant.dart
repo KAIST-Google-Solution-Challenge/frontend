@@ -1,7 +1,6 @@
+// ignore_for_file: constant_identifier_names
+
 const String BASEURL = 'http://35.216.72.5:3000/';
-// const String BASEURL = 'https://eac9-110-76-108-201.jp.ngrok.io';
-// const String BASEURL = 'http://10.0.2.2:3000'; // For Android emulator
-const double THREASHOLD = 80;
 
 const String CALLDIR = '/storage/emulated/0/Recordings/Call';
 const String CALLDIROLD = '/storage/emulated/0/Call';
@@ -12,6 +11,7 @@ const double THRESHOLD3 = 85;
 const double THRESHOLD2 = 15;
 const double THRESHOLD1 = 5;
 
-const double ERROR_NOFILE = -1;
-const double ERROR_SERVER = -2;
-const double ERROR_EMPTY = -3;
+const int ERROR_NOFILE = -1;
+const int ERROR_SERVER = -2;
+const int ERROR_CLIENT = -3;
+const int ERROR_EMPTY = -4;

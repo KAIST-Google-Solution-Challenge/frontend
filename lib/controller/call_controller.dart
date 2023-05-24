@@ -1,178 +1,154 @@
 import 'dart:io';
 import 'package:call_log/call_log.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contacts_service/contacts_service.dart';
-import 'package:dio/dio.dart' as d;
+import 'package:dio/dio.dart';
 import 'package:the_voice/controller/contact_controller.dart';
 import 'package:the_voice/util/constant.dart';
 
 class CallController {
-  static Future<List<CallLogEntry>> fetchCalls() async {
-    // Fetch call logs from device
-    var callLogs = (await CallLog.get())
+  static int _loadedIndex = 0;
+  static bool _isLoading = false;
+
+  static List<CallLogEntry> _callLogEntries = [];
+
+  // ignore: prefer_final_fields
+  static List<CallLogEntry> _calls = [];
+  static List<CallLogEntry> get calls {
+    if (_calls.isEmpty) loadCalls();
+    return _calls;
+  }
+
+  static Future<void> fetchCalls() async {
+    _callLogEntries = (await CallLog.get())
         .where(
           (call) =>
               call.callType == CallType.incoming ||
               call.callType == CallType.outgoing,
         )
         .toList()
-      ..sort((a, b) => b.timestamp!.compareTo(a.timestamp!));
+      ..sort((a, b) => (b.timestamp!).compareTo(a.timestamp!));
 
-    if (callLogs.length > 60) {
-      callLogs = callLogs.sublist(0, 60);
+    for (CallLogEntry callLogEntry in _callLogEntries) {
+      callLogEntry.name = ContactController.getName(callLogEntry.number!);
     }
+  }
 
-    final contacts = await ContactsService.getContacts(withThumbnails: false);
-    for (var callLogEntry in callLogs) {
-      // number of call log is undefined
-      if (callLogEntry.number == null) {
-        continue;
+  static void loadCalls() {
+    if (!_isLoading) {
+      _isLoading = true;
+      if (_loadedIndex + 10 < _callLogEntries.length) {
+        _calls.addAll(_callLogEntries.sublist(_loadedIndex, _loadedIndex + 10));
+        _loadedIndex += 10;
+      } else {
+        _calls.addAll(
+            _callLogEntries.sublist(_loadedIndex, _callLogEntries.length));
+        _loadedIndex = _callLogEntries.length;
       }
-
-      callLogEntry.number!.replaceAll('+', '');
-      callLogEntry.number!.replaceAll('-', '');
-
-      // If number registered in contacts, fetch the display name
-      callLogEntry.number =
-          ContactController.getName(contacts, callLogEntry.number!);
+      _isLoading = false;
     }
-
-    return callLogs;
   }
 
   static Future<CallLogEntry> fetchLastCall() async {
-    var now = DateTime.now();
-    int from = now.subtract(const Duration(days: 1)).millisecondsSinceEpoch;
-    final callLog =
-        (await CallLog.query(dateFrom: from, type: CallType.incoming)).first;
+    List<CallLogEntry> lastCallLogs = (await CallLog.query(
+            dateFrom: DateTime.now()
+                .subtract(const Duration(hours: 1))
+                .millisecondsSinceEpoch))
+        .where(
+          (call) =>
+              call.callType == CallType.incoming ||
+              call.callType == CallType.outgoing,
+        )
+        .toList()
+      ..sort((a, b) => (b.timestamp!).compareTo(a.timestamp!));
 
-    final contacts = await ContactsService.getContacts(withThumbnails: false);
-    callLog.number!.replaceAll('+', '');
-    callLog.number!.replaceAll('-', '');
-    callLog.number = ContactController.getName(contacts, callLog.number!);
+    CallLogEntry lastCallLog = lastCallLogs.first;
+    lastCallLog.name = ContactController.getName(lastCallLog.number!);
 
-    return callLog;
+    return lastCallLog;
   }
 
-  // datetime ISO8601 2023-03-26T06:49:36+00:00
-  static Future<String> getFilePath(String number, String datetime) async {
+  static Future<String> getFilePath(CallLogEntry callLogEntry) async {
+    String target =
+        callLogEntry.name! != '' ? callLogEntry.name! : callLogEntry.number!;
+    DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(callLogEntry.timestamp!);
     String fileName = '';
 
-    final contacts = await ContactsService.getContacts(withThumbnails: false);
-    String name = ContactController.getName(contacts, number);
-    print("name: $name");
-    late String date;
-    late String time;
+    String dt;
+    String date;
+    String time;
 
-    Directory directory = Directory(CALLDIR);
-    Directory oldDirectory = Directory(CALLDIROLD);
-
-    for (var i = 0; i < 100; i++) {
-      // Need to be optimized by pararmetering Datetime, not ISO8601String.
-      datetime = DateTime(
-        2000 + int.parse(datetime.substring(2, 4)),
-        int.parse(datetime.substring(5, 7)),
-        int.parse(datetime.substring(8, 10)),
-        int.parse(datetime.substring(11, 13)),
-        int.parse(datetime.substring(14, 16)),
-        int.parse(datetime.substring(17, 19)),
-      ).add(const Duration(seconds: 1)).toIso8601String();
-
-      date = datetime.substring(2, 4) +
-          datetime.substring(5, 7) +
-          datetime.substring(8, 10);
-      print("date: $date");
-      time = datetime.substring(11, 13) +
-          datetime.substring(14, 16) +
-          datetime.substring(17, 19);
-      print("time: $time");
+    for (int i = 0; i < 100; i++) {
+      dateTime = dateTime.add(const Duration(seconds: 1));
+      dt = dateTime.toIso8601String();
+      date = dt.substring(2, 4) + dt.substring(5, 7) + dt.substring(8, 10);
+      time = dt.substring(11, 13) + dt.substring(14, 16) + dt.substring(17, 19);
 
       String fileKor =
-          "${directory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
+          "${Directory(CALLDIR).path}/${'통화 녹음 ${target}_${date}_$time.m4a'}";
       String fileEng =
-          "${directory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
+          "${Directory(CALLDIR).path}/${'Call recording ${target}_${date}_$time.m4a'}";
       String fileKorOld =
-          "${oldDirectory.path}/${'통화 녹음 ${name == '' ? number : name}_${date}_$time.m4a'}";
+          "${Directory(CALLDIROLD).path}/${'통화 녹음 ${target}_${date}_$time.m4a'}";
       String fileEngOld =
-          "${oldDirectory.path}/${'Call recording ${name == '' ? number : name}_${date}_$time.m4a'}";
+          "${Directory(CALLDIROLD).path}/${'Call recording ${target}_${date}_$time.m4a'}";
 
       if (File(fileKor).existsSync()) {
         fileName = fileKor;
-        break;
-      }
-      if (File(fileEng).existsSync()) {
+      } else if (File(fileEng).existsSync()) {
         fileName = fileEng;
-        break;
-      }
-      if (File(fileKorOld).existsSync()) {
+      } else if (File(fileKorOld).existsSync()) {
         fileName = fileKorOld;
-        break;
-      }
-      if (File(fileEngOld).existsSync()) {
+      } else if (File(fileEngOld).existsSync()) {
         fileName = fileEng;
+      }
+
+      if (fileName != '') {
         break;
       }
     }
 
-    print("(getFilePath) fileName : $fileName");
     return fileName;
   }
 
-  static Future<dynamic> analyze(String number, String datetime) async {
+  static Future<dynamic> analyzeCall(CallLogEntry callLogEntry) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    final dio = d.Dio();
+    Dio dio = Dio();
     dio.options.baseUrl = BASEURL;
 
+    final String fileName = await getFilePath(callLogEntry);
+    if (fileName == '') return {'statusCode': ERROR_NOFILE};
+
     try {
-      final String fileName = await getFilePath(number, datetime);
-      if (fileName == '') return {'probability': ERROR_NOFILE};
-
-      var formData = d.FormData.fromMap(
-        {
-          'file': await d.MultipartFile.fromFile(
-            fileName,
-          ),
-        },
-      );
-
-      print("(analyze) requesting...");
-
       final response = await dio.post(
         '/model',
-        options: d.Options(
-          headers: {'ContentType': 'audio/mp4'},
+        options: Options(headers: {'ContentType': 'audio/mp4'}),
+        data: FormData.fromMap(
+          {'file': await MultipartFile.fromFile(fileName)},
         ),
-        data: formData,
       );
 
       if (response.statusCode == 200) {
-        print('response.data: ${response.data}');
-
-        print("parsed['probability'], ${response.data['probability']}");
-        print("parsed['tokens']: ${response.data['tokens']}");
-
-        print("(analyze) success!");
-        final Map<String, dynamic> document = {
-          'number': number,
-          'probability':
-              response.data['probability'].toString().substring(0, 4),
-          'timestamp':
-              Timestamp.now().toDate().toIso8601String().substring(0, 10),
-        };
-
-        firebaseFirestore.collection('phishing_probability').add(document);
+        firebaseFirestore.collection('phishing_probability').add(
+          {
+            'number': callLogEntry.number!,
+            'probability': response.data['probability'],
+            'timestamp':
+                DateTime.fromMillisecondsSinceEpoch(callLogEntry.timestamp!)
+                    .toIso8601String(),
+          },
+        );
 
         return {
+          'statusCode': response.statusCode,
+          'probability': double.parse(response.data['probability']),
           'tokens': response.data['tokens'],
-          'probability': double.parse(
-            response.data['probability'].toString(),
-          ),
         };
       } else {
-        return {'probability': -response.statusCode!.toDouble()};
+        return {'statusCode': ERROR_SERVER};
       }
     } catch (e) {
-      return {'probability': ERROR_SERVER};
+      return {'statusCode': ERROR_CLIENT};
     }
   }
 }

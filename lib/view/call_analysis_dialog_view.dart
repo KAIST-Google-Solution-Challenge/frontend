@@ -1,31 +1,31 @@
+import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:the_voice/view/call_analysis_view.dart';
 
 class CallAnalysisDialogView extends StatelessWidget {
-  final Widget leading;
-  final String title;
-  final String subtitle;
-  final String trailing;
-  final String datetime;
+  final CallLogEntry callLogEntry;
 
-  const CallAnalysisDialogView({
-    super.key,
-    required this.leading,
-    required this.title,
-    required this.subtitle,
-    required this.trailing,
-    required this.datetime,
-  });
+  const CallAnalysisDialogView({super.key, required this.callLogEntry});
 
   @override
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
-    SettingModel sm = context.watch<SettingModel>();
+    SettingProvider sm = context.watch<SettingProvider>();
     bool largeFont = sm.largeFont;
     bool lang = sm.language == Language.english;
+
+    int minute = callLogEntry.duration! ~/ 60;
+    int second = callLogEntry.duration! % 60;
+
+    String title =
+        callLogEntry.name! != '' ? callLogEntry.name! : callLogEntry.number!;
+    String subtitle =
+        callLogEntry.callType.toString().substring(9).toLowerCase();
+    String trailing =
+        '${minute < 10 ? '0$minute' : minute}:${second < 10 ? '0$second' : second}';
 
     return AlertDialog(
       icon: const Icon(Icons.assessment),
@@ -52,7 +52,7 @@ class CallAnalysisDialogView extends StatelessWidget {
         TextButton(
           onPressed: () {
             Navigator.pop(context);
-            Navigator.push(context, _buildRoute(title, datetime));
+            Navigator.push(context, _buildRoute(callLogEntry));
           },
           child: largeFont
               ? Text(lang ? 'Analysis' : '분석', style: tt.titleLarge)
@@ -62,12 +62,9 @@ class CallAnalysisDialogView extends StatelessWidget {
     );
   }
 
-  Route _buildRoute(String title, String datetime) {
+  Route _buildRoute(CallLogEntry callLogEntry) {
     return MaterialPageRoute(
-      builder: (context) => CallAnalysisView(
-        number: title,
-        datetime: datetime,
-      ),
+      builder: (context) => CallAnalysisView(callLogEntry: callLogEntry),
     );
   }
 }

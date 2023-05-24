@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:the_voice/view/profile_view.dart';
 
 class BuildAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -16,7 +16,7 @@ class BuildAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     TextTheme tt = Theme.of(context).textTheme;
-    SettingModel sm = context.watch<SettingModel>();
+    SettingProvider sm = context.watch<SettingProvider>();
     bool largeFont = sm.largeFont;
 
     if (pushed) {

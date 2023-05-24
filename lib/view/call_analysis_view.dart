@@ -1,21 +1,17 @@
+import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:the_voice/controller/call_controller.dart';
 import 'package:the_voice/util/build.dart';
-import 'package:the_voice/model/setting_model.dart';
+import 'package:the_voice/provider/setting_provider.dart';
 import 'package:the_voice/util/constant.dart';
 
 class CallAnalysisView extends StatefulWidget {
-  final String number;
-  final String datetime;
+  final CallLogEntry callLogEntry;
 
-  const CallAnalysisView({
-    super.key,
-    required this.number,
-    required this.datetime,
-  });
+  const CallAnalysisView({super.key, required this.callLogEntry});
 
   @override
   State<CallAnalysisView> createState() => _CallAnalysisViewState();
@@ -31,10 +27,14 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
-    SettingModel sm = context.watch<SettingModel>();
+    SettingProvider sm = context.watch<SettingProvider>();
     bool largeFont = sm.largeFont;
     bool brightness = sm.brightness == Brightness.light;
     bool lang = sm.language == Language.english;
+
+    String title = widget.callLogEntry.name! != ''
+        ? widget.callLogEntry.name!
+        : widget.callLogEntry.number!;
 
     SystemUiOverlayStyle getSystemUiOverlayStyle(double probability) {
       if (brightness) {
@@ -117,43 +117,54 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
       if (probability > THRESHOLD4) {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Very Dangerous!'
+              ? 'AI Detected Below\nTokens Very Dangerous!'
               : 'AI가 아래 토큰들을\n매우 위험하다고 판단했어요!',
           style: onTertiary,
         );
       } else if (probability > THRESHOLD3) {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Dangerous!'
+              ? 'AI Detected Below\nTokens Dangerous!'
               : 'AI가 아래 토큰들을\n위험하다고 판단했어요!',
           style: onTertiary,
         );
       } else if (probability > THRESHOLD2) {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Normal!'
+              ? 'AI Detected Below\nTokens Normal!'
               : 'AI가 아래 토큰들을\n기준으로 판단했어요!',
           style: onSurfaceVariant,
         );
       } else if (probability > THRESHOLD1) {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Safe!'
+              ? 'AI Detected Below\nTokens Safe!'
               : 'AI가 아래 토큰들을\n안전하다고 판단했어요!',
           style: onPrimary,
         );
       } else {
         return Text(
           lang
-              ? 'AI Detected\nBelow Tokens Very Safe!'
+              ? 'AI Detected Below\nTokens Very Safe!'
               : 'AI가 아래 토큰들을\n매우 안전하다고 판단했어요!',
           style: onPrimary,
         );
       }
     }
 
+    String getError(int statusCode) {
+      if (statusCode == ERROR_NOFILE) {
+        return 'NOFILE';
+      } else if (statusCode == ERROR_SERVER) {
+        return 'SERVER';
+      } else if (statusCode == ERROR_CLIENT) {
+        return 'CLIENT';
+      } else {
+        return 'UNKNOWN';
+      }
+    }
+
     Widget getLabel(List tokens, double probability) {
-      // List<String>
       TextStyle? onTertiary = largeFont
           ? tt.titleLarge?.copyWith(color: cs.onTertiary)
           : tt.bodyLarge?.copyWith(color: cs.onTertiary);
@@ -210,7 +221,7 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
       return AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
-          widget.number,
+          title,
           style: largeFont
               ? tt.headlineLarge?.copyWith(
                   color: getOnSurfaceColor(probability),
@@ -309,7 +320,6 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
     }
 
     Widget buildBody(double probability, List tokens) {
-      // List<String>
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 64),
@@ -338,56 +348,22 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
       );
     }
 
-    Widget buildError(double errorCode) {
+    Widget buildError(int statusCode) {
       return Scaffold(
-        appBar: BuildAppBar(pushed: true, title: widget.number),
+        appBar: BuildAppBar(pushed: true, title: title),
         body: Center(
-          child: Builder(
-            builder: (_) {
-              if (errorCode == ERROR_NOFILE) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'ERROR',
-                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
-                    ),
-                    Text(
-                      'NO FILE',
-                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
-                    )
-                  ],
-                );
-              } else if (errorCode == ERROR_SERVER) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'ERROR',
-                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
-                    ),
-                    Text(
-                      'SERVER',
-                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
-                    )
-                  ],
-                );
-              } else {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'ERROR',
-                      style: tt.headlineLarge?.copyWith(color: cs.onSurface),
-                    ),
-                    Text(
-                      (-errorCode.toInt()).toString(),
-                      style: tt.displayLarge?.copyWith(color: cs.onSurface),
-                    )
-                  ],
-                );
-              }
-            },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'ERROR',
+                style: tt.headlineLarge?.copyWith(color: cs.onSurface),
+              ),
+              Text(
+                getError(statusCode),
+                style: tt.displayLarge?.copyWith(color: cs.onSurface),
+              ),
+            ],
           ),
         ),
       );
@@ -395,36 +371,28 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
 
     Widget buildLoading() {
       return Scaffold(
-        appBar: BuildAppBar(pushed: true, title: widget.number),
+        appBar: BuildAppBar(pushed: true, title: title),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return FutureBuilder(
-      future: CallController.analyze(widget.number, widget.datetime),
+      future: CallController.analyzeCall(widget.callLogEntry),
       builder: (_, snapshot) {
-        // Debug
-        // snapshot = const AsyncSnapshot.withData(ConnectionState.done, 3);
-
         if (snapshot.hasData) {
-          double probability = snapshot.data['probability'];
-          print(snapshot.data['tokens']);
+          int statusCode = snapshot.data['statusCode'];
 
-          List parsed = snapshot.data['tokens'];
-          print(parsed);
-          print(parsed[0]);
+          if (statusCode == 200) {
+            double probability = snapshot.data['probability'];
+            List tokens = snapshot.data['tokens'];
 
-          if (probability >= 0) {
             return Scaffold(
               backgroundColor: getBackgroundColor(probability),
               appBar: buildAppBar(probability),
-              body: buildBody(
-                probability,
-                parsed,
-              ),
+              body: buildBody(probability, tokens),
             );
           } else {
-            return buildError(probability);
+            return buildError(statusCode);
           }
         } else {
           return buildLoading();
