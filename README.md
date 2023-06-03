@@ -1,3 +1,10 @@
 # The Voice
 Conversation Content based Phone Scam Detector for Seniors
-[Document](https://abrasive-shift-c8c.notion.site/The-Voice-2ba7dc9ab10a48dfaa9eed7f4a63228b)
+
+# Download
+
+[Download](https://github.com/KAIST-Google-Solution-Challenge/frontend/releases/download/v1.1.1/the-voice.apk)
+
+# Tutorial
+
+[Tutorial](https://github.com/KAIST-Google-Solution-Challenge/frontend/files/11524803/tutorial.pdf)
