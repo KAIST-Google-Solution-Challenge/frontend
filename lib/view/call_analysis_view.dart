@@ -379,6 +379,16 @@ class _CallAnalysisViewState extends State<CallAnalysisView> {
     return FutureBuilder(
       future: CallController.analyzeCall(widget.callLogEntry),
       builder: (_, snapshot) {
+        // debug
+        // snapshot = AsyncSnapshot.withData(
+        //   ConnectionState.done,
+        //   {
+        //     'statusCode': 200,
+        //     'probability': 97.0,
+        //     'tokens': ['prosecutor', 'account', 'fraud', 'criminal'],
+        //   },
+        // );
+
         if (snapshot.hasData) {
           int statusCode = snapshot.data['statusCode'];
 

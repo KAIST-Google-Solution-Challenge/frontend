@@ -15,3 +15,6 @@ const int ERROR_NOFILE = -1;
 const int ERROR_SERVER = -2;
 const int ERROR_CLIENT = -3;
 const int ERROR_EMPTY = -4;
+
+const int MESSAGE_VIEW_CROP = 12;
+const int MESSAGE_ANALYSIS_DIALOG_VIEW_CROP = 8;

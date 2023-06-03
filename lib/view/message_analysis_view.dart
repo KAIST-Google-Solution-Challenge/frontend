@@ -324,8 +324,22 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
     }
 
     return FutureBuilder(
-      future: MessageController.analyzeMessages(requests.sublist(0, 16)),
+      future: MessageController.analyzeMessages(
+        requests.length > 6 ? requests.sublist(0, 6) : requests,
+      ),
       builder: (_, snapshot) {
+        // debug
+        // snapshot = AsyncSnapshot.withData(
+        //   ConnectionState.done,
+        //   List.generate(
+        //     requests.length,
+        //     (index) => {
+        //       'statusCode': 200,
+        //       'probability': (index + 2).toDouble(),
+        //       'id': requests[index].id,
+        //     },
+        //   ),
+        // );
         responses = snapshot.data;
 
         if (snapshot.hasData) {

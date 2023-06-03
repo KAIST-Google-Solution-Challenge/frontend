@@ -39,7 +39,6 @@ dependencies:
     permission_handler: ^10.2.0
     path_provider: ^2.0.13
     call_log: ^4.0.0
-    telephony: ^0.2.0
     contacts_service: ^0.6.3
     url_launcher: ^6.1.10
     flutter_background_service: ^2.4.6
@@ -49,6 +48,9 @@ dependencies:
     phone_state: ^1.0.0
     google_sign_in: ^6.0.2
     material_color_utilities: ^0.5.0
+    telephony:
+        git:
+            url: https://github.com/KAIST-Google-Solution-Challenge/Telephony.git
 
 dev_dependencies:
     flutter_test:
