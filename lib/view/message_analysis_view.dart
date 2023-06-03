@@ -340,9 +340,10 @@ class _MessageAnalysisViewState extends State<MessageAnalysisView> {
         //     },
         //   ),
         // );
-        responses = snapshot.data;
 
         if (snapshot.hasData) {
+          responses = snapshot.data;
+
           if (responses!.isNotEmpty) {
             int statusCode = responses![0]['statusCode'];
 
