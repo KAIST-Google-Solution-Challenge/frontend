@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:telephony/telephony.dart';
 import 'package:the_voice/controller/message_controller.dart';
 import 'package:the_voice/provider/setting_provider.dart';
+import 'package:the_voice/util/constant.dart';
 import 'package:the_voice/view/message_analysis_dialog_view.dart';
 
 class MessageView extends StatefulWidget {
@@ -58,8 +59,8 @@ class BuildListTile extends StatelessWidget {
 
     String title =
         lastMessage.name! != '' ? lastMessage.name! : lastMessage.address!;
-    String subtitle = lastMessage.body!.length > 8
-        ? '${lastMessage.body!.substring(0, 8)}...'
+    String subtitle = lastMessage.body!.length > MESSAGE_VIEW_CROP
+        ? '${lastMessage.body!.substring(0, MESSAGE_VIEW_CROP)}...'
         : lastMessage.body!;
     String trailing = DateTime.fromMillisecondsSinceEpoch(lastMessage.date!)
         .toIso8601String()
